@@ -4,7 +4,7 @@ FSM coarse-stage experiment: Day x Jukna.
 Builds a residue-automaton path family, attaches Day-style coarse
 approximations with FSM-dependent intercepts, and measures both
 the exact H/V/D error and the Jukna-type combinatorial structure
-(Sidon / cover-free subsets) of the path incidence vectors.
+of the induced Day-pattern vector family.
 
 Run from project root:  ./sagew experiments/fsm_coarse.sage
 """
@@ -19,6 +19,26 @@ load(os.path.join(_root, 'lib', 'jukna.sage'))
 from collections import defaultdict
 
 
+# ── Helpers ─────────────────────────────────────────────────────────────
+
+_BEST_SINGLE_CACHE = {}
+
+
+def best_single_baseline(q, depth, p, qpow):
+    """Cache the best single-intercept baseline for a given case."""
+    key = (q, depth, p, qpow)
+    if key not in _BEST_SINGLE_CACHE:
+        _, paths, _ = residue_paths(q, depth)
+        _BEST_SINGLE_CACHE[key] = best_single_intercept(paths, p, qpow)
+    return _BEST_SINGLE_CACHE[key]
+
+
+def subset_size_str(greedy_size, exact_size):
+    """Render greedy/exact subset sizes compactly."""
+    exact_str = "-" if exact_size is None else str(exact_size)
+    return f"{greedy_size}/{exact_str}"
+
+
 # ── Measurement ─────────────────────────────────────────────────────────
 
 def run_experiment(q, depth, p, qpow, policy_name='zero', policy_kwargs=None):
@@ -30,9 +50,7 @@ def run_experiment(q, depth, p, qpow, policy_name='zero', policy_kwargs=None):
         policy_kwargs = {}
 
     edges, paths, edge_index = residue_paths(q, depth)
-    vecs = [P["vec"] for P in paths]
     n_paths = len(paths)
-    n_edges = len(edges)
     alpha_q = QQ(p) / QQ(qpow)
 
     policy = build_intercept_policy(policy_name, q, depth, alpha_q, **policy_kwargs)
@@ -44,19 +62,10 @@ def run_experiment(q, depth, p, qpow, policy_name='zero', policy_kwargs=None):
     intercept_max = max(intercepts)
     intercept_span = intercept_max - intercept_min
 
-    # Jukna diagnostics
-    full_sidon = is_sidon(vecs)
-    sidon_sub = greedy_sidon_subset(vecs)
-    sidon_size = len(sidon_sub)
-
-    cf_size = None
-    if n_paths <= 256:
-        cf_sub = greedy_cover_free_subset(vecs)
-        cf_size = len(cf_sub)
-
-    exact_worst, exact_ratio, cell_data = global_exact_error(
-        paths, p, qpow, c0_rat, delta_rat, q
-    )
+    best_single = best_single_baseline(q, depth, p, qpow)
+    exact_metrics = global_exact_metrics(paths, p, qpow, c0_rat, delta_rat, q)
+    active_family = build_active_pattern_family(paths, p, qpow, c0_rat, delta_rat, q)
+    family_summary = summarize_vector_family(list(active_family["unique_vectors"]))
 
     # Terminal-state distribution
     terminal_counts = defaultdict(int)
@@ -72,33 +81,60 @@ def run_experiment(q, depth, p, qpow, policy_name='zero', policy_kwargs=None):
         "policy": policy["name"],
         "policy_description": policy["description"],
         "n_paths": n_paths,
-        "n_edges": n_edges,
-        "full_sidon": full_sidon,
-        "sidon_subset_size": sidon_size,
-        "cover_free_subset_size": cf_size,
+        "pattern_family_size": len(active_family["unique_vectors"]),
+        "pattern_dimension": len(active_family["coordinate_keys"]),
+        "pattern_multiplicities": active_family["multiplicities"],
+        "full_sidon": family_summary["full_sidon"],
+        "sumset_size": family_summary["sumset_size"],
+        "pair_collision_count": family_summary["pair_collision_count"],
+        "additive_energy": family_summary["additive_energy"],
+        "greedy_sidon_subset_size": family_summary["greedy_sidon_subset_size"],
+        "exact_sidon_subset_size": family_summary["exact_sidon_subset_size"],
+        "greedy_cover_free_subset_size": family_summary["greedy_cover_free_subset_size"],
+        "exact_cover_free_subset_size": family_summary["exact_cover_free_subset_size"],
         "c0": float(c0_rat),
         "intercept_min": float(intercept_min),
         "intercept_max": float(intercept_max),
         "intercept_span": float(intercept_span),
         "unique_intercepts": len(set(intercepts)),
-        "exact_worst_log2err": exact_worst,
-        "exact_log2_ratio": exact_ratio,
-        "cell_data": cell_data,
+        "best_single_c0": float(best_single["c0_rat"]),
+        "best_single_worst_log2err": best_single["worst_abs"],
+        "best_single_union_log2_ratio": best_single["union_log2_ratio"],
+        "policy_improve_over_best_single": (
+            best_single["worst_abs"] - exact_metrics["worst_abs"]
+        ),
+        "exact_worst_log2err": exact_metrics["worst_abs"],
+        "exact_max_cell_log2_ratio": exact_metrics["max_cell_log2_ratio"],
+        "exact_union_log2_ratio": exact_metrics["union_log2_ratio"],
+        "cell_data": exact_metrics["cell_data"],
         "terminal_distribution": dict(terminal_counts),
+        "active_family": active_family,
     }
 
 
 def print_row(result):
-    cf_str = str(result["cover_free_subset_size"]) if result["cover_free_subset_size"] is not None else "-"
+    sidon_str = subset_size_str(
+        result["greedy_sidon_subset_size"],
+        result["exact_sidon_subset_size"],
+    )
+    cf_str = subset_size_str(
+        result["greedy_cover_free_subset_size"],
+        result["exact_cover_free_subset_size"],
+    )
     print(f"  pol={result['policy']:<13}  q={result['q']:>2}  d={result['depth']:>2}  "
-          f"paths={result['n_paths']:>5}  edges={result['n_edges']:>4}  "
+          f"paths={result['n_paths']:>5}  pat#={result['pattern_family_size']:>4}  "
+          f"dim={result['pattern_dimension']:>4}  "
           f"c#={result['unique_intercepts']:>4}  "
           f"cspan={result['intercept_span']:.6f}  "
+          f"sum={result['sumset_size']:>5}  "
+          f"coll={result['pair_collision_count']:>5}  "
+          f"E={result['additive_energy']:>6}  "
           f"sidon={'Y' if result['full_sidon'] else 'N'}  "
-          f"s_sub={result['sidon_subset_size']:>4}  "
-          f"cf={cf_str:>4}  "
+          f"s={sidon_str:>7}  "
+          f"cf={cf_str:>7}  "
+          f"single={result['best_single_worst_log2err']:.6f}  "
           f"err={result['exact_worst_log2err']:.6f}  "
-          f"ratio={result['exact_log2_ratio']:.6f}")
+          f"union={result['exact_union_log2_ratio']:.6f}")
 
 
 # ── Validation ──────────────────────────────────────────────────────────
@@ -237,9 +273,8 @@ def main():
     print("Exact evaluator: breakpoints are u-integer crossings (Day H-grid),")
     print("stationary points are Day D-candidates.  V-grid absent inside [1,2).")
     print()
-    print("Current policy layer exposes path-dependent intercept families.")
-    print("Next question: which rational policy/search class actually improves")
-    print("Day error while preserving interesting Jukna structure?")
+    print("Reported combinatorics now come from the induced Day-pattern family,")
+    print("with best-single-intercept and union-level baselines included.")
     print("=" * 80)
 
 

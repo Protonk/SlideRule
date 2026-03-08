@@ -20,6 +20,8 @@ D-candidate on a segment where floor(u) = k:
     x_plog_D = (c - k) / (1 + alpha)
 """
 
+import math
+
 # High-precision reals — used for transcendental evaluation.
 # Breakpoint locations are computed in exact QQ arithmetic.
 HiR = RealField(200)
@@ -40,6 +42,12 @@ def pexp(t):
     t = HiR(t)
     e = floor(t)
     return HiR(2)**e * (1 + (t - e))
+
+
+def dyadic_rational(value, bits=20):
+    """Round a scalar to the nearest dyadic rational with denominator 2^bits."""
+    scale = 2**bits
+    return QQ(round(float(value) * scale)) / QQ(scale)
 
 
 # ── Dyadic cells ────────────────────────────────────────────────────────
@@ -160,6 +168,22 @@ def cell_breakpoints(bits, p_num, q_den, c_rat):
     return sorted(set(points))
 
 
+def breakpoint_label(x_plog, plog_lo, plog_hi, p_num, q_den, c_rat):
+    """Label a breakpoint as a boundary or Day H-candidate."""
+    alpha_q = QQ(p_num) / QQ(q_den)
+    u = QQ(c_rat) - alpha_q * QQ(x_plog)
+    if x_plog == plog_lo:
+        return ('B', 'L', Integer(floor(u)))
+    if x_plog == plog_hi:
+        return ('B', 'R', Integer(floor(u)))
+    return ('H', Integer(u))
+
+
+def _token_key(token):
+    """Deterministic ordering key for candidate labels."""
+    return repr(token)
+
+
 def log2_z_at(x_plog, p_num, q_den, c_rat):
     """
     Evaluate log2(z) at a single plog-domain point.
@@ -220,6 +244,82 @@ def cell_exact_logerr(bits, p_num, q_den, c_rat):
     return float(log2_zmin), float(log2_zmax), float(worst), float(ratio)
 
 
+def cell_active_pattern(bits, p_num, q_den, c_rat):
+    """
+    Extract an exact Day-induced signature for one leaf cell.
+
+    The signature records:
+      * indexed breakpoint labels
+      * indexed segment min/max active-candidate pairs
+    """
+    alpha_q = QQ(p_num) / QQ(q_den)
+    c = QQ(c_rat)
+    plog_lo, plog_hi = dyadic_cell_plog(bits)
+    breakpoints = cell_breakpoints(bits, p_num, q_den, c_rat)
+
+    breakpoint_coords = []
+    segment_coords = []
+    segment_data = []
+
+    for idx, bp in enumerate(breakpoints):
+        breakpoint_coords.append(('BP', idx, breakpoint_label(
+            bp, plog_lo, plog_hi, p_num, q_den, c_rat
+        )))
+
+    for idx in range(len(breakpoints) - 1):
+        seg_lo = breakpoints[idx]
+        seg_hi = breakpoints[idx + 1]
+        seg_mid = (seg_lo + seg_hi) / 2
+
+        left_label = breakpoint_label(seg_lo, plog_lo, plog_hi, p_num, q_den, c_rat)
+        right_label = breakpoint_label(seg_hi, plog_lo, plog_hi, p_num, q_den, c_rat)
+
+        values = [
+            (left_label, float(log2_z_at(seg_lo, p_num, q_den, c_rat))),
+            (right_label, float(log2_z_at(seg_hi, p_num, q_den, c_rat))),
+        ]
+
+        u_mid = c - alpha_q * seg_mid
+        k = floor(u_mid)
+        xp_D = (c - QQ(k)) / (1 + alpha_q)
+        if seg_lo < xp_D < seg_hi:
+            d_label = ('D', Integer(k))
+            values.append((d_label, float(log2_z_at(xp_D, p_num, q_den, c_rat))))
+
+        min_label, min_value = min(values, key=lambda item: (item[1], _token_key(item[0])))
+        max_label, max_value = max(values, key=lambda item: (item[1], _token_key(item[0])))
+
+        segment_token = ('SEG', idx, min_label, max_label)
+        segment_coords.append(segment_token)
+        segment_data.append({
+            "index": idx,
+            "segment": (seg_lo, seg_hi),
+            "min_label": min_label,
+            "max_label": max_label,
+            "min_value": min_value,
+            "max_value": max_value,
+        })
+
+    coords = tuple(breakpoint_coords + segment_coords)
+
+    return {
+        "breakpoints": tuple(breakpoints),
+        "breakpoint_coords": tuple(breakpoint_coords),
+        "segment_coords": tuple(segment_coords),
+        "coords": coords,
+        "segments": tuple(segment_data),
+    }
+
+
+def active_pattern_vector(bits, p_num, q_den, c_rat, coordinate_index):
+    """Encode the exact active-pattern signature as a 0-1 vector."""
+    pattern = cell_active_pattern(bits, p_num, q_den, c_rat)
+    vec = [0] * len(coordinate_index)
+    for coord in pattern["coords"]:
+        vec[coordinate_index[coord]] = 1
+    return vector(ZZ, vec)
+
+
 def global_exact_error(paths, p_num, q_den, c0_rat, delta_rat, q):
     """
     Exact worst-case error and zmax/zmin ratio over all leaf cells.
@@ -242,3 +342,167 @@ def global_exact_error(paths, p_num, q_den, c0_rat, delta_rat, q):
             worst_ratio = cell_ratio
 
     return worst_abs, worst_ratio, cell_data
+
+
+def global_exact_metrics(paths, p_num, q_den, c0_rat, delta_rat, q):
+    """
+    Global metrics across the union of all leaf cells.
+
+    Returns a dict containing:
+      * worst_abs              -- sup norm of |log2(z)| over all leaves
+      * max_cell_log2_ratio    -- max cellwise log2(zmax/zmin)
+      * union_log2_zmin        -- global min over the union of leaves
+      * union_log2_zmax        -- global max over the union of leaves
+      * union_log2_ratio       -- true global log2(zmax/zmin)
+      * cell_data              -- per-cell tuples
+    """
+    worst_abs = 0.0
+    max_cell_ratio = 0.0
+    union_log2_zmin = None
+    union_log2_zmax = None
+    cell_data = []
+
+    for P in paths:
+        c = path_intercept(P["bits"], c0_rat, delta_rat, q)
+        zmin, zmax, cell_worst, cell_ratio = cell_exact_logerr(
+            P["bits"], p_num, q_den, c
+        )
+        cell_data.append((P["bits"], zmin, zmax, cell_worst, cell_ratio))
+
+        if cell_worst > worst_abs:
+            worst_abs = cell_worst
+        if cell_ratio > max_cell_ratio:
+            max_cell_ratio = cell_ratio
+        if union_log2_zmin is None or zmin < union_log2_zmin:
+            union_log2_zmin = zmin
+        if union_log2_zmax is None or zmax > union_log2_zmax:
+            union_log2_zmax = zmax
+
+    return {
+        "worst_abs": float(worst_abs),
+        "max_cell_log2_ratio": float(max_cell_ratio),
+        "union_log2_zmin": float(union_log2_zmin),
+        "union_log2_zmax": float(union_log2_zmax),
+        "union_log2_ratio": float(union_log2_zmax - union_log2_zmin),
+        "cell_data": cell_data,
+    }
+
+
+def build_active_pattern_family(paths, p_num, q_den, c0_rat, delta_rat, q):
+    """
+    Build the Day-induced vector family from exact active-pattern signatures.
+
+    Returns a dict with coordinates, per-path pattern data, and the deduplicated
+    0-1 vector family used for additive diagnostics.
+    """
+    pattern_rows = []
+    all_coords = []
+
+    for P in paths:
+        c = path_intercept(P["bits"], c0_rat, delta_rat, q)
+        pattern = cell_active_pattern(P["bits"], p_num, q_den, c)
+        pattern_rows.append({
+            "bits": P["bits"],
+            "intercept": c,
+            "pattern": pattern,
+        })
+        all_coords.extend(pattern["coords"])
+
+    coordinate_keys = sorted(set(all_coords), key=repr)
+    coordinate_index = {coord: idx for idx, coord in enumerate(coordinate_keys)}
+
+    unique_vectors = []
+    unique_index = {}
+    unique_rows = []
+    multiplicities = []
+
+    for row in pattern_rows:
+        vec = active_pattern_vector(row["bits"], p_num, q_den, row["intercept"], coordinate_index)
+        key = tuple(vec)
+        if key in unique_index:
+            multiplicities[unique_index[key]] += 1
+            continue
+        unique_index[key] = len(unique_vectors)
+        unique_vectors.append(vec)
+        multiplicities.append(1)
+        unique_rows.append({
+            "bits": row["bits"],
+            "intercept": row["intercept"],
+            "pattern": row["pattern"],
+            "vector": vec,
+        })
+
+    return {
+        "coordinate_keys": tuple(coordinate_keys),
+        "coordinate_index": coordinate_index,
+        "rows": tuple(pattern_rows),
+        "unique_rows": tuple(unique_rows),
+        "unique_vectors": tuple(unique_vectors),
+        "multiplicities": tuple(multiplicities),
+    }
+
+
+def _golden_section_minimize(func, lo, hi, tol=1e-12, maxiter=200):
+    """Simple bounded scalar minimization without external dependencies."""
+    phi = (math.sqrt(5.0) - 1.0) / 2.0
+    a = float(lo)
+    b = float(hi)
+    c = b - phi * (b - a)
+    d = a + phi * (b - a)
+    fc = func(c)
+    fd = func(d)
+
+    for _ in range(maxiter):
+        if abs(b - a) <= tol:
+            break
+        if fc <= fd:
+            b = d
+            d = c
+            fd = fc
+            c = b - phi * (b - a)
+            fc = func(c)
+        else:
+            a = c
+            c = d
+            fc = fd
+            d = a + phi * (b - a)
+            fd = func(d)
+
+    x_opt = (a + b) / 2.0
+    return x_opt, func(x_opt)
+
+
+def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0, dyadic_bits=20):
+    """
+    Optimize a single global intercept c with delta = 0.
+
+    This is the correct baseline against which shared-delta FSM policies
+    should be compared.
+    """
+    alpha_q = QQ(p_num) / QQ(q_den)
+    if c_init is None:
+        c_init = float(QQ(1 - alpha_q) / 2)
+
+    def objective(c_val):
+        metrics = global_exact_metrics(
+            paths, p_num, q_den, dyadic_rational(c_val, dyadic_bits), None, 1
+        )
+        return metrics["worst_abs"]
+
+    c_float, _ = _golden_section_minimize(
+        objective,
+        c_init - span,
+        c_init + span,
+        tol=1e-12,
+        maxiter=250,
+    )
+    c_opt = dyadic_rational(c_float, dyadic_bits)
+    metrics = global_exact_metrics(paths, p_num, q_den, c_opt, None, 1)
+
+    return {
+        "c0_rat": c_opt,
+        "worst_abs": metrics["worst_abs"],
+        "union_log2_ratio": metrics["union_log2_ratio"],
+        "max_cell_log2_ratio": metrics["max_cell_log2_ratio"],
+        "metrics": metrics,
+    }

@@ -37,7 +37,9 @@ def optimal_cell_intercept(bits, p_num, q_den, c_init=None):
         args=(bits, p_num, q_den),
         options={'xatol': 1e-15},
     )
-    return res.x, res.fun
+    c_opt = dyadic_rational(res.x, bits=20)
+    _, _, worst, _ = cell_exact_logerr(bits, p_num, q_den, c_opt)
+    return c_opt, worst
 
 
 def free_per_cell_optimum(depth, p_num, q_den):
@@ -50,44 +52,75 @@ def free_per_cell_optimum(depth, p_num, q_den):
     """
     c_init = float(QQ(1 - QQ(p_num) / QQ(q_den)) / 2)
 
-    results = []
-    global_worst = 0.0
+    metrics = free_per_cell_metrics(depth, p_num, q_den)
+    return metrics["worst_abs"], [
+        (row["bits"], row["c_opt"], row["cell_worst"]) for row in metrics["rows"]
+    ]
+
+
+def free_per_cell_metrics(depth, p_num, q_den):
+    """
+    Per-cell optimum metrics under independent intercepts.
+
+    Returns a dict with the global sup norm, the induced union-level ratio,
+    and per-cell optimized rows.
+    """
+    c_init = float(QQ(1 - QQ(p_num) / QQ(q_den)) / 2)
+
+    rows = []
+    worst_abs = 0.0
+    union_log2_zmin = None
+    union_log2_zmax = None
 
     for bits in iproduct((0, 1), repeat=depth):
         c_opt, w = optimal_cell_intercept(bits, p_num, q_den, c_init=c_init)
-        results.append((bits, c_opt, w))
-        if w > global_worst:
-            global_worst = w
+        zmin, zmax, cell_worst, cell_ratio = cell_exact_logerr(bits, p_num, q_den, c_opt)
+        rows.append({
+            "bits": bits,
+            "c_opt": c_opt,
+            "zmin": zmin,
+            "zmax": zmax,
+            "cell_worst": cell_worst,
+            "cell_ratio": cell_ratio,
+        })
+        if cell_worst > worst_abs:
+            worst_abs = cell_worst
+        if union_log2_zmin is None or zmin < union_log2_zmin:
+            union_log2_zmin = zmin
+        if union_log2_zmax is None or zmax > union_log2_zmax:
+            union_log2_zmax = zmax
 
-    return global_worst, results
+    return {
+        "worst_abs": worst_abs,
+        "union_log2_zmin": union_log2_zmin,
+        "union_log2_zmax": union_log2_zmax,
+        "union_log2_ratio": union_log2_zmax - union_log2_zmin,
+        "rows": rows,
+    }
 
 
 # ── Shared-delta optimization ───────────────────────────────────────────
 
-def _unpack_params(params, q):
+def _unpack_params(params, q, dyadic_bits=12):
     """Unpack flat float vector -> (c0 as QQ, delta dict of QQ)."""
-    c0 = QQ(params[0])
+    c0 = dyadic_rational(params[0], bits=dyadic_bits)
     delta = {}
     for r in range(q):
         for b in (0, 1):
-            delta[(r, b)] = QQ(params[1 + 2*r + b])
+            delta[(r, b)] = dyadic_rational(params[1 + 2*r + b], bits=dyadic_bits)
     return c0, delta
 
 
-def _shared_objective(params, paths, p_num, q_den, q):
+def _shared_objective(params, paths, p_num, q_den, q, dyadic_bits):
     """Minimax: max over cells of cell worst |log2(z)|."""
-    c0, delta = _unpack_params(params, q)
-    worst = 0.0
-    for P in paths:
-        c = path_intercept(P["bits"], c0, delta, q)
-        _, _, cell_worst, _ = cell_exact_logerr(P["bits"], p_num, q_den, c)
-        if cell_worst > worst:
-            worst = cell_worst
-    return worst
+    c0, delta = _unpack_params(params, q, dyadic_bits=dyadic_bits)
+    metrics = global_exact_metrics(paths, p_num, q_den, c0, delta, q)
+    return metrics["worst_abs"]
 
 
 def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
-                          maxiter=5000, n_restarts=3, seed=42):
+                          maxiter=5000, n_restarts=3, seed=42,
+                          dyadic_bits=12):
     """
     Optimize c0 and delta[(r,b)] to minimize worst-case error
     over all leaf cells.
@@ -119,7 +152,7 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
         res = scipy_minimize(
             _shared_objective,
             x0,
-            args=(paths, p_num, q_den, q),
+            args=(paths, p_num, q_den, q, dyadic_bits),
             method='Nelder-Mead',
             options={'maxiter': maxiter, 'xatol': 1e-12, 'fatol': 1e-10,
                      'adaptive': True},
@@ -130,7 +163,8 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
             best_fun = res.fun
             best_result = res
 
-    c0_opt, delta_opt = _unpack_params(best_result.x, q)
+    c0_opt, delta_opt = _unpack_params(best_result.x, q, dyadic_bits=dyadic_bits)
+    metrics = global_exact_metrics(paths, p_num, q_den, c0_opt, delta_opt, q)
 
     # Compute unique intercepts under the optimized policy
     intercepts = set()
@@ -141,11 +175,15 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
     return {
         "name": "optimized",
         "description": (f"minimax optimized (q={q}, d={depth}, "
-                        f"{total_evals} evals, {n_restarts} restarts)"),
+                        f"{total_evals} evals, {n_restarts} restarts, "
+                        f"dyadic_bits={dyadic_bits})"),
         "c0_rat": c0_opt,
         "delta_rat": delta_opt,
-        "worst_err": best_fun,
+        "worst_err": metrics["worst_abs"],
+        "union_log2_ratio": metrics["union_log2_ratio"],
+        "max_cell_log2_ratio": metrics["max_cell_log2_ratio"],
         "n_evals": total_evals,
         "converged": best_result.success,
         "unique_intercepts": n_unique,
+        "metrics": metrics,
     }
