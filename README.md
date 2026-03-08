@@ -17,6 +17,7 @@ smale/
 ├── sagew                        # Sage runner (wraps macOS cask)
 ├── lib/
 │   ├── paths.sage               # Layer 1: residue automaton, path vectors
+│   ├── policies.sage            # Layer 1.5: path-dependent intercept policies
 │   ├── day.sage                 # Layer 2: plog/pexp, exact H/V/D evaluator
 │   ├── jukna.sage               # Layer 3: Sidon / cover-free diagnostics
 │   └── trajectory.py            # Day trajectory analysis (pure Python, standalone)
@@ -36,7 +37,7 @@ All commands from project root:
 
 ```sh
 # main experiment
-sage experiments/fsm_coarse.sage
+./sagew experiments/fsm_coarse.sage
 
 # trajectory analysis (pure Python, no Sage needed)
 python3 lib/trajectory.py
@@ -44,5 +45,8 @@ python3 lib/trajectory.py
 # sage REPL
 ./sagew
 ```
+
+`experiments/fsm_coarse.sage` now compares several named intercept policies:
+`zero`, `state_bit`, `terminal_bias`, and `hand_tuned` (currently for `q=3`).
 
 Project-local Sage state is stored in `.sage/`.

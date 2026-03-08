@@ -71,6 +71,25 @@ def dyadic_cell_plog(bits):
 
 # ── FSM intercept ───────────────────────────────────────────────────────
 
+def delta_value(delta, layer, state, bit):
+    """
+    Resolve a policy correction.
+
+    Supported dictionary layouts:
+      * delta[(state, bit)]         -- layer-invariant correction
+      * delta[(layer, state, bit)]  -- layer-dependent correction
+
+    Missing entries default to 0.
+    """
+    if delta is None:
+        return QQ(0)
+    if (layer, state, bit) in delta:
+        return QQ(delta[(layer, state, bit)])
+    if (state, bit) in delta:
+        return QQ(delta[(state, bit)])
+    return QQ(0)
+
+
 def path_intercept(bits, c0, delta, q):
     """
     Walk the residue automaton, accumulating shared corrections.
@@ -79,15 +98,15 @@ def path_intercept(bits, c0, delta, q):
     ----------
     bits  : tuple of 0/1
     c0    : QQ — base intercept
-    delta : dict (state, bit) -> QQ correction
+    delta : dict keyed by (state, bit) or (layer, state, bit)
     q     : int — automaton modulus
 
     Returns QQ intercept for this path.
     """
     c = QQ(c0)
     r = 0
-    for b in bits:
-        c += QQ(delta[(r, b)])
+    for t, b in enumerate(bits):
+        c += delta_value(delta, t, r, b)
         r = (2*r + b) % q
     return c
 
