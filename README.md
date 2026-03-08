@@ -2,35 +2,51 @@
 
 FSM-parameterised coarse-stage approximations meet tropical complexity.
 
-Day's FRSR analysis gives an exact finite candidate set (H/V/D) for the
-error extrema of piecewise-linear coarse approximations to `x^(p/q)`.
-This project replaces Day's single global intercept `c` with a
-finite-state machine that reads mantissa bits, producing a
-prefix-dependent intercept per dyadic cell.  The resulting path family
-induces a Day-pattern vector family whose Jukna-type combinatorial
-structure (Sidon subsets, cover-free subsets, additive collisions,
-sumsets, additive energy) we measure.
+Day's FRSR analysis gives an exact finite candidate set for the extrema of
+piecewise-linear coarse approximations to `x^(p/q)`. This project replaces
+Day's single global intercept `c` with a finite-state machine that reads
+mantissa bits and produces a prefix-dependent intercept on each dyadic cell.
+
+The repo now studies three connected objects:
+
+1. A residue automaton path family over mantissa prefixes.
+2. An exact Day-style coarse-stage evaluator on each leaf cell.
+3. The induced Day-pattern vector family, on which Jukna-style additive
+   diagnostics are computed.
+
+The central question is no longer just whether an FSM policy improves Day's
+error, but whether the policy-induced active-pattern family acquires
+meaningful additive structure at the same time.
+
+## Documentation
+
+- [`lib/README.md`](lib/README.md): module graph, data contracts, and numerical caveats.
+- [`experiments/README.md`](experiments/README.md): experiment drivers, output columns, and runtime notes.
 
 ## Layout
 
 ```
 smale/
-├── sagew                        # Sage runner (wraps macOS cask)
+├── sagew
+├── README.md
+├── LAUNCHPAD-PLAN.md
 ├── lib/
-│   ├── paths.sage               # Layer 1: residue automaton, path vectors
-│   ├── policies.sage            # Layer 1.5: path-dependent intercept policies
-│   ├── day.sage                 # Layer 2: plog/pexp, exact H/V/D evaluator
-│   ├── jukna.sage               # Layer 3: Sidon / cover-free diagnostics
-│   ├── optimize.sage            # Dyadic shared-delta and free-per-cell optimization
-│   └── trajectory.py            # Day trajectory analysis (pure Python, standalone)
+│   ├── README.md
+│   ├── paths.sage
+│   ├── policies.sage
+│   ├── day.sage
+│   ├── jukna.sage
+│   ├── optimize.sage
+│   └── trajectory.py
 ├── experiments/
-│   ├── fsm_coarse.sage          # Main experiment: Day × Jukna measurement
-│   ├── optimize_delta.sage      # Optimization sweep with corrected baselines
-│   └── smoke_test.sage          # Wrapper around the project test suite
+│   ├── README.md
+│   ├── fsm_coarse.sage
+│   ├── optimize_delta.sage
+│   └── smoke_test.sage
 ├── tests/
-│   └── run_tests.sage           # Project tests
+│   └── run_tests.sage
 └── sources/
-    ├── day_2022_frsr.pdf         # Day — generalising the FRSR algorithm
+    ├── day_2022_frsr.pdf
     ├── jukna_2016_tropical_sidon.pdf
     ├── rojas_2013_ultrametric.pdf
     └── koiran_portier_rojas_2024_tropical_permanent.pdf
@@ -38,38 +54,40 @@ smale/
 
 ## Running
 
-All commands from project root:
+All commands below are run from project root.
 
 ```sh
-# main experiment
 ./sagew experiments/fsm_coarse.sage
-
-# optimization sweep
 ./sagew experiments/optimize_delta.sage
-
-# trajectory analysis (pure Python, no Sage needed)
 python3 lib/trajectory.py
-
-# project tests
 ./sagew tests/run_tests.sage
-
-# sage REPL
 ./sagew
 ```
 
-## Current Experiment Shape
+## Current Shape
 
-- `experiments/fsm_coarse.sage` compares several named intercept policies:
-  `zero`, `state_bit`, `terminal_bias`, and `hand_tuned` (currently for `q=3`).
-- Coarse-stage metrics now include:
-  `best_single_c`, worst-case `max |log2(z)|`, max cell ratio, and the true
-  union-level `log2(zmax/zmin)` over all leaves.
-- The combinatorial object is the induced Day-pattern family, not the raw
-  automaton path family.
-- Small-instance Sidon and cover-free subset sizes are certified exactly; the
-  greedy routines remain available and are still reported alongside them.
-- `experiments/optimize_delta.sage` uses dyadic-quantized shared-delta search
-  and compares optimized policies against the best single intercept and the
-  free-per-cell lower bound.
+- [`experiments/fsm_coarse.sage`](experiments/fsm_coarse.sage) is the main
+  coupled experiment. It evaluates named intercept policies, computes exact
+  coarse-stage metrics, and measures combinatorics on the induced Day-pattern
+  family rather than on raw path vectors.
+- [`experiments/optimize_delta.sage`](experiments/optimize_delta.sage) compares
+  three baselines for each `(q, depth)` case: best single intercept,
+  optimized shared-delta policy, and free-per-cell lower bound.
+- Exact global metrics include worst-case `max |log2(z)|`, max cellwise
+  `log2(zmax/zmin)`, and the true union-level `log2(zmax/zmin)` over all leaves.
+- Small-instance Sidon and cover-free subset sizes are certified exactly.
+  Greedy sizes are still reported alongside the exact optima.
+
+## Dependencies And Runtime
+
+- SageMath is required for the `.sage` drivers.
+- The optimizer in [`lib/optimize.sage`](lib/optimize.sage) uses `numpy` and
+  `scipy.optimize.linprog`.
+- [`experiments/fsm_coarse.sage`](experiments/fsm_coarse.sage) is the fast
+  entry point. [`experiments/optimize_delta.sage`](experiments/optimize_delta.sage)
+  is the expensive sweep.
+- The minimax optimizer is implemented as float bisection plus LP feasibility,
+  followed by dyadic snapping of the returned parameters. Treat it as a strong
+  numerical solver, not a fully certified rational optimum.
 
 Project-local Sage state is stored in `.sage/`.
