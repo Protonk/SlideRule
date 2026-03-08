@@ -1,9 +1,11 @@
 """
 Optimize shared delta and compare against baselines.
 
+Uses bisection+LP minimax solver (exact) by default.
+
 For each (q, depth), reports:
   single_err — best single shared intercept (delta = 0)
-  opt_err    — optimized shared delta
+  opt_err    — optimized shared delta (bisection+LP minimax)
   free_err   — per-cell independent optimum (lower bound)
   improve    — single_err - opt_err  (how much the FSM helps)
   gap        — opt_err - free_err  (cost of the sharing constraint)
@@ -30,7 +32,7 @@ def subset_size_str(greedy_size, exact_size):
 
 def main():
     print("=" * 100)
-    print("Shared-delta optimization: Day x Jukna")
+    print("Shared-delta optimization: Day x Jukna (bisection+LP minimax)")
     print("=" * 100)
 
     p_num, q_den = 1, 2
@@ -52,7 +54,7 @@ def main():
               f"{'single_u':>10}  {'opt_u':>10}  {'free_u':>10}  "
               f"{'improve':>9}  {'gap':>10}  "
               f"{'pat#':>4}  {'sum':>5}  {'s':>7}  {'cf':>7}  "
-              f"{'evals':>6}  {'time':>5}")
+              f"{'steps':>6}  {'time':>5}")
     print(header)
     print("-" * len(header))
 

@@ -94,12 +94,44 @@ def test_exact_combinatorics():
 def test_optimizer_smoke():
     _, paths, _ = residue_paths(1, 2)
     best = best_single_intercept(paths, 1, 2)
-    opt = optimize_shared_delta(1, 2, 1, 2, maxiter=40, n_restarts=1, dyadic_bits=8)
+    opt = optimize_shared_delta(1, 2, 1, 2, maxiter=40, n_restarts=1, dyadic_bits=8,
+                                method='nelder-mead')
 
     assert_true(opt["unique_intercepts"] >= 1, "optimized policy should expose at least one intercept")
     assert_true(
         opt["worst_err"] <= best["worst_abs"] + 1e-8,
         "shared-delta optimizer should not regress against best single intercept on the smoke case",
+    )
+
+
+def test_minimax_smoke():
+    opt = optimize_shared_delta(1, 2, 1, 2)  # defaults to method='minimax'
+
+    assert_true(opt["unique_intercepts"] >= 1, "minimax should expose at least one intercept")
+    assert_true(opt["converged"], "minimax should report converged")
+    assert_true(opt["worst_err"] > 0, "minimax worst_err should be positive")
+
+
+def test_minimax_beats_nelder_mead():
+    q, depth = 2, 4
+    mm = optimize_shared_delta(q, depth, 1, 2, method='minimax')
+    nm = optimize_shared_delta(q, depth, 1, 2, method='nelder-mead',
+                               maxiter=2000, n_restarts=2, dyadic_bits=12)
+    assert_true(
+        mm["worst_err"] <= nm["worst_err"] + 1e-8,
+        f"minimax ({mm['worst_err']:.8f}) should be no worse than "
+        f"nelder-mead ({nm['worst_err']:.8f})",
+    )
+
+
+def test_minimax_above_free_bound():
+    q, depth = 2, 4
+    mm = optimize_shared_delta(q, depth, 1, 2, method='minimax')
+    free_worst, _ = free_per_cell_optimum(depth, 1, 2)
+    assert_true(
+        mm["worst_err"] >= free_worst - 1e-8,
+        f"minimax ({mm['worst_err']:.8f}) should be >= "
+        f"free-per-cell bound ({free_worst:.8f})",
     )
 
 
@@ -110,6 +142,9 @@ def main():
         ("active_pattern_family", test_active_pattern_family),
         ("exact_combinatorics", test_exact_combinatorics),
         ("optimizer_smoke", test_optimizer_smoke),
+        ("minimax_smoke", test_minimax_smoke),
+        ("minimax_beats_nelder_mead", test_minimax_beats_nelder_mead),
+        ("minimax_above_free_bound", test_minimax_above_free_bound),
     ]
 
     print("=" * 80)
