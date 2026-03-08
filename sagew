@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOT_SAGE_DIR="${DOT_SAGE:-$ROOT_DIR/.sage}"
+
+if [[ -n "${SAGE_BIN:-}" ]]; then
+  SAGE_BIN_PATH="$SAGE_BIN"
+else
+  shopt -s nullglob
+  candidates=(
+    /Applications/SageMath-*.app/Contents/Frameworks/Sage.framework/Versions/Current/venv/bin/sage
+    /opt/homebrew/Caskroom/sage/*/SageMath-*.app/Contents/Frameworks/Sage.framework/Versions/Current/venv/bin/sage
+  )
+  shopt -u nullglob
+
+  SAGE_BIN_PATH=""
+  for candidate in "${candidates[@]}"; do
+    if [[ -x "$candidate" ]]; then
+      SAGE_BIN_PATH="$candidate"
+      break
+    fi
+  done
+fi
+
+if [[ -z "${SAGE_BIN_PATH:-}" ]]; then
+  echo "Could not locate Sage. Set SAGE_BIN to the app bundle's venv/bin/sage path." >&2
+  exit 1
+fi
+
+mkdir -p "$DOT_SAGE_DIR"
+export DOT_SAGE="$DOT_SAGE_DIR"
+SAGE_BIN_DIR="$(dirname "$SAGE_BIN_PATH")"
+SAGE_PYTHON="$SAGE_BIN_DIR/python3"
+export PATH="$SAGE_BIN_DIR:$PATH"
+
+case "${1:-}" in
+  --python|--python3)
+    shift
+    exec "$SAGE_PYTHON" "$@"
+    ;;
+  --pip)
+    shift
+    exec "$SAGE_PYTHON" -m pip "$@"
+    ;;
+  --jupyter)
+    shift
+    exec "$SAGE_PYTHON" -m jupyter "$@"
+    ;;
+  --notebook=jupyterlab)
+    shift
+    exec "$SAGE_PYTHON" -m jupyterlab "$@"
+    ;;
+  --notebook|--notebook=default|--notebook=jupyter)
+    shift
+    exec "$SAGE_PYTHON" -m notebook "$@"
+    ;;
+esac
+
+exec "$SAGE_BIN_PATH" "$@"
