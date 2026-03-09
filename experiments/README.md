@@ -135,193 +135,87 @@ artifacts, not source-of-truth files.
   still useful for quick pure-Python pilot work on the older fixed-intercept
   trajectory question.
 
-## Hypothesis-Driven Test Plan
+## Hypothesis Status and Experiment Roadmap
 
-This repo is now organized around four research hypotheses from the root
-README. The current drivers already cover part of that space, but not all of
-it. This section turns those hypotheses into a concrete experiment queue.
+This repo is organized around four research hypotheses from the root README.
+The first full sweep with the bisection+LP minimax solver was run on
+2024-03-09. Results are summarized here; see the root README for the full
+hypothesis statements and empirical findings.
 
-### H1. Shared FSM structure gives real approximation power
+### H1. Shared FSM structure gives real approximation power — Confirmed, weak
 
-Question:
-does a shared FSM policy beat the best single-intercept Day model by a stable
-margin under a fixed parameter budget?
+Driver: `optimize_delta.sage`
 
-Current driver:
+Key findings (alpha=1/2, 10 cases, q=1..5, depth=4..8):
 
-- `optimize_delta.sage`
+- `improve > 0` in all cases. Best relative gain ~54% at q=5/d=4.
+- Improvement decays with depth at fixed q.
+- `gap >> improve` everywhere: the sharing constraint, not solver weakness, is
+  the bottleneck.
 
-What this driver already measures:
+Open follow-ups:
 
-- `single_err`, `opt_err`, `free_err`
-- `single_u`, `opt_u`, `free_u`
-- `improve = single_err - opt_err`
-- `gap = opt_err - free_err`
-- `Mopt = min max |delta_(r,b)|` at fixed continuous tau
+- Fixed-budget sweep: hold `1 + 2q` constant while depth grows, to measure
+  whether `improve / single_err` stabilizes or decays to zero.
+- Multi-alpha sweeps beyond `alpha = 1/2`.
+- Characterize the structural wall: is it a property of layer-invariant
+  `(state, bit)` parameterization specifically, or of any `O(q)`-parameter
+  shared scheme?
 
-What to add or emphasize next:
+### H2. The policy-induced active-extrema family actually grows — Falsified
 
-- A fixed-budget sweep where the parameter count `1 + 2q` is held fixed while
-  depth grows.
-- Multi-`alpha` sweeps, not just `alpha = 1/2`.
-- Output saved to CSV or JSON so the decay or persistence of `improve` can be
-  plotted directly.
+Driver: `optimize_delta.sage` (pat# column)
 
-Suggested success signal:
+Key finding: `pat# = 2` or `3` in all 10 cases. The minimax objective
+equalizes cells, collapsing their Day-pattern signatures. Sumset sizes are 3–6
+and the full family is trivially Sidon.
 
-- `opt_err < single_err` and `opt_u < single_u` across a stable range of depths
-  for the same parameter budget.
+The minimax objective is structurally antagonistic to pattern diversity. A
+different objective (average error, or diversity-maximizing under an error
+budget) might produce richer families, but that would be a different research
+question.
 
-Suggested falsification signal:
+### H3. The relevant Jukna object is the induced pattern family — Moot
 
-- Improvement appears only in small isolated cases, or tends to zero rapidly as
-  depth grows.
+Moot because `pat# = 2–3` leaves no meaningful additive structure to measure.
 
-Recommended output columns:
+### H4. Tropical-vs-arithmetic compression — Open, less motivated
 
-- `alpha`, `q`, `depth`, `n_params`, `single_err`, `opt_err`, `free_err`,
-  `single_u`, `opt_u`, `free_u`, `improve`, `gap`, `Mopt`, `steps`, `time`
+Not yet tested directly. The LP already operates on `1 + 2q` parameters rather
+than `2^depth` leaves, which is a form of compressed evaluation. But with H2
+falsified, the original motivation (compressing an exponentially growing induced
+family) does not apply.
 
-### H2. The policy-induced active-extrema family actually grows
+### Refined H1 sub-hypotheses
 
-Question:
-does the induced active-pattern family become materially richer under FSM
-policies, or does it collapse to a tiny bounded repertoire?
+See the root README for full statements. Summary:
 
-Current starting points:
+- **H1a**: the gap closes with parameter budget at fixed depth. Test by
+  sweeping q at fixed depth=4. Predicted crossover: `gap < improve` for some q.
+- **H1b**: `improve / single_err` has a nonzero limit as depth grows at fixed
+  q. Test by sweeping depth at fixed q=5.
+- **H1c**: the wall is specific to layer-invariant parameterization. Requires
+  extending the optimizer to layer-dependent `delta[(layer, state, bit)]`.
+- **H1d**: the optimal delta table is nearly sparse. Can be read off existing
+  data with minor reporting additions.
 
-- `fsm_coarse.sage`
-- `lib/trajectory.py`
+### Suggested next experiments
 
-What this test should do:
+Priority order given the current findings:
 
-- For each policy and each leaf, extract an active-pattern signature.
-- Measure the number of distinct signatures and their multiplicities.
-- Compute additive diagnostics on the induced family:
-  `|A + A|`, pair-collision count, additive energy, Sidon size, and cover-free
-  size.
-- Sweep over `q`, depth, and selected `alpha` values.
+1. **H1a+H1b sweep**: a single experiment varying q (1..15+) at depth=4, and
+   depth (4..10+) at q=5, reports `improve`, `gap`, `improve / single_err`,
+   and `gap / (single_err - free_err)`. This is the most important next step.
+2. **H1d sparsity check**: add reporting of per-entry delta magnitudes to the
+   existing sweep. No new optimizer work needed.
+3. **H1c layer-dependent**: extend `optimize_minimax` to support
+   `delta[(layer, state, bit)]` parameterization. Requires expanding the
+   intercept matrix and LP. Medium implementation effort.
+4. **H4 scaling experiment**: lower priority, but the compression of the LP
+   itself is still a clean result worth documenting if time permits.
 
-What is still missing:
-
-- A dedicated growth driver, likely something like
-  `experiments/pattern_growth.sage`.
-- Optional policy sweeps beyond the current named presets and the shared-delta
-  optimizer.
-
-Suggested success signal:
-
-- `pat#`, dimension, or additive statistics show sustained growth with `q`,
-  depth, or policy richness.
-
-Suggested falsification signal:
-
-- `pat#` saturates quickly and the induced families remain tiny even as the path
-  family grows.
-
-Recommended output columns:
-
-- `alpha`, `policy`, `q`, `depth`, `paths`, `pat#`, `dim`, `c#`, `sum`,
-  `coll`, `E`, `sidon_full`, `sidon_size`, `cover_free_size`
-
-### H3. The relevant Jukna object is the induced pattern family, not the raw path family
-
-Question:
-which family tracks approximation quality: raw path-incidence vectors or
-policy-induced active-pattern vectors?
-
-Current driver:
-
-- `fsm_coarse.sage` already computes the induced-family side.
-
-What this test should do:
-
-- For each case and policy, compute additive diagnostics twice:
-  once on raw path vectors and once on induced active-pattern vectors.
-- Compare both diagnostic sets against exact error improvement from the same
-  policy.
-- Report whether raw metrics are policy-invariant while induced metrics move.
-
-What is still missing:
-
-- A side-by-side comparison driver, likely
-  `experiments/object_compare.sage`.
-- A compact correlation summary between combinatorial metrics and
-  approximation improvement.
-
-Suggested success signal:
-
-- Raw-path diagnostics stay essentially fixed under policy changes, while
-  induced-pattern diagnostics move with policy and track `improve`.
-
-Suggested falsification signal:
-
-- Induced metrics are no more policy-sensitive than raw metrics, or neither
-  family correlates with approximation quality.
-
-Recommended output columns:
-
-- `alpha`, `policy`, `q`, `depth`, `improve`, `raw_sum`, `raw_coll`, `raw_E`,
-  `raw_sidon`, `raw_cf`, `ind_sum`, `ind_coll`, `ind_E`, `ind_sidon`, `ind_cf`
-
-### H4. There is a real tropical-vs-arithmetic compression story
-
-Question:
-can a constrained policy class be evaluated or searched in polynomial-size
-state space even when the leaf family grows exponentially?
-
-Current ingredients:
-
-- `paths.sage` for the layered residue automaton
-- `day.sage` for exact local evaluation
-- `optimize.sage` for shared-parameter policy search
-
-What this test should do:
-
-- Pick a sharply defined restricted policy class.
-- Build a DP or shortest-path-style evaluator over compressed states.
-- Compare the DP runtime and state count against full leaf enumeration.
-- Check whether the DP reproduces the exact exhaustive metric on the same cases.
-
-What is still missing:
-
-- A dedicated compression driver, likely `experiments/dp_scaling.sage`.
-- A clearly defined restricted policy family that is rich enough to be
-  interesting but small enough to compress.
-
-Suggested success signal:
-
-- DP state count and runtime scale polynomially in depth while matching the
-  exact leaf-enumeration answer on benchmark cases.
-
-Suggested falsification signal:
-
-- The DP state blows up with depth in the same way as leaf enumeration, or
-  exact agreement requires effectively tracking leaves anyway.
-
-Recommended output columns:
-
-- `alpha`, `policy_class`, `q`, `depth`, `leaves`, `dp_states`, `dp_time`,
-  `enum_time`, `matches_exact`, `worst_err`, `union_ratio`
-
-## Suggested Next Drivers
-
-If the repo grows by one driver per hypothesis, the clean layout is:
-
-- `fsm_coarse.sage`: quick coupled measurement and validation.
-- `optimize_delta.sage`: H1 baseline-vs-shared optimization sweep.
-- `pattern_growth.sage`: H2 induced-family growth sweep.
-- `object_compare.sage`: H3 raw-vs-induced comparison.
-- `dp_scaling.sage`: H4 compression and runtime scaling experiment.
-
-## Suggested Result Artifacts
-
-To make repeated runs comparable, future experiment drivers should save their
-tables in a machine-readable format. A simple convention is:
+Suggested result artifacts:
 
 - `experiments/results/h1_shared_power.csv`
-- `experiments/results/h2_pattern_growth.csv`
-- `experiments/results/h3_object_compare.csv`
-- `experiments/results/h4_dp_scaling.csv`
-
-That keeps the human-readable scripts separate from the archived sweep outputs.
+- `experiments/results/h1a_gap_vs_q.csv`
+- `experiments/results/h1b_depth_scaling.csv`

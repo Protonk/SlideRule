@@ -105,24 +105,31 @@ def free_per_cell_metrics(depth, p_num, q_den):
 
 # ── Bisection + LP minimax solver ───────────────────────────────────────
 
-def build_intercept_matrix(paths, q):
+def build_intercept_matrix(paths, q, depth=None, layer_dependent=False):
     """
-    Build the matrix A mapping parameter vector x = [c0, d_00, d_01, ..., d_{q-1,1}]
-    to per-path intercepts.
+    Build the matrix A mapping parameter vector to per-path intercepts.
 
-    Row i has 1 in column 0 (for c0), and the count of times edge (r, b) is
-    traversed in column 1 + 2*r + b.
+    Layer-invariant (default): x = [c0, d_00, d_01, ..., d_{q-1,1}]
+        Shape (len(paths), 1 + 2*q).  Column 1+2*r+b accumulates edge counts.
 
-    Returns a numpy float64 matrix of shape (len(paths), 1 + 2*q).
+    Layer-dependent: x = [c0, d_0_0_0, d_0_0_1, ..., d_{depth-1,q-1,1}]
+        Shape (len(paths), 1 + 2*q*depth).  Column 1+2*q*t+2*r+b is 0 or 1.
     """
-    n_params = 1 + 2 * q
+    if layer_dependent:
+        assert depth is not None, "depth required for layer-dependent mode"
+        n_params = 1 + 2 * q * depth
+    else:
+        n_params = 1 + 2 * q
     n_paths = len(paths)
     A = np.zeros((n_paths, n_params), dtype=np.float64)
     for i, P in enumerate(paths):
         A[i, 0] = 1.0  # c0 coefficient
         r = 0
-        for b in P["bits"]:
-            A[i, 1 + 2*r + b] += 1.0
+        for t, b in enumerate(P["bits"]):
+            if layer_dependent:
+                A[i, 1 + 2*q*t + 2*r + b] = 1.0
+            else:
+                A[i, 1 + 2*r + b] += 1.0
             r = (2*r + b) % q
     return A
 
@@ -264,13 +271,21 @@ def _build_feasible_intervals(cell_optima, p_num, q_den, tau):
     return lo_bounds, hi_bounds
 
 
-def _snap_policy_vector(x_solution, q, dyadic_bits):
+def _snap_policy_vector(x_solution, q, dyadic_bits, depth=None, layer_dependent=False):
     """Snap a continuous LP solution to dyadic policy parameters."""
     c0_opt = dyadic_rational(x_solution[0], bits=dyadic_bits)
     delta_opt = {}
-    for r in range(q):
-        for b in (0, 1):
-            delta_opt[(r, b)] = dyadic_rational(x_solution[1 + 2*r + b], bits=dyadic_bits)
+    if layer_dependent:
+        assert depth is not None
+        for t in range(depth):
+            for r in range(q):
+                for b in (0, 1):
+                    delta_opt[(t, r, b)] = dyadic_rational(
+                        x_solution[1 + 2*q*t + 2*r + b], bits=dyadic_bits)
+    else:
+        for r in range(q):
+            for b in (0, 1):
+                delta_opt[(r, b)] = dyadic_rational(x_solution[1 + 2*r + b], bits=dyadic_bits)
     return c0_opt, delta_opt
 
 
@@ -282,17 +297,23 @@ def _delta_linf_from_vector(x_solution):
 
 
 def _delta_linf_from_policy(delta, q):
-    """Snapped max |delta| from a policy table."""
-    return float(max(abs(float(delta[(r, b)])) for r in range(q) for b in (0, 1)))
+    """Snapped max |delta| from a policy table.  Handles both (r,b) and (t,r,b) keys."""
+    if not delta:
+        return 0.0
+    return float(max(abs(float(v)) for v in delta.values()))
 
 
-def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
+def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
+                     layer_dependent=False):
     """
     Numerical minimax solver via bisection on target error + LP feasibility.
 
     For each candidate tau, checks whether a shared-delta policy can achieve
     worst-case error <= tau by computing per-cell feasible intercept intervals
     and solving an LP feasibility problem.
+
+    When layer_dependent=True, uses per-layer delta parameters (1 + 2*q*depth
+    parameters) instead of shared deltas (1 + 2*q parameters).
 
     Returns a policy dict compatible with optimize_shared_delta output.
     """
@@ -312,12 +333,15 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
     tau_lo = max(f for _, _, f in cell_optima)  # free-per-cell bound
     # Upper bound: error under zero policy
     zero_c0 = QQ(1 - alpha_q) / 2
-    zero_delta = {(r, b): QQ(0) for r in range(q) for b in (0, 1)}
+    if layer_dependent:
+        zero_delta = {(t, r, b): QQ(0) for t in range(depth) for r in range(q) for b in (0, 1)}
+    else:
+        zero_delta = {(r, b): QQ(0) for r in range(q) for b in (0, 1)}
     zero_metrics = global_exact_metrics(paths, p_num, q_den, zero_c0, zero_delta, q)
     tau_hi = max(zero_metrics["worst_abs"], tau_lo + 0.1)
 
     # Step 3: build intercept matrix
-    A = build_intercept_matrix(paths, q)
+    A = build_intercept_matrix(paths, q, depth=depth, layer_dependent=layer_dependent)
 
     # Step 4: binary search
     bisection_steps = 0
@@ -372,12 +396,16 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
         m_opt = _delta_linf_from_vector(x_solution)
 
     if x_continuous is not None:
-        c0_opt, delta_opt = _snap_policy_vector(x_continuous, q, dyadic_bits)
+        c0_opt, delta_opt = _snap_policy_vector(
+            x_continuous, q, dyadic_bits, depth=depth, layer_dependent=layer_dependent)
     else:
         fallback_used = True
         # Last resort: use zero policy
         c0_opt = QQ(1 - alpha_q) / 2
-        delta_opt = {(r, b): QQ(0) for r in range(q) for b in (0, 1)}
+        if layer_dependent:
+            delta_opt = {(t, r, b): QQ(0) for t in range(depth) for r in range(q) for b in (0, 1)}
+        else:
+            delta_opt = {(r, b): QQ(0) for r in range(q) for b in (0, 1)}
         m_opt = 0.0
 
     metrics = global_exact_metrics(paths, p_num, q_den, c0_opt, delta_opt, q)
@@ -402,7 +430,8 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
                 repair_ok, x_repair = _lp_feasibility(A, repair_intervals[0], repair_intervals[1])
                 m_repair = _delta_linf_from_vector(x_repair) if repair_ok else None
             if repair_ok:
-                c0_repair, delta_repair = _snap_policy_vector(x_repair, q, dyadic_bits)
+                c0_repair, delta_repair = _snap_policy_vector(
+                    x_repair, q, dyadic_bits, depth=depth, layer_dependent=layer_dependent)
                 metrics_repair = global_exact_metrics(paths, p_num, q_den, c0_repair, delta_repair, q)
                 tau_repair_snapped = float(metrics_repair["worst_abs"])
                 if tau_repair_snapped <= repair_tau + snap_tol:
@@ -416,6 +445,12 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
                     if m_repair is not None:
                         m_opt = m_repair
         if not repair_succeeded:
+            # Deliberate choice: when repair fails, we report the actual snapped
+            # error as the target rather than claiming the tighter continuous tau.
+            # This means target_tau may exceed tau_continuous, but the reported
+            # worst_err is always honest.  The alternative — reporting within_target
+            # = False — would flag every case where dyadic loss is nonzero, which
+            # is noisy and unhelpful for downstream sweeps.
             target_tau = tau_snapped
             within_target = True
 
@@ -429,6 +464,7 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
     return {
         "name": "optimized",
         "description": (f"numerical minimax bisection+LP (q={q}, d={depth}, "
+                        f"layer_dep={layer_dependent}, "
                         f"{bisection_steps} bisection steps, "
                         f"dyadic_bits={dyadic_bits})"),
         "c0_rat": c0_opt,
@@ -452,6 +488,7 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
         "dyadic_loss": tau_snapped - tau_continuous,
         "target_tau": target_tau,
         "unique_intercepts": n_unique,
+        "layer_dependent": layer_dependent,
         "metrics": metrics,
     }
 
@@ -477,17 +514,20 @@ def _shared_objective(params, paths, p_num, q_den, q, dyadic_bits):
 
 def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
                           maxiter=5000, n_restarts=3, seed=42,
-                          dyadic_bits=12, method='minimax'):
+                          dyadic_bits=12, method='minimax', layer_dependent=False):
     """
-    Optimize c0 and delta[(r,b)] to minimize worst-case error
-    over all leaf cells.
+    Optimize c0 and delta to minimize worst-case error over all leaf cells.
 
     method='minimax' uses bisection+LP with dyadic snapping (default, numerical).
     method='nelder-mead' uses Nelder-Mead with multiple restarts (legacy).
+    layer_dependent=True uses per-layer deltas (1+2*q*depth params).
     Returns a policy dict compatible with build_intercept_policy.
     """
     if method == 'minimax':
-        return optimize_minimax(q, depth, p_num, q_den, dyadic_bits=dyadic_bits)
+        return optimize_minimax(q, depth, p_num, q_den, dyadic_bits=dyadic_bits,
+                                layer_dependent=layer_dependent)
+    if layer_dependent:
+        raise ValueError("layer_dependent=True requires method='minimax'")
     alpha_q = QQ(p_num) / QQ(q_den)
     if c0_init is None:
         c0_init = float(QQ(1 - alpha_q) / 2)

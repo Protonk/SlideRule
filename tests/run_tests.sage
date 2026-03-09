@@ -144,6 +144,42 @@ def test_minimax_above_free_bound():
     )
 
 
+def test_layer_dependent_smoke():
+    q, depth = 2, 3
+    opt = optimize_shared_delta(q, depth, 1, 2, layer_dependent=True)
+
+    assert_true(opt["unique_intercepts"] >= 1,
+                "layer-dependent minimax should expose at least one intercept")
+    assert_true(opt["converged"],
+                "layer-dependent minimax should converge")
+    assert_true(opt["worst_err"] > 0,
+                "layer-dependent worst_err should be positive")
+    assert_true(opt.get("layer_dependent") == True,
+                "result should report layer_dependent=True")
+
+
+def test_layer_dependent_beats_invariant():
+    q, depth = 2, 3
+    ld = optimize_shared_delta(q, depth, 1, 2, layer_dependent=True)
+    li = optimize_shared_delta(q, depth, 1, 2, layer_dependent=False)
+    assert_true(
+        ld["worst_err"] <= li["worst_err"] + 1e-8,
+        f"layer-dependent ({ld['worst_err']:.8f}) should not be worse than "
+        f"layer-invariant ({li['worst_err']:.8f})",
+    )
+
+
+def test_layer_dependent_above_free_bound():
+    q, depth = 2, 3
+    opt = optimize_shared_delta(q, depth, 1, 2, layer_dependent=True)
+    free_worst, _ = free_per_cell_optimum(depth, 1, 2)
+    assert_true(
+        opt["worst_err"] >= free_worst - 1e-8,
+        f"layer-dependent ({opt['worst_err']:.8f}) should be >= "
+        f"free-per-cell bound ({free_worst:.8f})",
+    )
+
+
 def main():
     tests = [
         ("residue_paths", test_residue_paths),
@@ -154,6 +190,9 @@ def main():
         ("minimax_smoke", test_minimax_smoke),
         ("minimax_beats_nelder_mead", test_minimax_beats_nelder_mead),
         ("minimax_above_free_bound", test_minimax_above_free_bound),
+        ("layer_dependent_smoke", test_layer_dependent_smoke),
+        ("layer_dependent_beats_invariant", test_layer_dependent_beats_invariant),
+        ("layer_dependent_above_free_bound", test_layer_dependent_above_free_bound),
     ]
 
     print("=" * 80)
