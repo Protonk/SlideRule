@@ -1,8 +1,7 @@
 # Experiment Guide
 
 The `experiments/` directory contains runnable entry points. These scripts are
-thin drivers over the `lib/` modules and are the intended way to inspect the
-current research state from the command line.
+thin drivers over the `lib/` modules.
 
 Run all commands from project root.
 
@@ -10,7 +9,7 @@ Run all commands from project root.
 
 ### `fsm_coarse.sage`
 
-Main coupled Day x Jukna experiment.
+Legacy/secondary Day x Jukna driver.
 
 What it does:
 
@@ -28,7 +27,16 @@ Run:
 ./sagew experiments/fsm_coarse.sage
 ```
 
-This is the faster experiment and the best first run after changing code.
+Use this when you want:
+
+- exact evaluator spot checks
+- induced-family diagnostics under named policies
+- the older Day x Jukna exploratory view
+
+Primarily informs:
+
+- [`SWEEP-REPORTS.md`](../SWEEP-REPORTS.md) for background baseline context
+- [`HYPOTHESES.md`](../HYPOTHESES.md) for the retired H2/H3 path
 
 Row fields:
 
@@ -51,7 +59,7 @@ Row fields:
 
 ### `optimize_delta.sage`
 
-Optimization sweep for shared-delta policies.
+Baseline shared-delta optimization sweep.
 
 What it does:
 
@@ -69,8 +77,12 @@ Run:
 ./sagew experiments/optimize_delta.sage
 ```
 
-This is the expensive sweep. Expect it to take substantially longer than
-`fsm_coarse.sage`, especially as `q` and `depth` grow.
+This is the expensive layer-invariant sweep.
+
+Primarily informs:
+
+- [`HYPOTHESES.md`](../HYPOTHESES.md)
+- [`SWEEP-REPORTS.md`](../SWEEP-REPORTS.md)
 
 Table fields:
 
@@ -105,6 +117,54 @@ Important interpretation notes:
 - The additive columns in this script describe the induced family of the
   optimized policy only.
 
+### `h1_sweep.sage`
+
+Primary current H1 driver.
+
+What it does:
+
+- Sweep 1: fixed `q`, varying depth for H1b
+- Sweep 2: fixed depth, varying `q` for H1a
+- Sweep 3: layer-invariant vs layer-dependent benchmark comparisons for H1c
+- Reports delta-shape statistics for H1d
+- Writes CSV artifacts into `experiments/results/`
+
+Run:
+
+```sh
+./sagew experiments/h1_sweep.sage
+```
+
+This is the main current research driver.
+
+Primarily informs:
+
+- [`HYPOTHESES.md`](../HYPOTHESES.md)
+- [`WALL.md`](../WALL.md)
+- [`SWEEP-REPORTS.md`](../SWEEP-REPORTS.md)
+
+Printed columns:
+
+- `q`, `d`: automaton modulus and bit depth
+- `#p`: parameter count
+- `paths`: leaf count
+- `single_err`, `opt_err`, `free_err`
+- `improve`
+- `gap`
+- `imp/sgl`: `improve / single_err`
+- `imp/avl`: `improve / (single_err - free_err)`
+- `Mopt`: minimum continuous `max |delta|` at the selected minimax `tau`
+- `l1_d`: `sum |delta_i|`
+- `nnz`: count of entries with `|delta_i| >= Mopt / 10`
+- `top2`: L1 mass fraction in the two largest entries
+- `time`
+
+CSV outputs:
+
+- `experiments/results/h1b_depth_scaling.csv`
+- `experiments/results/h1a_gap_vs_q.csv`
+- `experiments/results/h1c_layer_dependent.csv`
+
 ### `smoke_test.sage`
 
 Compatibility wrapper around the real test suite in `tests/run_tests.sage`.
@@ -134,88 +194,3 @@ artifacts, not source-of-truth files.
 - `lib/trajectory.py` is not an experiment driver in this directory, but it is
   still useful for quick pure-Python pilot work on the older fixed-intercept
   trajectory question.
-
-## Hypothesis Status and Experiment Roadmap
-
-This repo is organized around four research hypotheses from the root README.
-The first full sweep with the bisection+LP minimax solver was run on
-2024-03-09. Results are summarized here; see the root README for the full
-hypothesis statements and empirical findings.
-
-### H1. Shared FSM structure gives real approximation power — Confirmed, weak
-
-Driver: `optimize_delta.sage`
-
-Key findings (alpha=1/2, 10 cases, q=1..5, depth=4..8):
-
-- `improve > 0` in all cases. Best relative gain ~54% at q=5/d=4.
-- Improvement decays with depth at fixed q.
-- `gap >> improve` everywhere: the sharing constraint, not solver weakness, is
-  the bottleneck.
-
-Open follow-ups:
-
-- Fixed-budget sweep: hold `1 + 2q` constant while depth grows, to measure
-  whether `improve / single_err` stabilizes or decays to zero.
-- Multi-alpha sweeps beyond `alpha = 1/2`.
-- Characterize the structural wall: is it a property of layer-invariant
-  `(state, bit)` parameterization specifically, or of any `O(q)`-parameter
-  shared scheme?
-
-### H2. The policy-induced active-extrema family actually grows — Falsified
-
-Driver: `optimize_delta.sage` (pat# column)
-
-Key finding: `pat# = 2` or `3` in all 10 cases. The minimax objective
-equalizes cells, collapsing their Day-pattern signatures. Sumset sizes are 3–6
-and the full family is trivially Sidon.
-
-The minimax objective is structurally antagonistic to pattern diversity. A
-different objective (average error, or diversity-maximizing under an error
-budget) might produce richer families, but that would be a different research
-question.
-
-### H3. The relevant Jukna object is the induced pattern family — Moot
-
-Moot because `pat# = 2–3` leaves no meaningful additive structure to measure.
-
-### H4. Tropical-vs-arithmetic compression — Open, less motivated
-
-Not yet tested directly. The LP already operates on `1 + 2q` parameters rather
-than `2^depth` leaves, which is a form of compressed evaluation. But with H2
-falsified, the original motivation (compressing an exponentially growing induced
-family) does not apply.
-
-### Refined H1 sub-hypotheses
-
-See the root README for full statements. Summary:
-
-- **H1a**: the gap closes with parameter budget at fixed depth. Test by
-  sweeping q at fixed depth=4. Predicted crossover: `gap < improve` for some q.
-- **H1b**: `improve / single_err` has a nonzero limit as depth grows at fixed
-  q. Test by sweeping depth at fixed q=5.
-- **H1c**: the wall is specific to layer-invariant parameterization. Requires
-  extending the optimizer to layer-dependent `delta[(layer, state, bit)]`.
-- **H1d**: the optimal delta table is nearly sparse. Can be read off existing
-  data with minor reporting additions.
-
-### Suggested next experiments
-
-Priority order given the current findings:
-
-1. **H1a+H1b sweep**: a single experiment varying q (1..15+) at depth=4, and
-   depth (4..10+) at q=5, reports `improve`, `gap`, `improve / single_err`,
-   and `gap / (single_err - free_err)`. This is the most important next step.
-2. **H1d sparsity check**: add reporting of per-entry delta magnitudes to the
-   existing sweep. No new optimizer work needed.
-3. **H1c layer-dependent**: extend `optimize_minimax` to support
-   `delta[(layer, state, bit)]` parameterization. Requires expanding the
-   intercept matrix and LP. Medium implementation effort.
-4. **H4 scaling experiment**: lower priority, but the compression of the LP
-   itself is still a clean result worth documenting if time permits.
-
-Suggested result artifacts:
-
-- `experiments/results/h1_shared_power.csv`
-- `experiments/results/h1a_gap_vs_q.csv`
-- `experiments/results/h1b_depth_scaling.csv`

@@ -35,11 +35,8 @@ implementation-facing engagement.
   - no sweep tables
 
 - `AGENTS.md`
-  - short router: given a task type, which docs to read and update
-  - e.g., "when a sweep produces decisive results: update hypothesis status
-    in HYPOTHESES.md, add dated entry to SWEEP-REPORTS.md, revise WALL.md
-    if the decomposition changes, update REPORT.md with what just happened"
-  - written after the named docs exist, since the router depends on them
+  - existing compact router
+  - keep as-is during this refactor
 
 - `PLAN.md`
   - immediate next work only
@@ -256,10 +253,7 @@ Target human reading order after refactor:
 3. Trim `README.md` to orientation and current-state summary.
 4. Trim `experiments/README.md` to operator guidance and references.
 5. Rewrite `REPORT.md` as a current-cycle handoff.
-6. Write `AGENTS.md` as a short router: given a task type, which docs to
-   read and which to update. This step comes after the move because the
-   router's value depends on the named docs existing in their final roles.
-7. Optionally retire or fold `LAUNCHPAD-PLAN.md` if it no longer serves a live
+6. Optionally retire or fold `LAUNCHPAD-PLAN.md` if it no longer serves a live
    purpose.
 
 Note: `PLAN.md` is now treated as a disposable template. It does not contain
