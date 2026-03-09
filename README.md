@@ -78,6 +78,102 @@ python3 lib/trajectory.py
 - Small-instance Sidon and cover-free subset sizes are certified exactly.
   Greedy sizes are still reported alongside the exact optima.
 
+## Working Hypotheses
+
+### H1. Shared FSM structure gives real approximation power
+
+Hypothesis:
+for fixed `alpha` and fixed parameter budget, a shared FSM policy lowers Day's
+exact coarse-stage worst-case error by a stable amount relative to the best
+single-intercept baseline.
+
+What to test:
+add a true `best_single_c` baseline and compare it against the optimized
+shared-`delta` policy using the exact H/V/D evaluator. Track both worst
+absolute log-error and global log-ratio, not just one of them.
+
+How it is falsified:
+if the best shared policy only beats the best single-`c` model in isolated
+small cases, or if the gain decays toward zero as depth grows.
+
+Why it is independent:
+this is a pure Day-side numerical claim. It can fail even if interesting
+combinatorics show up elsewhere.
+
+### H2. The policy-induced active-extrema family actually grows
+
+Hypothesis:
+once we move from a single global intercept to a family of FSM policies, the
+induced H/V/D active-pattern family grows materially with `q`, depth, or
+`(a, b)`, rather than collapsing to a tiny bounded repertoire.
+
+What to test:
+extend the `trajectory.py` idea from single-`c` to FSM policies. For each leaf
+under a policy, extract an active-pattern signature and then measure distinct
+counts, collision counts, additive energy, `|A + A|`, and Sidon/cover-free
+subset sizes on those induced objects.
+
+How it is falsified:
+if the number of distinct induced signatures saturates quickly, or grows no
+faster than the single-`c` pilot already suggests.
+
+Why it is independent:
+this is a structure-only claim. It can hold even if FSM policies do not improve
+approximation error.
+
+### H3. The relevant Jukna object is the induced pattern family, not the raw path family
+
+Hypothesis:
+the Jukna diagnostics that matter are not the raw path-incidence vectors, but
+policy-induced active-pattern vectors; only the latter should vary meaningfully
+with policy and track approximation quality.
+
+What to test:
+for the existing policy menu, compute Sidon / cover-free / additive-collision
+statistics twice: once on the raw path vectors and once on induced
+active-pattern vectors. Then compare those metrics against exact error
+improvement.
+
+How it is falsified:
+if induced metrics are no more policy-sensitive than raw path metrics, or if
+policy-induced structure does not correlate at all with error improvement.
+
+Why it is independent:
+it does not assert that either improvement or growth exists in the abstract. It
+asserts where the meaningful object lives.
+
+### H4. There is a real tropical-vs-arithmetic compression story
+
+Hypothesis:
+there is a constrained FSM policy class for which the coarse stage admits
+polynomial-size state-based evaluation or search, even while the leaf family or
+induced signature family grows exponentially; the arithmetic refinement remains
+a small second stage.
+
+What to test:
+pick a sharply defined policy class, such as layer-invariant rational
+corrections from a small alphabet or bounded-variation tables, and implement a
+DP or shortest-path-style evaluator over automaton states. Compare its runtime
+scaling against exhaustive leaf enumeration as depth grows.
+
+How it is falsified:
+if exact evaluation or optimization still effectively requires enumerating
+leaves, or if the DP state space blows up in lockstep with the combinatorial
+family.
+
+Why it is independent:
+this is a complexity claim, not an approximation or structure claim. You could
+have a compression gap without a Jukna lower-bound story, and vice versa.
+
+Taken together, these hypotheses separate the possibilities cleanly:
+
+- H1 true, H2 false: useful numerical trick, no serious combinatorics.
+- H2 true, H1 false: interesting structure, but not helping approximation.
+- H1 and H2 true, H3 false: both phenomena exist, but we are measuring the
+  wrong combinatorial object.
+- H4 true without the others: there is a computational compression story, but
+  not yet a Day-Jukna one.
+
 ## Dependencies And Runtime
 
 - SageMath is required for the `.sage` drivers.

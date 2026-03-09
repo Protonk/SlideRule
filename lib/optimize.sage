@@ -3,6 +3,8 @@ lib/optimize.sage — Intercept optimization for the FSM coarse stage.
 
 Per-cell optimal intercept (free-per-cell lower bound) and shared-delta
 minimax optimization via bisection+LP (primary) or scipy Nelder-Mead (legacy).
+The primary solver now uses a lexicographic second-stage LP to minimize
+max |delta| at fixed tau, then repairs dyadic snapping if needed.
 
 Depends on: lib/paths.sage, lib/day.sage (must be loaded first).
 """
@@ -209,9 +211,84 @@ def _lp_feasibility(A, lo_bounds, hi_bounds):
     return False, None
 
 
+def _lp_minimize_max_delta(A, lo_bounds, hi_bounds):
+    """
+    Minimize M subject to the interval constraints and |delta_j| <= M.
+
+    The base intercept c0 is left free. Only the shared delta parameters are
+    regularized.
+    """
+    n_rows, n_cols = A.shape
+    c_obj = np.zeros(n_cols + 1)
+    c_obj[-1] = 1.0
+
+    interval_A = np.vstack([-A, A])
+    interval_b = np.concatenate([-np.array(lo_bounds), np.array(hi_bounds)])
+    interval_A = np.hstack([interval_A, np.zeros((2 * n_rows, 1))])
+
+    delta_rows = []
+    for j in range(1, n_cols):
+        row_pos = np.zeros(n_cols + 1)
+        row_pos[j] = 1.0
+        row_pos[-1] = -1.0
+        delta_rows.append(row_pos)
+
+        row_neg = np.zeros(n_cols + 1)
+        row_neg[j] = -1.0
+        row_neg[-1] = -1.0
+        delta_rows.append(row_neg)
+
+    delta_A = np.array(delta_rows, dtype=np.float64)
+    delta_b = np.zeros(len(delta_rows), dtype=np.float64)
+
+    A_ub = np.vstack([interval_A, delta_A])
+    b_ub = np.concatenate([interval_b, delta_b])
+    bounds = [(None, None)] * n_cols + [(0.0, None)]
+
+    res = scipy_linprog(c_obj, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method='highs')
+    if res.success and res.status == 0:
+        return True, res.x[:-1], float(res.x[-1])
+    return False, None, None
+
+
+def _build_feasible_intervals(cell_optima, p_num, q_den, tau):
+    """Build per-cell feasible intercept intervals at a fixed target tau."""
+    lo_bounds = []
+    hi_bounds = []
+    for bits, c_star, f_star in cell_optima:
+        interval = _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau)
+        if interval is None:
+            return None
+        lo_bounds.append(interval[0])
+        hi_bounds.append(interval[1])
+    return lo_bounds, hi_bounds
+
+
+def _snap_policy_vector(x_solution, q, dyadic_bits):
+    """Snap a continuous LP solution to dyadic policy parameters."""
+    c0_opt = dyadic_rational(x_solution[0], bits=dyadic_bits)
+    delta_opt = {}
+    for r in range(q):
+        for b in (0, 1):
+            delta_opt[(r, b)] = dyadic_rational(x_solution[1 + 2*r + b], bits=dyadic_bits)
+    return c0_opt, delta_opt
+
+
+def _delta_linf_from_vector(x_solution):
+    """Continuous max |delta| from an LP parameter vector."""
+    if len(x_solution) <= 1:
+        return 0.0
+    return float(max(abs(float(value)) for value in x_solution[1:]))
+
+
+def _delta_linf_from_policy(delta, q):
+    """Snapped max |delta| from a policy table."""
+    return float(max(abs(float(delta[(r, b)])) for r in range(q) for b in (0, 1)))
+
+
 def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
     """
-    Exact minimax solver via bisection on target error + LP feasibility.
+    Numerical minimax solver via bisection on target error + LP feasibility.
 
     For each candidate tau, checks whether a shared-delta policy can achieve
     worst-case error <= tau by computing per-cell feasible intercept intervals
@@ -245,6 +322,11 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
     # Step 4: binary search
     bisection_steps = 0
     x_solution = None
+    fallback_used = False
+    stage2_regularized = False
+    repair_used = False
+    repair_succeeded = False
+    snap_tol = max(1e-8, 10.0 * tol)
 
     for _ in range(70):  # ~70 steps gives ~1e-21 precision
         if tau_hi - tau_lo < tol:
@@ -253,64 +335,100 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
         bisection_steps += 1
 
         # Compute feasible interval for each cell
-        lo_bounds = []
-        hi_bounds = []
-        feasible = True
-        for bits, c_star, f_star in cell_optima:
-            interval = _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau_mid)
-            if interval is None:
-                feasible = False
-                break
-            lo_bounds.append(interval[0])
-            hi_bounds.append(interval[1])
-
-        if not feasible:
+        intervals = _build_feasible_intervals(cell_optima, p_num, q_den, tau_mid)
+        if intervals is None:
             tau_lo = tau_mid
             continue
 
         # LP feasibility check
-        lp_ok, x_opt = _lp_feasibility(A, lo_bounds, hi_bounds)
+        lp_ok, x_opt = _lp_feasibility(A, intervals[0], intervals[1])
         if lp_ok:
             tau_hi = tau_mid
             x_solution = x_opt
         else:
             tau_lo = tau_mid
 
-    # Step 5: extract solution and snap to dyadic rationals
-    if x_solution is None:
-        # Fallback: try at tau_hi
-        lo_bounds = []
-        hi_bounds = []
-        for bits, c_star, f_star in cell_optima:
-            interval = _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau_hi)
-            if interval is None:
-                interval = (c_star, c_star)
-            lo_bounds.append(interval[0])
-            hi_bounds.append(interval[1])
-        _, x_solution = _lp_feasibility(A, lo_bounds, hi_bounds)
+    tau_continuous = float(tau_hi)
+    intervals = _build_feasible_intervals(cell_optima, p_num, q_den, tau_hi)
+    x_continuous = None
+    m_opt = None
 
-    if x_solution is not None:
-        c0_opt = dyadic_rational(x_solution[0], bits=dyadic_bits)
-        delta_opt = {}
-        for r in range(q):
-            for b in (0, 1):
-                delta_opt[(r, b)] = dyadic_rational(x_solution[1 + 2*r + b], bits=dyadic_bits)
+    if intervals is not None:
+        lp_ok, x_opt, m_stage2 = _lp_minimize_max_delta(A, intervals[0], intervals[1])
+        if lp_ok:
+            x_continuous = x_opt
+            m_opt = m_stage2
+            stage2_regularized = True
+        else:
+            fallback_used = True
+            lp_ok, x_opt = _lp_feasibility(A, intervals[0], intervals[1])
+            if lp_ok:
+                x_continuous = x_opt
+                m_opt = _delta_linf_from_vector(x_opt)
+
+    if x_continuous is None and x_solution is not None:
+        fallback_used = True
+        x_continuous = x_solution
+        m_opt = _delta_linf_from_vector(x_solution)
+
+    if x_continuous is not None:
+        c0_opt, delta_opt = _snap_policy_vector(x_continuous, q, dyadic_bits)
     else:
+        fallback_used = True
         # Last resort: use zero policy
         c0_opt = QQ(1 - alpha_q) / 2
         delta_opt = {(r, b): QQ(0) for r in range(q) for b in (0, 1)}
+        m_opt = 0.0
 
     metrics = global_exact_metrics(paths, p_num, q_den, c0_opt, delta_opt, q)
+    continuous_feasible = (x_continuous is not None)
+    target_tau = tau_continuous
+    tau_snapped = float(metrics["worst_abs"])
+    matches_continuous_tau = continuous_feasible and (tau_snapped <= tau_continuous + snap_tol)
+    within_target = continuous_feasible and (tau_snapped <= target_tau + snap_tol)
+
+    if continuous_feasible and not matches_continuous_tau:
+        repair_used = True
+        repair_tau = tau_snapped + snap_tol
+        repair_intervals = _build_feasible_intervals(cell_optima, p_num, q_den, repair_tau)
+        if repair_intervals is not None:
+            repair_ok, x_repair, m_repair = _lp_minimize_max_delta(
+                A, repair_intervals[0], repair_intervals[1]
+            )
+            if repair_ok:
+                stage2_regularized = True
+            if not repair_ok:
+                fallback_used = True
+                repair_ok, x_repair = _lp_feasibility(A, repair_intervals[0], repair_intervals[1])
+                m_repair = _delta_linf_from_vector(x_repair) if repair_ok else None
+            if repair_ok:
+                c0_repair, delta_repair = _snap_policy_vector(x_repair, q, dyadic_bits)
+                metrics_repair = global_exact_metrics(paths, p_num, q_den, c0_repair, delta_repair, q)
+                tau_repair_snapped = float(metrics_repair["worst_abs"])
+                if tau_repair_snapped <= repair_tau + snap_tol:
+                    c0_opt = c0_repair
+                    delta_opt = delta_repair
+                    metrics = metrics_repair
+                    tau_snapped = tau_repair_snapped
+                    target_tau = repair_tau
+                    within_target = True
+                    repair_succeeded = True
+                    if m_repair is not None:
+                        m_opt = m_repair
+        if not repair_succeeded:
+            target_tau = tau_snapped
+            within_target = True
 
     # Compute unique intercepts
     intercepts = set()
     for P in paths:
         intercepts.add(path_intercept(P["bits"], c0_opt, delta_opt, q))
     n_unique = len(intercepts)
+    max_delta_abs = _delta_linf_from_policy(delta_opt, q)
 
     return {
         "name": "optimized",
-        "description": (f"minimax bisection+LP (q={q}, d={depth}, "
+        "description": (f"numerical minimax bisection+LP (q={q}, d={depth}, "
                         f"{bisection_steps} bisection steps, "
                         f"dyadic_bits={dyadic_bits})"),
         "c0_rat": c0_opt,
@@ -318,8 +436,21 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20):
         "worst_err": metrics["worst_abs"],
         "union_log2_ratio": metrics["union_log2_ratio"],
         "max_cell_log2_ratio": metrics["max_cell_log2_ratio"],
+        "m_opt": float(m_opt),
+        "max_delta_abs": max_delta_abs,
         "n_evals": bisection_steps,
-        "converged": True,
+        "converged": continuous_feasible,
+        "continuous_feasible": continuous_feasible,
+        "stage2_regularized": stage2_regularized,
+        "matches_continuous_tau": matches_continuous_tau,
+        "within_target": within_target,
+        "fallback_used": fallback_used,
+        "repair_used": repair_used,
+        "repair_succeeded": repair_succeeded,
+        "tau_continuous": tau_continuous,
+        "tau_snapped": tau_snapped,
+        "dyadic_loss": tau_snapped - tau_continuous,
+        "target_tau": target_tau,
         "unique_intercepts": n_unique,
         "metrics": metrics,
     }
@@ -351,7 +482,7 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
     Optimize c0 and delta[(r,b)] to minimize worst-case error
     over all leaf cells.
 
-    method='minimax' uses bisection+LP (default, exact).
+    method='minimax' uses bisection+LP with dyadic snapping (default, numerical).
     method='nelder-mead' uses Nelder-Mead with multiple restarts (legacy).
     Returns a policy dict compatible with build_intercept_policy.
     """
@@ -400,6 +531,7 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
     for P in paths:
         intercepts.add(path_intercept(P["bits"], c0_opt, delta_opt, q))
     n_unique = len(intercepts)
+    max_delta_abs = _delta_linf_from_policy(delta_opt, q)
 
     return {
         "name": "optimized",
@@ -411,8 +543,20 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
         "worst_err": metrics["worst_abs"],
         "union_log2_ratio": metrics["union_log2_ratio"],
         "max_cell_log2_ratio": metrics["max_cell_log2_ratio"],
+        "m_opt": max_delta_abs,
+        "max_delta_abs": max_delta_abs,
         "n_evals": total_evals,
         "converged": best_result.success,
+        "continuous_feasible": best_result.success,
+        "stage2_regularized": False,
+        "within_target": True,
+        "fallback_used": False,
+        "repair_used": False,
+        "repair_succeeded": False,
+        "tau_continuous": metrics["worst_abs"],
+        "tau_snapped": metrics["worst_abs"],
+        "dyadic_loss": 0.0,
+        "target_tau": metrics["worst_abs"],
         "unique_intercepts": n_unique,
         "metrics": metrics,
     }

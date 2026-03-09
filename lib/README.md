@@ -114,7 +114,7 @@ Primary entry points:
 - `build_intercept_matrix(paths, q)`: linear map from policy parameters to
   per-path intercepts.
 - `optimize_minimax(q, depth, p_num, q_den, ...)`: minimax shared-delta search
-  by bisection on target error plus LP feasibility.
+  by bisection on target error, then a second-stage LP minimizing `max |delta|`.
 - `optimize_shared_delta(...)`: dispatcher exposing the minimax solver by
   default and the legacy Nelder-Mead path on request.
 
@@ -129,8 +129,9 @@ families, and is useful for quick exploratory work without Sage.
 - The exact evaluator in `day.sage` uses exact rational breakpoint structure
   and high-precision reals for transcendental values.
 - The shared-delta minimax path in `optimize.sage` is not a fully symbolic
-  rational proof. It uses float bisection, SciPy LP feasibility, and dyadic
-  snapping of the returned solution.
+  rational proof. It uses float bisection, SciPy LPs, dyadic snapping of the
+  returned solution, and a post-snap repair step when the dyadic policy drifts
+  above the continuous target.
 - Exact Sidon and cover-free routines are exact only up to their configured
   family-size limits. Larger families fall back to greedy summaries only.
 - Induced families are currently deduplicated before additive diagnostics are

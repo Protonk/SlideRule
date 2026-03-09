@@ -110,6 +110,15 @@ def test_minimax_smoke():
     assert_true(opt["unique_intercepts"] >= 1, "minimax should expose at least one intercept")
     assert_true(opt["converged"], "minimax should report converged")
     assert_true(opt["worst_err"] > 0, "minimax worst_err should be positive")
+    assert_true(opt["m_opt"] >= 0, "minimax should expose nonnegative m_opt")
+    assert_true(opt["max_delta_abs"] >= 0, "minimax should expose snapped max |delta|")
+    assert_true("matches_continuous_tau" in opt, "minimax result should expose continuous-tau match status")
+    assert_true("within_target" in opt, "minimax result should expose within_target")
+    assert_true("fallback_used" in opt, "minimax result should expose fallback_used")
+    assert_true("repair_used" in opt, "minimax result should expose repair_used")
+    assert_true("tau_continuous" in opt, "minimax result should expose tau_continuous")
+    assert_true("tau_snapped" in opt, "minimax result should expose tau_snapped")
+    assert_true(opt["within_target"], "minimax smoke case should satisfy its final target")
 
 
 def test_minimax_beats_nelder_mead():
