@@ -382,17 +382,37 @@ def test_arb_concavity_boundary_min():
         _, _, _, _, meta = cell_logerr_arb(
             row['plog_lo'], row['plog_hi'], 1, 2, c_rat
         )
-        # If the worst candidate is a D-point, it should be a max (positive),
-        # not the min.  The segment min should be at an endpoint or H-point.
-        for plog_val, val, ctype in meta['candidates']:
-            if ctype == 'D':
-                # D-point should not be the most-negative candidate
-                min_val = min(v for _, v, _ in meta['candidates'])
-                assert_true(
-                    val >= min_val - 1e-14,
-                    f"D-point at plog={plog_val:.6f} is segment min "
-                    f"on cell {row['index']}",
-                )
+        d_vals = [v for _, v, t in meta['candidates'] if t == 'D']
+        non_d_vals = [v for _, v, t in meta['candidates'] if t != 'D']
+
+        if not d_vals:
+            continue
+
+        min_d = min(d_vals)
+        min_non_d = min(non_d_vals)
+        assert_true(
+            min_d > min_non_d + 1e-12,
+            f"D-candidate realizes the worst negative excursion on cell {row['index']}: "
+            f"min_d={min_d:.15e}, min_non_d={min_non_d:.15e}",
+        )
+
+
+def test_arb_meta_reports_x_and_plog():
+    """Arbitrary-cell metadata should report worst candidate in both x and plog."""
+    c_rat = QQ(1) / QQ(4)
+    row = build_partition(4, kind='geometric_x')[5]
+    _, _, _, _, meta = cell_logerr_arb(row['plog_lo'], row['plog_hi'], 1, 2, c_rat)
+
+    assert_true('worst_x' in meta, "meta should expose worst_x")
+    assert_true('worst_plog' in meta, "meta should expose worst_plog")
+    assert_true(
+        abs(meta['worst_x'] - (1.0 + meta['worst_plog'])) < 1e-12,
+        "worst_x and worst_plog should satisfy x = 1 + plog on [1,2)",
+    )
+    assert_true(
+        float(row['x_lo']) - 1e-12 <= meta['worst_x'] <= float(row['x_hi']) + 1e-12,
+        "worst_x should lie inside the cell bounds",
+    )
 
 
 def test_minimax_uniform_x_partition():
@@ -467,6 +487,7 @@ def main():
         ("d_candidate_validity", test_d_candidate_validity),
         ("arb_evaluator_geometric_smoke", test_arb_evaluator_geometric_smoke),
         ("arb_concavity_boundary_min", test_arb_concavity_boundary_min),
+        ("arb_meta_reports_x_and_plog", test_arb_meta_reports_x_and_plog),
         ("minimax_uniform_x_partition", test_minimax_uniform_x_partition),
         ("minimax_geometric_x_smoke", test_minimax_geometric_x_smoke),
         ("geometric_x_above_free_bound", test_geometric_x_above_free_bound),

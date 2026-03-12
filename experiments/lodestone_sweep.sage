@@ -135,7 +135,8 @@ def run_lodestone_case(q, depth, p_num, q_den, partition_kind,
             "path_intercept": float(cell_c),
             "free_cell_intercept": float(free_cell_c) if free_cell_c is not None else "",
             "worst_candidate_type": meta.get('worst_type', '') if isinstance(meta, dict) else '',
-            "worst_candidate_x": meta.get('worst_plog', '') if isinstance(meta, dict) else '',
+            "worst_candidate_x": meta.get('worst_x', '') if isinstance(meta, dict) else '',
+            "worst_candidate_plog": meta.get('worst_plog', '') if isinstance(meta, dict) else '',
             "n_candidates": meta.get('n_candidates', '') if isinstance(meta, dict) else '',
         })
 
@@ -160,7 +161,7 @@ PERCELL_COLUMNS = [
     "x_mid", "plog_mid",
     "cell_worst_err", "cell_log2_ratio",
     "path_intercept", "free_cell_intercept",
-    "worst_candidate_type", "worst_candidate_x",
+    "worst_candidate_type", "worst_candidate_x", "worst_candidate_plog",
     "n_candidates",
 ]
 
@@ -236,17 +237,17 @@ def main():
         run_pair(q, 4, p_num, q_den)
         print()
 
-    # ── Sweep 3: layer-dependent vs invariant at (q=3,d=5) ──────────
+    # ── Sweep 3: layer-dependent vs invariant at (q=3,d=6) ──────────
 
     print()
     print("=" * 100)
-    print("Sweep 3: layer-dependent vs layer-invariant at (q=3, d=5)")
+    print("Sweep 3: layer-dependent vs layer-invariant at (q=3, d=6)")
     print("=" * 100)
     print()
     print_comparison_header()
 
     for ld in [False, True]:
-        run_pair(3, 5, p_num, q_den, layer_dependent=ld)
+        run_pair(3, 6, p_num, q_den, layer_dependent=ld)
     print()
 
     # ── Sweep 4: secondary alpha checkpoint (alpha=1/3) ─────────────

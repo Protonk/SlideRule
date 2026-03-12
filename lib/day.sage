@@ -376,6 +376,7 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
         'candidates': [(float(HiR(p)), float(v), t) for p, v, t in evaluated],
         'n_candidates': len(evaluated),
         'worst_type': worst_entry[2],
+        'worst_x': float(HiR(1) + HiR(worst_entry[0])),
         'worst_plog': float(HiR(worst_entry[0])),
     }
 
