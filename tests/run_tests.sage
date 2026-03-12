@@ -8,6 +8,7 @@ import os
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load(os.path.join(_root, 'lib', 'paths.sage'))
 load(os.path.join(_root, 'lib', 'day.sage'))
+load(os.path.join(_root, 'lib', 'partitions.sage'))
 load(os.path.join(_root, 'lib', 'policies.sage'))
 load(os.path.join(_root, 'lib', 'jukna.sage'))
 load(os.path.join(_root, 'lib', 'optimize.sage'))
@@ -180,8 +181,131 @@ def test_layer_dependent_above_free_bound():
     )
 
 
+def test_bits_index_roundtrip():
+    for depth in (1, 2, 3, 5):
+        N = 2^depth
+        for j in range(N):
+            bits = index_to_bits(j, depth)
+            assert_true(len(bits) == depth, f"bits length mismatch for j={j}, depth={depth}")
+            assert_true(bits_to_index(bits) == j, f"roundtrip failed for j={j}, depth={depth}")
+
+
+def test_uniform_x_partition():
+    depth = 4
+    part = build_partition(depth, kind='uniform_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+
+    # Contiguity: x_hi of cell j == x_lo of cell j+1
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"uniform_x contiguity gap at j={j}",
+        )
+
+    # Covers [1, 2)
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "uniform_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "uniform_x should end at 2")
+
+    # Equal additive widths
+    expected_width = HiR(1) / HiR(N)
+    for row in part:
+        assert_true(
+            abs(row['width_x'] - expected_width) < tol,
+            f"uniform_x cell {row['index']} has wrong additive width",
+        )
+
+    # bits match index
+    for row in part:
+        assert_true(
+            bits_to_index(row['bits']) == row['index'],
+            f"uniform_x cell {row['index']} bits mismatch",
+        )
+
+
+def test_geometric_x_partition():
+    depth = 4
+    part = build_partition(depth, kind='geometric_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+
+    # Contiguity
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"geometric_x contiguity gap at j={j}",
+        )
+
+    # Covers [1, 2)
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "geometric_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "geometric_x should end at 2")
+
+    # Equal log widths
+    expected_log_width = HiR(1) / HiR(N)
+    for row in part:
+        assert_true(
+            abs(row['width_log'] - expected_log_width) < tol,
+            f"geometric_x cell {row['index']} has wrong log width: "
+            f"{float(row['width_log'])} vs {float(expected_log_width)}",
+        )
+
+    # bits match index
+    for row in part:
+        assert_true(
+            bits_to_index(row['bits']) == row['index'],
+            f"geometric_x cell {row['index']} bits mismatch",
+        )
+
+
+def test_partition_row_map():
+    depth = 3
+    part = build_partition(depth, kind='uniform_x')
+    rmap = partition_row_map(part)
+    assert_true(len(rmap) == 2^depth, "row map should have 2^depth entries")
+    for row in part:
+        assert_true(row['bits'] in rmap, f"row map missing bits {row['bits']}")
+        assert_true(rmap[row['bits']]['index'] == row['index'], "row map index mismatch")
+
+
+def test_uniform_x_matches_dyadic():
+    """Verify that uniform_x partition agrees with the legacy dyadic_cell_* helpers."""
+    depth = 4
+    part = build_partition(depth, kind='uniform_x')
+    tol = HiR(10)^(-50)
+
+    for row in part:
+        dy_lo, dy_hi = dyadic_cell_bounds(row['bits'])
+        assert_true(
+            abs(row['x_lo'] - dy_lo) < tol,
+            f"uniform_x x_lo disagrees with dyadic at cell {row['index']}",
+        )
+        assert_true(
+            abs(row['x_hi'] - dy_hi) < tol,
+            f"uniform_x x_hi disagrees with dyadic at cell {row['index']}",
+        )
+
+        dy_plo, dy_phi = dyadic_cell_plog(row['bits'])
+        assert_true(
+            abs(row['plog_lo'] - HiR(dy_plo)) < tol,
+            f"uniform_x plog_lo disagrees with dyadic at cell {row['index']}",
+        )
+        assert_true(
+            abs(row['plog_hi'] - HiR(dy_phi)) < tol,
+            f"uniform_x plog_hi disagrees with dyadic at cell {row['index']}",
+        )
+
+
 def main():
     tests = [
+        ("bits_index_roundtrip", test_bits_index_roundtrip),
+        ("uniform_x_partition", test_uniform_x_partition),
+        ("geometric_x_partition", test_geometric_x_partition),
+        ("partition_row_map", test_partition_row_map),
+        ("uniform_x_matches_dyadic", test_uniform_x_matches_dyadic),
         ("residue_paths", test_residue_paths),
         ("global_metrics_and_best_single", test_global_metrics_and_best_single),
         ("active_pattern_family", test_active_pattern_family),
