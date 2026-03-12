@@ -8,11 +8,13 @@ Run all commands from project root.
 ## Current Orientation
 
 - [`LODESTONE.md`](../LODESTONE.md) is the main scientific target.
-- The scripts currently checked in mostly characterize the dyadic/geometric
-  baseline and its wall; they are not yet a full `L1`-`L3` comparison suite.
-- If the repo is organized around the lodestone program, the next primary
-  driver should compare geometric and uniform-in-`x` partitions under the same
-  optimizer and reporting format.
+- [`lodestone_sweep.sage`](lodestone_sweep.sage) is the primary current driver
+  for `L1`-`L3`.
+- [`optimize_delta.sage`](optimize_delta.sage) and
+  [`h1_sweep.sage`](h1_sweep.sage) remain legacy baseline drivers on the exact
+  `uniform_x` oracle path.
+- The repo now has a first partition-comparison sweep, but coverage is still
+  sparse and should be extended before treating the lodestone claims as settled.
 
 ## Scripts
 
@@ -68,7 +70,7 @@ Row fields:
 
 ### `optimize_delta.sage`
 
-Baseline shared-delta optimization sweep on the dyadic baseline.
+Legacy exact shared-delta optimization sweep on the `uniform_x` baseline.
 
 What it does:
 
@@ -128,7 +130,7 @@ Important interpretation notes:
 
 ### `h1_sweep.sage`
 
-Current dyadic wall baseline driver.
+Legacy `uniform_x` wall baseline driver.
 
 What it does:
 
@@ -144,9 +146,11 @@ Run:
 ./sagew experiments/h1_sweep.sage
 ```
 
-This is the main existing benchmark driver for the matched
-dyadic/geometric partition. It is preparatory support for
-[`LODESTONE.md`](../LODESTONE.md), not yet the full lodestone test suite.
+This is the main legacy benchmark driver for the exact `uniform_x` oracle path.
+Historically these runs were described as "dyadic" because the cells are
+addressed by binary prefixes, but geometrically this is the `uniform_x`
+baseline. It remains preparatory support for [`LODESTONE.md`](../LODESTONE.md),
+not the primary lodestone comparison source.
 
 Primarily informs:
 
@@ -177,13 +181,57 @@ CSV outputs:
 - `experiments/results/h1a_gap_vs_q.csv`
 - `experiments/results/h1c_layer_dependent.csv`
 
-## Missing Next Driver
+### `lodestone_sweep.sage`
 
-- A partition-comparison sweep that runs the same minimax pipeline on geometric
-  and uniform-in-`x` grids.
-- That driver should record cellwise worst-case localization in addition to
-  `single_err`, `opt_err`, `free_err`, and `gap`.
-- If implemented, that becomes the natural source of truth for `L1`-`L3`.
+Primary partition-comparison driver for the lodestone program.
+
+What it does:
+
+- Runs the same minimax pipeline on `uniform_x` and `geometric_x`.
+- Records both summary metrics and per-cell localization data.
+- Compares layer-invariant and layer-dependent sharing at the lodestone
+  benchmark points.
+- Includes a small secondary `alpha` checkpoint in addition to the main
+  `alpha = 1/2` runs.
+
+Run:
+
+```sh
+./sagew experiments/lodestone_sweep.sage
+```
+
+Primarily informs:
+
+- [`LODESTONE.md`](../LODESTONE.md)
+- [`HYPOTHESES.md`](../HYPOTHESES.md)
+- [`WALL.md`](../WALL.md)
+- [`SWEEP-REPORTS.md`](../SWEEP-REPORTS.md)
+
+Artifacts:
+
+- [`experiments/results/lodestone_summary.csv`](results/lodestone_summary.csv)
+- [`experiments/results/lodestone_percell.csv`](results/lodestone_percell.csv)
+
+Summary fields:
+
+- `partition_kind`, `alpha`, `q`, `depth`, `layer_dependent`
+- `single_err`, `opt_err`, `free_err`
+- `improve`, `gap`
+- worst-cell metadata and runtime
+
+Per-cell fields:
+
+- cell bounds in both `x` and `plog`
+- `cell_worst_err`, `cell_log2_ratio`
+- optimized path intercept and free-per-cell intercept
+- worst-candidate type and location
+
+## Next Comparison Expansions
+
+- Extend the layer-dependent comparison beyond `(q, d) = (3, 6)`.
+- Add more secondary `alpha` checkpoints.
+- Use the per-cell artifacts to compare worst-cell movement and error
+  concentration across partition kinds.
 
 ### `smoke_test.sage`
 

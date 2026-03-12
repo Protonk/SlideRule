@@ -67,68 +67,66 @@ against it.
 
 ### L1. Geometric partitions outperform uniform partitions for power-law targets
 
-Status: untested
+Status: subdivided (2026-03-11) — see L1a, L1b, L1c
 
-Claim:
+The first partition-comparison sweep shows that the original L1 claim is true
+at the cell level but not under the shared-delta constraint in general.
 
-- Running the existing FSM optimization on a uniform-in-x partition (equal
-  additive width) rather than the dyadic partition should produce a
-  qualitatively worse wall.
-- The error should concentrate at the fine end (small x), where uniform cells
-  are too wide relative to the function's variation.
+**L1a** (free-per-cell): geometric cells have lower optimal per-cell error at
+every tested depth. *Supported* — equal-log-width cells match the curvature of
+`log2(z)` for power-law targets.
 
-This is the negative-control experiment for the thesis. If the formulation is
-correct, the dyadic structure is not merely convenient but is doing measurable
-work matched to the scaling symmetry.
+**L1b** (shared-delta, layer-invariant): geometric partitions do not generally
+yield lower `opt_err`. *Not generally supported* — at intermediate depths,
+the sharing penalty on geometric cells erases the cell-level advantage.
 
-Test:
+**L1c** (layer-dependent): under layer-dependent parameterization, the
+geometric advantage from L1a propagates to lower `opt_err`. *Supported* at
+(q=3, d=6).
 
-- Modify the partition generator to produce a uniform grid on [a, b] with the
-  same number of cells as the dyadic grid.
-- Run the same minimax optimizer.
-- Compare wall size, error distribution across cells, and qualitative shape.
+Key insight: the FSM sharing constraint is bitwise/additive in structure, which
+may align better with uniform-x cell boundaries. The "sharing penalty"
+(`opt_err - free_err`) is larger on geometric cells under layer-invariant
+parameterization but smaller under layer-dependent parameterization.
+
+For detailed evidence, see [`HYPOTHESES.md`](HYPOTHESES.md) and
+[`SWEEP-REPORTS.md`](SWEEP-REPORTS.md).
 
 ### L2. Log-organized schemes behave more naturally for power laws than x-organized schemes
 
-Status: untested
+Status: mixed, requires subdivision similar to L1
 
-Claim:
+Claim (unchanged):
 
 - Approximation quality for x^(p/q) should degrade less with depth on a
-  geometric grid than on a uniform grid, because the geometric grid keeps
-  the per-cell approximation problem self-similar across scales.
+  geometric grid than on a uniform grid.
 
-This is closely related to L1 but focused on depth scaling rather than a
-single snapshot. If the layer-invariant FSM works at all, it should work
-better on a grid where each layer presents the same local problem.
+First evidence (2026-03-11):
 
-Test:
-
-- Run the H1b depth sweep (fixed q, varying depth) on both partition types.
-- Compare the decay rate of improve / single_err.
+- `free_err` decays faster on geometric (lower at every depth), confirming L1a.
+- `opt_err` grows faster on geometric at higher depths under layer-invariant
+  sharing, mirroring L1b.
+- Whether geometric behaves "more naturally" depends on which metric is used
+  and which parameterization regime applies.
 
 ### L3. The wall decomposition is partition-dependent
 
-Status: untested
+Status: first evidence (2026-03-11)
 
-Claim:
+Claim (unchanged):
 
-- On a geometric grid, the dominant wall source is layer sharing (as currently
-  observed).
+- On a geometric grid, the dominant wall source is layer sharing.
 - On a uniform grid, the dominant wall source should shift toward cell-level
-  difficulty imbalance, because the hardest cells (near zero) will dominate
-  the minimax.
+  difficulty imbalance.
 
-This tests whether the current wall decomposition (parameter budget, layer
-  sharing, automaton coupling) is a structural fact about the FSM or partly an
-artifact of the grid's cooperation with the objective.
+First evidence:
 
-Test:
-
-- Run the H1c comparison (layer-invariant vs layer-dependent) on a uniform
-  grid.
-- Check whether layer dependence still produces the same large gap reduction,
-  or whether the wall is now dominated by something else.
+- The gap differs between partition kinds at every tested point.
+- At (q=3, d=6), layer-dependent deltas reduce the gap by ~40% (uniform) and
+  ~50% (geometric), confirming that layer sharing is the dominant source for
+  both geometries at this depth.
+- The larger gap reduction on geometric suggests the sharing penalty is more
+  concentrated in the layer-sharing source for geometric cells.
 
 ## Connections
 

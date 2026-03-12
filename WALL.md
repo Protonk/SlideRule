@@ -1,4 +1,4 @@
-Purpose: define and explain the approximation wall seen in shared-delta optimization on the current dyadic baseline
+Purpose: define and explain the approximation wall seen in shared-delta optimization on the legacy `uniform_x` baseline and its partition-dependent extensions
 Canonical for: the current obstruction model and its decomposition
 Not for: the repo-level thesis, run logs, or full sweep tables
 
@@ -6,11 +6,10 @@ Not for: the repo-level thesis, run logs, or full sweep tables
 
 ## Role in the current program
 
-All evidence in this file currently comes from the dyadic/geometric partition
-used by the Day model. The wall is not the repo's main claim. It is the
-diagnostic model for understanding how the matched baseline fails, and it
-becomes directly load-bearing when `L3` asks whether the same decomposition
-survives on mismatched partitions.
+Most baseline evidence in this file comes from the legacy exact `uniform_x`
+path. The wall is not the repo's main claim. It is the diagnostic model for
+understanding how the baseline fails, and it becomes directly load-bearing when
+`L3` asks whether the same decomposition survives across partition geometries.
 
 ## Definition
 
@@ -37,7 +36,7 @@ quality has already been accounted for.
 
 ## Current decomposition
 
-The current dyadic model has three nested constraints.
+The current baseline model has three nested constraints.
 
 ### 1. Exponential cell growth
 
@@ -68,13 +67,14 @@ So some coupling remains even after layer sharing is removed.
 
 ## Current evidence
 
-All current evidence below is on the dyadic/geometric partition.
+Unless marked otherwise, the evidence below is on the legacy `uniform_x`
+baseline.
 
 ### Parameter budget can nearly remove the wall at shallow depth
 
 At depth 4, increasing `q` in the layer-invariant model drives `opt_err` very
-close to `free_err`. This says the dyadic wall is not absolute at small depth;
-it is strongly tied to parameter budget.
+close to `free_err`. This says the baseline wall is not absolute at small
+depth; it is strongly tied to parameter budget.
 
 ### Layer sharing is a large part of the wall at the tested benchmark points
 
@@ -85,13 +85,33 @@ At `(q, d) = (5, 6)`:
 
 This is a large reduction, so the current best explanation is that reusing one
 delta table across all layers is the main obstruction in the layer-invariant
-dyadic model.
+baseline model.
 
 ### Residual coupling remains after layer dependence is introduced
 
 The layer-dependent model still does not reach `free_err` in the tested cases.
 That residual is the current evidence for a second wall coming from the
 residue-state basis itself.
+
+### First partition-dependent evidence (2026-03-11)
+
+The first lodestone partition-comparison sweep tests the wall on both
+`uniform_x` and `geometric_x`. Key observations at (q=3, d=6), alpha=1/2:
+
+- Layer-invariant gap: uniform 0.03601, geometric 0.03976.
+- Layer-dependent gap: uniform 0.02176, geometric 0.01998.
+- Gap reduction from layer dependence: ~40% (uniform), ~50% (geometric).
+
+Layer sharing is the dominant wall source for both partition kinds at this
+depth. The geometric partition has a larger layer-invariant gap but a smaller
+layer-dependent residual, suggesting that the sharing penalty interacts
+differently with the two cell geometries.
+
+The gap is also consistently larger on geometric across the full depth sweep
+(q=5, d=3..6) in the layer-invariant model, which is why L1b is not generally
+supported. See [`HYPOTHESES.md`](HYPOTHESES.md) for the L1a/L1b/L1c
+subdivision and [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md) for the dated sweep
+summary.
 
 ## Working interpretation
 
@@ -108,7 +128,7 @@ This is a case-based decomposition, not yet a theorem.
 - Does the residual automaton-coupling wall shrink predictably with larger `q`
   in the layer-dependent model?
 - Do the same decompositions hold away from `alpha = 1/2`?
-- Do the same decompositions survive on uniform-in-`x` partitions, or does
+- Do the same decompositions survive on `uniform_x`, or does
   cell-difficulty imbalance become dominant there?
 - Is there a clean scaling law in the parameter-to-cell ratio that captures both
   the layer-invariant and layer-dependent models?

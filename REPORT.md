@@ -5,18 +5,15 @@ claims or sweep conclusions.
 
 ## This cycle
 
-- Elevated [`LODESTONE.md`](LODESTONE.md) to the primary scientific entry
-  point.
-- Reframed:
-  - [`README.md`](README.md)
-  - [`HYPOTHESES.md`](HYPOTHESES.md)
-  - [`WALL.md`](WALL.md)
-  - [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md)
-  - [`experiments/README.md`](experiments/README.md)
-  so the scale-equivariance thesis is primary and the wall/H1 material is
-  supporting baseline machinery.
-- Left experiment driver names and code layout unchanged pending the actual
-  implementation of partition-comparison experiments.
+- The partition-support milestone landed:
+  - `lib/partitions.sage`
+  - arbitrary-cell evaluation in `lib/day.sage`
+  - partition-aware optimizer threading in `lib/optimize.sage`
+  - `experiments/lodestone_sweep.sage`
+- The first lodestone partition-comparison run (2026-03-11) now exists and is
+  recorded in the results artifacts.
+- Repo docs were synchronized around the new post-lodestone state, with
+  `uniform_x` / `geometric_x` as the canonical geometry names.
 
 ## Where things live now
 
@@ -24,7 +21,7 @@ claims or sweep conclusions.
   [`LODESTONE.md`](LODESTONE.md)
 - Current research claims/status:
   [`HYPOTHESES.md`](HYPOTHESES.md)
-- Current dyadic obstruction model:
+- Current obstruction model and wall diagnostics:
   [`WALL.md`](WALL.md)
 - Dated sweep evidence and artifact links:
   [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md)
@@ -33,22 +30,25 @@ claims or sweep conclusions.
 - Implementation/module structure:
   [`lib/README.md`](lib/README.md)
 
-## Most recent substantive run
+## Most recent substantive runs
 
-The latest substantive numeric cycle is still the dyadic H1 sweep recorded in:
+The current primary lodestone evidence is the 2026-03-11 partition-comparison
+sweep:
 
 - [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md)
+- [`experiments/results/lodestone_summary.csv`](experiments/results/lodestone_summary.csv)
+- [`experiments/results/lodestone_percell.csv`](experiments/results/lodestone_percell.csv)
+
+The older H1 baseline runs remain useful support and context:
+
 - [`experiments/results/h1b_depth_scaling.csv`](experiments/results/h1b_depth_scaling.csv)
 - [`experiments/results/h1a_gap_vs_q.csv`](experiments/results/h1a_gap_vs_q.csv)
 - [`experiments/results/h1c_layer_dependent.csv`](experiments/results/h1c_layer_dependent.csv)
 
-These runs are now framed as preparatory baseline evidence for the lodestone
-program. No direct partition-comparison run exists yet.
-
 ## Likely next work
 
-- add a partition generator that can switch between dyadic/geometric and
-  uniform-in-`x` grids
-- build a lodestone comparison driver or extend `h1_sweep.sage` to run `L1`-`L3`
-- reuse the existing H1 benchmark points as the first `L3` comparison cases
-- run multi-`alpha` checks once the first partition comparison exists
+- extend the layer-dependent comparison beyond `(q, d) = (3, 6)`
+- add more secondary `alpha` checkpoints
+- inspect per-cell concentration and worst-cell movement across partition kinds
+- decide whether any baseline-only docs or drivers still need a historical note
+  clarifying their `uniform_x` geometry

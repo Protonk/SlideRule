@@ -1,9 +1,10 @@
 # Library Guide
 
 The `lib/` directory is the project core. It builds the automaton path family,
-evaluates Day-style coarse approximations exactly on dyadic cells, derives the
-policy-induced pattern family, computes additive diagnostics on that family,
-and searches for shared-delta policies.
+evaluates Day-style coarse approximations on the legacy exact `uniform_x`
+baseline and on arbitrary partition rows, derives the policy-induced pattern
+family, computes additive diagnostics on that family, and searches for
+shared-delta policies.
 
 ## Load Order
 
@@ -12,6 +13,7 @@ The Sage modules are meant to be loaded in this order:
 ```sage
 load('lib/paths.sage')
 load('lib/day.sage')
+load('lib/partitions.sage')
 load('lib/policies.sage')
 load('lib/jukna.sage')
 load('lib/optimize.sage')
@@ -39,6 +41,33 @@ Returned path rows have this shape:
 - `vec`: 0-1 edge-incidence vector over the layered graph.
 - `terminal`: terminal residue after reading the prefix.
 
+`paths.sage` is purely combinatorial. It does not know about partition
+geometry.
+
+### `partitions.sage`
+
+Partition geometry for `[1,2)`.
+
+Primary entry points:
+
+- `build_partition(depth, kind='uniform_x')`
+- `partition_row_map(partition)`
+- `bits_to_index(bits)`
+- `index_to_bits(index, depth)`
+
+Canonical geometry names:
+
+- `uniform_x`: equal additive width on `[1,2)`
+- `geometric_x`: equal width in `log x` on `[1,2)`
+
+Each partition row carries:
+
+- `index`, `bits`
+- `x_lo`, `x_hi`
+- `plog_lo`, `plog_hi`
+- `width_x`, `width_log`
+- `kind`
+
 ### `policies.sage`
 
 Layer 1.5: named intercept policies.
@@ -59,18 +88,24 @@ A policy returns:
 
 ### `day.sage`
 
-Layer 2: Day-style exact evaluator and induced-family builder.
+Layer 2: Day-style evaluators and induced-family builder.
 
 Core evaluator pieces:
 
 - `path_intercept(bits, c0, delta, q)`: accumulates the intercept along one
   automaton path.
-- `cell_exact_logerr(bits, p_num, q_den, c_rat)`: exact per-cell extrema using
-  Day's breakpoint/stationary-point candidate set.
+- `cell_exact_logerr(bits, p_num, q_den, c_rat)`: exact per-cell extrema on the
+  legacy exact `uniform_x` path. This is the regression oracle.
+- `cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat)`: arbitrary-cell
+  evaluator using the same finite candidate set on general cell bounds.
+- `validate_arb_against_exact(depth, p_num, q_den, c_rat, ...)`: checks the
+  arbitrary-cell evaluator against the exact `uniform_x` oracle.
 - `global_exact_metrics(paths, p_num, q_den, c0_rat, delta_rat, q)`: global
-  metrics across all leaves.
+  metrics across all leaves on the exact oracle path.
+- `global_arb_metrics(paths, p_num, q_den, c0_rat, delta_rat, q, row_map)`:
+  global metrics across partition rows.
 - `best_single_intercept(paths, p_num, q_den, ...)`: best baseline with
-  `delta = 0`.
+  `delta = 0`; accepts `partition_kind` for partition-aware runs.
 
 Induced-family pieces:
 
@@ -109,14 +144,14 @@ Shared-delta optimization and lower bounds.
 
 Primary entry points:
 
-- `free_per_cell_metrics(depth, p_num, q_den)`: unconstrained per-cell lower
-  bound.
+- `free_per_cell_metrics(depth, p_num, q_den, partition_kind=None)`:
+  unconstrained per-cell lower bound.
 - `build_intercept_matrix(paths, q)`: linear map from policy parameters to
   per-path intercepts.
 - `optimize_minimax(q, depth, p_num, q_den, ...)`: minimax shared-delta search
   by bisection on target error, then a second-stage LP minimizing `max |delta|`.
-- `optimize_shared_delta(...)`: dispatcher exposing the minimax solver by
-  default and the legacy Nelder-Mead path on request.
+- `optimize_shared_delta(..., partition_kind=None)`: dispatcher exposing the
+  minimax solver by default and the legacy Nelder-Mead path on request.
 
 ### `trajectory.py`
 
@@ -126,8 +161,15 @@ families, and is useful for quick exploratory work without Sage.
 
 ## Numerical Caveats
 
-- The exact evaluator in `day.sage` uses exact rational breakpoint structure
-  and high-precision reals for transcendental values.
+- The exact evaluator in `day.sage` is now best understood as the legacy
+  `uniform_x` oracle path. It uses exact rational breakpoint structure and
+  high-precision reals for transcendental values.
+- The arbitrary-cell evaluator uses the same endpoint / `H` / `D` candidate
+  logic on arbitrary cell bounds and is validated against the exact oracle on
+  `uniform_x`.
+- The lodestone partition comparisons should use the arbitrary-cell path for
+  both `uniform_x` and `geometric_x`, keeping the exact path only as a
+  regression oracle.
 - The shared-delta minimax path in `optimize.sage` is not a fully symbolic
   rational proof. It uses float bisection, SciPy LPs, dyadic snapping of the
   returned solution, and a post-snap repair step when the dyadic policy drifts
@@ -139,6 +181,7 @@ families, and is useful for quick exploratory work without Sage.
 
 ## Extension Notes
 
+- New partition geometries belong in `partitions.sage`.
 - New policy families belong in `policies.sage`.
 - New per-cell or global Day metrics belong in `day.sage`.
 - New additive invariants or certified subset routines belong in `jukna.sage`.
