@@ -605,6 +605,46 @@ def global_exact_metrics(paths, p_num, q_den, c0_rat, delta_rat, q):
     }
 
 
+def global_arb_metrics(paths, p_num, q_den, c0_rat, delta_rat, q, row_map):
+    """
+    Global metrics using the arbitrary-cell evaluator with partition geometry.
+
+    Like global_exact_metrics but uses cell_logerr_arb with partition row bounds.
+    row_map: dict from bits -> partition row (from partition_row_map).
+    """
+    worst_abs = 0.0
+    max_cell_ratio = 0.0
+    union_log2_zmin = None
+    union_log2_zmax = None
+    cell_data = []
+
+    for P in paths:
+        c = path_intercept(P["bits"], c0_rat, delta_rat, q)
+        row = row_map[P["bits"]]
+        zmin, zmax, cell_worst, cell_ratio, meta = cell_logerr_arb(
+            row['plog_lo'], row['plog_hi'], p_num, q_den, c
+        )
+        cell_data.append((P["bits"], zmin, zmax, cell_worst, cell_ratio, meta))
+
+        if cell_worst > worst_abs:
+            worst_abs = cell_worst
+        if cell_ratio > max_cell_ratio:
+            max_cell_ratio = cell_ratio
+        if union_log2_zmin is None or zmin < union_log2_zmin:
+            union_log2_zmin = zmin
+        if union_log2_zmax is None or zmax > union_log2_zmax:
+            union_log2_zmax = zmax
+
+    return {
+        "worst_abs": float(worst_abs),
+        "max_cell_log2_ratio": float(max_cell_ratio),
+        "union_log2_zmin": float(union_log2_zmin),
+        "union_log2_zmax": float(union_log2_zmax),
+        "union_log2_ratio": float(union_log2_zmax - union_log2_zmin),
+        "cell_data": cell_data,
+    }
+
+
 def build_active_pattern_family(paths, p_num, q_den, c0_rat, delta_rat, q):
     """
     Build the Day-induced vector family from exact active-pattern signatures.
@@ -689,22 +729,41 @@ def _golden_section_minimize(func, lo, hi, tol=1e-12, maxiter=200):
     return x_opt, func(x_opt)
 
 
-def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0, dyadic_bits=20):
+def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0,
+                          dyadic_bits=20, partition_kind=None, depth=None):
     """
     Optimize a single global intercept c with delta = 0.
 
     This is the correct baseline against which shared-delta FSM policies
     should be compared.
+
+    When partition_kind is specified, uses the arbitrary-cell evaluator
+    with the given partition geometry.
     """
     alpha_q = QQ(p_num) / QQ(q_den)
     if c_init is None:
         c_init = float(QQ(1 - alpha_q) / 2)
 
-    def objective(c_val):
-        metrics = global_exact_metrics(
-            paths, p_num, q_den, dyadic_rational(c_val, dyadic_bits), None, 1
-        )
-        return metrics["worst_abs"]
+    if partition_kind is not None:
+        if depth is None:
+            depth = len(paths[0]["bits"])
+        partition = build_partition(depth, kind=partition_kind)
+        row_map = partition_row_map(partition)
+
+        def objective(c_val):
+            metrics = global_arb_metrics(
+                paths, p_num, q_den, dyadic_rational(c_val, dyadic_bits),
+                None, 1, row_map
+            )
+            return metrics["worst_abs"]
+    else:
+        row_map = None
+
+        def objective(c_val):
+            metrics = global_exact_metrics(
+                paths, p_num, q_den, dyadic_rational(c_val, dyadic_bits), None, 1
+            )
+            return metrics["worst_abs"]
 
     c_float, _ = _golden_section_minimize(
         objective,
@@ -714,12 +773,17 @@ def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0, dyadic_bit
         maxiter=250,
     )
     c_opt = dyadic_rational(c_float, dyadic_bits)
-    metrics = global_exact_metrics(paths, p_num, q_den, c_opt, None, 1)
+
+    if partition_kind is not None:
+        metrics = global_arb_metrics(paths, p_num, q_den, c_opt, None, 1, row_map)
+    else:
+        metrics = global_exact_metrics(paths, p_num, q_den, c_opt, None, 1)
 
     return {
         "c0_rat": c_opt,
         "worst_abs": metrics["worst_abs"],
         "union_log2_ratio": metrics["union_log2_ratio"],
         "max_cell_log2_ratio": metrics["max_cell_log2_ratio"],
+        "partition_kind": partition_kind,
         "metrics": metrics,
     }

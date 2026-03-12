@@ -395,6 +395,65 @@ def test_arb_concavity_boundary_min():
                 )
 
 
+def test_minimax_uniform_x_partition():
+    """Minimax with explicit uniform_x partition converges and has partition metadata."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='uniform_x')
+
+    assert_true(opt["converged"], "uniform_x partition minimax should converge")
+    assert_true(opt["worst_err"] > 0, "worst_err should be positive")
+    assert_true(opt.get("partition_kind") == 'uniform_x', "result should report partition_kind")
+    assert_true("worst_cell_bits" in opt, "result should have worst_cell_bits")
+
+
+def test_minimax_geometric_x_smoke():
+    """Minimax with geometric_x partition converges."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='geometric_x')
+
+    assert_true(opt["converged"], "geometric_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "geometric_x worst_err should be positive")
+    assert_true(opt.get("partition_kind") == 'geometric_x', "result should report geometric_x")
+    assert_true("worst_cell_bits" in opt, "result should have worst_cell metadata")
+    assert_true("worst_cell_index" in opt, "result should have worst_cell_index")
+    assert_true("worst_cell_x_lo" in opt, "result should have worst_cell_x_lo")
+
+
+def test_geometric_x_above_free_bound():
+    """Geometric_x minimax stays above the free-per-cell bound."""
+    q, depth = 1, 3
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='geometric_x')
+    free_worst, _ = free_per_cell_optimum(depth, 1, 2, partition_kind='geometric_x')
+    assert_true(
+        opt["worst_err"] >= free_worst - 1e-8,
+        f"geometric_x minimax ({opt['worst_err']:.8f}) should be >= "
+        f"free-per-cell bound ({free_worst:.8f})",
+    )
+
+
+def test_partition_aware_best_single():
+    """best_single_intercept works with partition_kind."""
+    _, paths, _ = residue_paths(1, 3)
+    best_legacy = best_single_intercept(paths, 1, 2)
+    best_uniform = best_single_intercept(paths, 1, 2, partition_kind='uniform_x')
+    best_geometric = best_single_intercept(paths, 1, 2, partition_kind='geometric_x')
+
+    # uniform_x should agree closely with legacy
+    assert_true(
+        abs(best_legacy["worst_abs"] - best_uniform["worst_abs"]) < 1e-10,
+        "partition-aware uniform_x best_single should match legacy",
+    )
+    # geometric should produce a finite positive result
+    assert_true(
+        best_geometric["worst_abs"] > 0,
+        "geometric_x best_single should have positive error",
+    )
+    assert_true(
+        best_geometric.get("partition_kind") == 'geometric_x',
+        "result should report partition_kind",
+    )
+
+
 def main():
     tests = [
         ("bits_index_roundtrip", test_bits_index_roundtrip),
@@ -408,6 +467,10 @@ def main():
         ("d_candidate_validity", test_d_candidate_validity),
         ("arb_evaluator_geometric_smoke", test_arb_evaluator_geometric_smoke),
         ("arb_concavity_boundary_min", test_arb_concavity_boundary_min),
+        ("minimax_uniform_x_partition", test_minimax_uniform_x_partition),
+        ("minimax_geometric_x_smoke", test_minimax_geometric_x_smoke),
+        ("geometric_x_above_free_bound", test_geometric_x_above_free_bound),
+        ("partition_aware_best_single", test_partition_aware_best_single),
         ("residue_paths", test_residue_paths),
         ("global_metrics_and_best_single", test_global_metrics_and_best_single),
         ("active_pattern_family", test_active_pattern_family),
