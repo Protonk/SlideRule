@@ -1,11 +1,16 @@
 Purpose: dated summaries of important experiment runs
 Canonical for: what was run, what the numbers were, and which artifacts were produced
-Not for: evergreen conceptual definitions or the causal model behind the wall
+Not for: evergreen conceptual definitions, the repo-level thesis, or the causal model behind the wall
 
 # Sweep Reports
 
-Explanations belong in [`WALL.md`](WALL.md). This file is for dated empirical
-box scores.
+Explanations belong in [`LODESTONE.md`](LODESTONE.md) and
+[`WALL.md`](WALL.md). This file is for dated empirical box scores.
+
+## Current coverage
+
+- All recorded sweeps so far are on the dyadic/geometric partition.
+- No direct `L1`-`L3` partition-comparison run has been recorded yet.
 
 ## 2026-03-09 — Baseline minimax sweep
 
@@ -43,6 +48,12 @@ Artifacts:
 - [`experiments/results/h1b_depth_scaling.csv`](experiments/results/h1b_depth_scaling.csv)
 - [`experiments/results/h1a_gap_vs_q.csv`](experiments/results/h1a_gap_vs_q.csv)
 - [`experiments/results/h1c_layer_dependent.csv`](experiments/results/h1c_layer_dependent.csv)
+
+Role in current program:
+
+- This is the dyadic baseline sweep. It supports `H1` directly and provides the
+  prerequisite comparisons needed before `L2` and `L3` can be tested across
+  partition types.
 
 ### Sweep 1 — H1b: depth scaling at fixed q
 
@@ -142,5 +153,7 @@ Direct observations:
 
 ## Where to look next
 
+- For the guiding thesis and the still-missing direct tests, read
+  [`LODESTONE.md`](LODESTONE.md).
 - For the current status labels, read [`HYPOTHESES.md`](HYPOTHESES.md).
 - For the current explanation of the wall, read [`WALL.md`](WALL.md).

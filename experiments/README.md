@@ -5,6 +5,15 @@ thin drivers over the `lib/` modules.
 
 Run all commands from project root.
 
+## Current Orientation
+
+- [`LODESTONE.md`](../LODESTONE.md) is the main scientific target.
+- The scripts currently checked in mostly characterize the dyadic/geometric
+  baseline and its wall; they are not yet a full `L1`-`L3` comparison suite.
+- If the repo is organized around the lodestone program, the next primary
+  driver should compare geometric and uniform-in-`x` partitions under the same
+  optimizer and reporting format.
+
 ## Scripts
 
 ### `fsm_coarse.sage`
@@ -59,7 +68,7 @@ Row fields:
 
 ### `optimize_delta.sage`
 
-Baseline shared-delta optimization sweep.
+Baseline shared-delta optimization sweep on the dyadic baseline.
 
 What it does:
 
@@ -119,7 +128,7 @@ Important interpretation notes:
 
 ### `h1_sweep.sage`
 
-Primary current H1 driver.
+Current dyadic wall baseline driver.
 
 What it does:
 
@@ -135,10 +144,13 @@ Run:
 ./sagew experiments/h1_sweep.sage
 ```
 
-This is the main current research driver.
+This is the main existing benchmark driver for the matched
+dyadic/geometric partition. It is preparatory support for
+[`LODESTONE.md`](../LODESTONE.md), not yet the full lodestone test suite.
 
 Primarily informs:
 
+- [`LODESTONE.md`](../LODESTONE.md)
 - [`HYPOTHESES.md`](../HYPOTHESES.md)
 - [`WALL.md`](../WALL.md)
 - [`SWEEP-REPORTS.md`](../SWEEP-REPORTS.md)
@@ -164,6 +176,14 @@ CSV outputs:
 - `experiments/results/h1b_depth_scaling.csv`
 - `experiments/results/h1a_gap_vs_q.csv`
 - `experiments/results/h1c_layer_dependent.csv`
+
+## Missing Next Driver
+
+- A partition-comparison sweep that runs the same minimax pipeline on geometric
+  and uniform-in-`x` grids.
+- That driver should record cellwise worst-case localization in addition to
+  `single_err`, `opt_err`, `free_err`, and `gap`.
+- If implemented, that becomes the natural source of truth for `L1`-`L3`.
 
 ### `smoke_test.sage`
 

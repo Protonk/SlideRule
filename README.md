@@ -1,43 +1,55 @@
 # smale
 
-FSM-parameterised coarse-stage approximations meet tropical complexity.
+FSM-parameterised coarse-stage approximations meet scale-equivariant geometry.
 
 Day's FRSR analysis gives an exact finite candidate set for the extrema of
 piecewise-linear coarse approximations to `x^(p/q)`. This repo studies finite-
-state intercept policies for those coarse approximations and, at the moment, is
-primarily about the structural wall between shared-delta policies and the
-free-per-cell lower bound.
+state intercept policies for those coarse approximations. The main guiding push
+is now the thesis in [`LODESTONE.md`](LODESTONE.md): on `R_{>0}`, approximation
+problems governed by scaling should be organized in log coordinates,
+approximated by the affine pseudo-log, and discretized on geometric grids.
+
+The current shared-delta wall work remains important, but as supporting
+baseline machinery. It tells us how the matched dyadic/geometric setup behaves
+before the repo compares that partition against mismatched alternatives such as
+uniform-in-`x` grids.
 
 ## Documentation
 
+- [`LODESTONE.md`](LODESTONE.md): guiding thesis, structural motivation, and
+  the primary `L1`-`L3` tests.
 - [`HYPOTHESES.md`](HYPOTHESES.md): active research claims and their status.
-- [`WALL.md`](WALL.md): the current obstruction model.
+- [`WALL.md`](WALL.md): the current dyadic obstruction model and its
+  decomposition.
 - [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md): dated sweep summaries and artifact links.
+- [`experiments/README.md`](experiments/README.md): experiment drivers, output
+  columns, and which scripts support the lodestone program.
 - [`lib/README.md`](lib/README.md): module graph, data contracts, and numerical caveats.
-- [`experiments/README.md`](experiments/README.md): experiment drivers, output columns, and runtime notes.
 - [`REPORT.md`](REPORT.md): current-cycle handoff, not canonical science.
 
 ## Current State
 
-- Layer-invariant shared-delta policies beat the best single-intercept baseline
-  in finite cases, but the relative gain collapses with depth at fixed `q`.
-- At fixed shallow depth, increasing `q` can drive the layer-invariant model
-  close to the free-per-cell floor.
-- Layer-dependent deltas recover much more of the wall in the tested benchmark
-  cases, so layer sharing is the main current suspect.
-- The induced-family combinatorics did not survive contact with the minimax
-  objective; the project is now centered on H1 and the wall.
+- `L1`-`L3` in [`LODESTONE.md`](LODESTONE.md) are the main untested claims.
+- Existing dyadic H1 sweeps establish that shared FSM structure helps over a
+  single intercept, that the layer-invariant gain decays with depth at fixed
+  `q`, and that much of the observed dyadic wall comes from layer sharing.
+- Those results are preparatory rather than decisive. They characterize the
+  matched dyadic baseline, not the partition-dependence predicted by the
+  lodestone thesis.
+- No geometric-vs-uniform partition comparison has been run yet, so the thesis
+  still awaits its direct negative-control experiments.
 
 ## Reading Order
 
 1. [`README.md`](README.md)
-2. [`HYPOTHESES.md`](HYPOTHESES.md)
-3. [`WALL.md`](WALL.md)
-4. [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md)
-5. [`experiments/README.md`](experiments/README.md)
-6. [`lib/README.md`](lib/README.md)
-7. [`PLAN.md`](PLAN.md)
-8. [`REPORT.md`](REPORT.md)
+2. [`LODESTONE.md`](LODESTONE.md)
+3. [`HYPOTHESES.md`](HYPOTHESES.md)
+4. [`WALL.md`](WALL.md)
+5. [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md)
+6. [`experiments/README.md`](experiments/README.md)
+7. [`lib/README.md`](lib/README.md)
+8. [`PLAN.md`](PLAN.md)
+9. [`REPORT.md`](REPORT.md)
 
 ## Layout
 
@@ -45,6 +57,7 @@ free-per-cell lower bound.
 smale/
 ├── sagew
 ├── README.md
+├── LODESTONE.md
 ├── HYPOTHESES.md
 ├── WALL.md
 ├── SWEEP-REPORTS.md
@@ -67,7 +80,7 @@ smale/
 ├── tests/
 │   └── run_tests.sage
 └── sources/
-    ├── day_2022_frsr.pdf
+    ├── day_generalize_frsr.pdf
     ├── jukna_2016_tropical_sidon.pdf
     ├── rojas_2013_ultrametric.pdf
     └── koiran_portier_rojas_2024_tropical_permanent.pdf
@@ -91,9 +104,13 @@ python3 lib/trajectory.py
 - SageMath is required for the `.sage` drivers.
 - The optimizer in [`lib/optimize.sage`](lib/optimize.sage) uses `numpy` and
   `scipy.optimize.linprog`.
-- [`experiments/fsm_coarse.sage`](experiments/fsm_coarse.sage) is the fast
-  entry point. [`experiments/optimize_delta.sage`](experiments/optimize_delta.sage)
-  is the expensive sweep.
+- [`experiments/fsm_coarse.sage`](experiments/fsm_coarse.sage) is the
+  legacy/exploratory entry point.
+- [`experiments/optimize_delta.sage`](experiments/optimize_delta.sage) and
+  [`experiments/h1_sweep.sage`](experiments/h1_sweep.sage) are the current
+  dyadic baseline drivers.
+- The next missing research driver is a partition-comparison sweep for
+  `L1`-`L3`.
 - The minimax optimizer is implemented as float bisection plus LP feasibility,
   followed by dyadic snapping of the returned parameters. Treat it as a strong
   numerical solver, not a fully certified rational optimum.

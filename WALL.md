@@ -1,8 +1,16 @@
-Purpose: define and explain the approximation wall seen in shared-delta optimization
+Purpose: define and explain the approximation wall seen in shared-delta optimization on the current dyadic baseline
 Canonical for: the current obstruction model and its decomposition
-Not for: run logs, command usage, or full sweep tables
+Not for: the repo-level thesis, run logs, or full sweep tables
 
 # Wall
+
+## Role in the current program
+
+All evidence in this file currently comes from the dyadic/geometric partition
+used by the Day model. The wall is not the repo's main claim. It is the
+diagnostic model for understanding how the matched baseline fails, and it
+becomes directly load-bearing when `L3` asks whether the same decomposition
+survives on mismatched partitions.
 
 ## Definition
 
@@ -29,7 +37,7 @@ quality has already been accounted for.
 
 ## Current decomposition
 
-The current model has three nested constraints.
+The current dyadic model has three nested constraints.
 
 ### 1. Exponential cell growth
 
@@ -60,11 +68,13 @@ So some coupling remains even after layer sharing is removed.
 
 ## Current evidence
 
+All current evidence below is on the dyadic/geometric partition.
+
 ### Parameter budget can nearly remove the wall at shallow depth
 
 At depth 4, increasing `q` in the layer-invariant model drives `opt_err` very
-close to `free_err`. This says the wall is not absolute at small depth; it is
-strongly tied to parameter budget.
+close to `free_err`. This says the dyadic wall is not absolute at small depth;
+it is strongly tied to parameter budget.
 
 ### Layer sharing is a large part of the wall at the tested benchmark points
 
@@ -75,7 +85,7 @@ At `(q, d) = (5, 6)`:
 
 This is a large reduction, so the current best explanation is that reusing one
 delta table across all layers is the main obstruction in the layer-invariant
-model.
+dyadic model.
 
 ### Residual coupling remains after layer dependence is introduced
 
@@ -98,11 +108,15 @@ This is a case-based decomposition, not yet a theorem.
 - Does the residual automaton-coupling wall shrink predictably with larger `q`
   in the layer-dependent model?
 - Do the same decompositions hold away from `alpha = 1/2`?
+- Do the same decompositions survive on uniform-in-`x` partitions, or does
+  cell-difficulty imbalance become dominant there?
 - Is there a clean scaling law in the parameter-to-cell ratio that captures both
   the layer-invariant and layer-dependent models?
 
 ## Reading outward
 
+- For the repo-level thesis and why partition choice matters, read
+  [`LODESTONE.md`](LODESTONE.md).
 - For status labels and next tests, read [`HYPOTHESES.md`](HYPOTHESES.md).
 - For the sweep tables and dated observations behind this decomposition, read
   [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md).

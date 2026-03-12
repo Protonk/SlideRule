@@ -1,8 +1,9 @@
 ## Task -> Document
 
 - Repo orientation -> `README.md`
+- Guiding thesis / scientific north star -> `LODESTONE.md`
 - Active research claims/status -> `HYPOTHESES.md`
-- Current obstruction / "the wall" -> `WALL.md`
+- Current obstruction / dyadic wall diagnostics -> `WALL.md`
 - Sweep findings and dated empirical summaries -> `SWEEP-REPORTS.md`
 - Experiment usage and output interpretation -> `experiments/README.md`
 - Library/module structure and numerical caveats -> `lib/README.md`
