@@ -451,6 +451,107 @@ def test_geometric_x_above_free_bound():
     )
 
 
+def test_harmonic_x_partition():
+    depth = 4
+    part = build_partition(depth, kind='harmonic_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+
+    # Contiguity
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"harmonic_x contiguity gap at j={j}",
+        )
+
+    # Covers [1, 2)
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "harmonic_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "harmonic_x should end at 2")
+
+    # Reciprocal spacing is finer near x=1 and wider near x=2.
+    assert_true(
+        part[-1]['width_x'] > part[0]['width_x'],
+        "harmonic_x cells should be wider near x=2 than near x=1",
+    )
+
+    # Descriptive alias should resolve to the same geometry.
+    alias_part = build_partition(depth, kind='reciprocal_x')
+    for j in range(N):
+        assert_true(
+            abs(part[j]['x_lo'] - alias_part[j]['x_lo']) < tol
+            and abs(part[j]['x_hi'] - alias_part[j]['x_hi']) < tol,
+            f"reciprocal_x alias mismatch at j={j}",
+        )
+
+    # bits match index
+    for row in part:
+        assert_true(
+            bits_to_index(row['bits']) == row['index'],
+            f"harmonic_x cell {row['index']} bits mismatch",
+        )
+
+
+def test_mirror_harmonic_x_partition():
+    depth = 4
+    part = build_partition(depth, kind='mirror_harmonic_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"mirror_harmonic_x contiguity gap at j={j}",
+        )
+
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "mirror_harmonic_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "mirror_harmonic_x should end at 2")
+
+    # Mirrored reciprocal spacing is wider near x=1 and finer near x=2.
+    assert_true(
+        part[0]['width_x'] > part[-1]['width_x'],
+        "mirror_harmonic_x cells should be wider near x=1 than near x=2",
+    )
+
+    alias_part = build_partition(depth, kind='mirror_reciprocal_x')
+    for j in range(N):
+        assert_true(
+            abs(part[j]['x_lo'] - alias_part[j]['x_lo']) < tol
+            and abs(part[j]['x_hi'] - alias_part[j]['x_hi']) < tol,
+            f"mirror_reciprocal_x alias mismatch at j={j}",
+        )
+
+
+def test_minimax_harmonic_x_smoke():
+    """Minimax with harmonic_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='harmonic_x')
+
+    assert_true(opt["converged"], "harmonic_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "harmonic_x worst_err should be positive")
+    assert_true(opt.get("partition_kind") == 'harmonic_x', "result should report harmonic_x")
+    assert_true("worst_cell_bits" in opt, "result should have worst_cell metadata")
+    assert_true("worst_cell_index" in opt, "result should have worst_cell_index")
+
+
+def test_minimax_mirror_harmonic_x_smoke():
+    """Minimax with mirror_harmonic_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='mirror_harmonic_x')
+
+    assert_true(opt["converged"], "mirror_harmonic_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "mirror_harmonic_x worst_err should be positive")
+    assert_true(
+        opt.get("partition_kind") == 'mirror_harmonic_x',
+        "result should report mirror_harmonic_x",
+    )
+    assert_true("worst_cell_bits" in opt, "result should have worst_cell metadata")
+    assert_true("worst_cell_index" in opt, "result should have worst_cell_index")
+
+
 def test_partition_aware_best_single():
     """best_single_intercept works with partition_kind."""
     _, paths, _ = residue_paths(1, 3)
@@ -490,6 +591,10 @@ def main():
         ("arb_meta_reports_x_and_plog", test_arb_meta_reports_x_and_plog),
         ("minimax_uniform_x_partition", test_minimax_uniform_x_partition),
         ("minimax_geometric_x_smoke", test_minimax_geometric_x_smoke),
+        ("harmonic_x_partition", test_harmonic_x_partition),
+        ("mirror_harmonic_x_partition", test_mirror_harmonic_x_partition),
+        ("minimax_harmonic_x_smoke", test_minimax_harmonic_x_smoke),
+        ("minimax_mirror_harmonic_x_smoke", test_minimax_mirror_harmonic_x_smoke),
         ("geometric_x_above_free_bound", test_geometric_x_above_free_bound),
         ("partition_aware_best_single", test_partition_aware_best_single),
         ("residue_paths", test_residue_paths),

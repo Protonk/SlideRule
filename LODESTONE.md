@@ -82,7 +82,11 @@ the sharing penalty on geometric cells erases the cell-level advantage.
 
 **L1c** (layer-dependent): under layer-dependent parameterization, the
 geometric advantage from L1a propagates to lower `opt_err`. *Supported* across
-tested grid (2026-03-12): (q=3, d=4), (q=5, d=4), (q=5, d=6), (q=3, d=8).
+the tested alpha=1/2 grid (2026-03-12), with initial positive checks at
+alpha=1/3, but now refined by reciprocal controls: geometric is not unique
+inside the tested x=1-heavy family, while the actual opposite-end control
+`mirror_harmonic_x` loses to `uniform_x` at every tested LD point. At q=3, the
+layer-dependent `opt_err` now appears nearly depth-flat across d=4..8.
 
 Key insight: the FSM sharing constraint is bitwise/additive in structure, which
 may align better with uniform-x cell boundaries. The "sharing penalty"

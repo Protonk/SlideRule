@@ -10,6 +10,12 @@ Run all commands from project root.
 - [`LODESTONE.md`](../LODESTONE.md) is the main scientific target.
 - [`lodestone_sweep.sage`](lodestone_sweep.sage) is the primary current driver
   for `L1`-`L3`.
+- [`l1c_grid_sweep.sage`](l1c_grid_sweep.sage) and
+  [`l1c_stability_sweep.sage`](l1c_stability_sweep.sage) are focused follow-up
+  drivers for the current L1c program.
+- [`harmonic_diagnostic_sweep.sage`](harmonic_diagnostic_sweep.sage) is the
+  current redistribution-control driver. It compares the existing lodestone
+  geometries against reciprocal and mirrored-reciprocal controls.
 - [`optimize_delta.sage`](optimize_delta.sage) and
   [`h1_sweep.sage`](h1_sweep.sage) remain legacy baseline drivers on the exact
   `uniform_x` oracle path.
@@ -225,6 +231,77 @@ Per-cell fields:
 - `cell_worst_err`, `cell_log2_ratio`
 - optimized path intercept and free-per-cell intercept
 - worst-candidate type and location
+
+### `l1c_grid_sweep.sage`
+
+Focused follow-up driver for the first L1c expansion.
+
+What it does:
+
+- tests whether geometric still beats uniform under layer-dependent sharing on
+  a small `(q, depth)` grid at `alpha = 1/2`
+- writes a separate run-directory artifact set under
+  `experiments/results/lodestone/`
+- keeps the first lodestone comparison artifacts untouched
+
+Run:
+
+```sh
+./sagew experiments/l1c_grid_sweep.sage
+```
+
+Use this when you want:
+
+- the first post-benchmark L1c grid
+- a clean follow-up artifact set rather than appending to the original
+  lodestone CSVs
+
+### `l1c_stability_sweep.sage`
+
+Focused follow-up driver for the current q=3 and alpha-robustness checks.
+
+What it does:
+
+- fills in the q=3 layer-dependent depth band at `alpha = 1/2`
+- adds the first small `alpha = 1/3` robustness checks
+- reuses exact-match rows from earlier lodestone artifact sets where possible
+- writes a fresh run directory with `source_run` provenance columns
+
+Run:
+
+```sh
+./sagew experiments/l1c_stability_sweep.sage
+```
+
+Use this when you want:
+
+- the current best evidence about the q=3 layer-dependent band
+- the first non-`1/2` checks for L1c
+- an artifact set that distinguishes reused versus newly generated rows
+
+### `harmonic_diagnostic_sweep.sage`
+
+Redistribution-control driver for the post-L1c interpretation check.
+
+What it does:
+
+- reuses exact-match `uniform_x` and `geometric_x` rows from the L1c grid
+- reuses prior `harmonic_x` rows when present
+- runs the mirrored reciprocal control `mirror_harmonic_x` fresh
+- writes a single corrected artifact set with per-row provenance
+
+Run:
+
+```sh
+./sagew experiments/harmonic_diagnostic_sweep.sage
+```
+
+Use this when you want:
+
+- to compare `uniform_x`, `geometric_x`, reciprocal spacing, and the actual
+  opposite-end reciprocal control on the same grid
+- to test whether the layer-dependent advantage is specific to log-like
+  geometry or survives other redistributions of cell resolution
 
 ## Next Comparison Expansions
 

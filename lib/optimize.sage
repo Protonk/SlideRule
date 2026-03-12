@@ -658,7 +658,9 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
     method='minimax' uses bisection+LP with dyadic snapping (default, numerical).
     method='nelder-mead' uses Nelder-Mead with multiple restarts (legacy).
     layer_dependent=True uses per-layer deltas (1+2*q*depth params).
-    partition_kind selects cell geometry (None=legacy exact, 'uniform_x', 'geometric_x').
+    partition_kind selects cell geometry (None=legacy exact or any supported
+    partition kind such as 'uniform_x', 'geometric_x', 'harmonic_x',
+    'mirror_harmonic_x').
     Returns a policy dict compatible with build_intercept_policy.
     """
     if method == 'minimax':

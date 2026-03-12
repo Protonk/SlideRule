@@ -59,6 +59,13 @@ Canonical geometry names:
 
 - `uniform_x`: equal additive width on `[1,2)`
 - `geometric_x`: equal width in `log x` on `[1,2)`
+- `harmonic_x`: reciprocal spacing in `1/x`, still finer near `x=1`
+- `mirror_harmonic_x`: mirrored reciprocal spacing, finer near `x=2`
+
+Accepted descriptive aliases:
+
+- `reciprocal_x` -> `harmonic_x`
+- `mirror_reciprocal_x` -> `mirror_harmonic_x`
 
 Each partition row carries:
 
@@ -168,7 +175,7 @@ families, and is useful for quick exploratory work without Sage.
   logic on arbitrary cell bounds and is validated against the exact oracle on
   `uniform_x`.
 - The lodestone partition comparisons should use the arbitrary-cell path for
-  both `uniform_x` and `geometric_x`, keeping the exact path only as a
+  every partition kind, keeping the exact `uniform_x` path only as a
   regression oracle.
 - The shared-delta minimax path in `optimize.sage` is not a fully symbolic
   rational proof. It uses float bisection, SciPy LPs, dyadic snapping of the

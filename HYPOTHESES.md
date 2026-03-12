@@ -10,8 +10,10 @@ The main live claim is the scale-equivariance thesis in
 [`LODESTONE.md`](LODESTONE.md). The first lodestone partition-comparison run
 exists (2026-03-11). L1 has been subdivided: the cell-level advantage of
 geometric partitions is clear, but the shared-delta advantage depends on the
-parameterization regime. The wall and H1 results remain important as
-legacy baseline evidence.
+parameterization regime. The corrected reciprocal-control diagnostic
+(2026-03-12) sharpens L1c: under layer-dependent sharing, x=1-heavy
+redistributions beat `uniform_x`, but the actual opposite-end control does
+not. The wall and H1 results remain important as legacy baseline evidence.
 
 ## Primary lodestone hypotheses
 
@@ -61,41 +63,77 @@ Key insight: the FSM sharing constraint is bitwise/additive in structure, which
 may align better with uniform-x cell boundaries. Geometric cells win at the
 cell level but the sharing penalty can erase that advantage.
 
-### L1c. Under layer-dependent parameterization, the geometric advantage propagates
+### L1c. Under layer-dependent parameterization, x=1-heavy non-uniform partitions outperform uniform
 
-Status: supported across tested grid (2026-03-12)
+Status: refined by reciprocal controls (2026-03-12)
 
-Claim:
+Claim (original):
 
 - When the parameterization is loosened to layer-dependent deltas, the
   geometric free-per-cell advantage from L1a propagates through to lower
   `opt_err`.
 
-Evidence (L1c grid sweep, alpha=1/2, 2026-03-12):
+Claim (revised after reciprocal controls):
+
+- Under layer-dependent sharing, both geometric_x and harmonic_x beat
+  uniform_x at the tested alpha=1/2 grid points, but the actual opposite-end
+  control mirror_harmonic_x does not.
+- The advantage is therefore not unique to the log coordinate, but it is also
+  not “any redistribution helps.” Direction matters.
+- Within the x=1-heavy family, the ranking is still q-dependent: harmonic_x
+  beats geometric_x at q=3, while geometric_x beats harmonic_x at q=5.
+
+Evidence (lodestone follow-up sweeps, 2026-03-11 to 2026-03-12):
 
 - Geometric layer-dependent `opt_err` < uniform layer-dependent `opt_err` at
-  all 4 tested grid points:
+  all 4 tested grid points (pre-harmonic):
   - (q=3, d=4): geo 0.02184 vs uni 0.02451
   - (q=5, d=4): geo 0.01025 vs uni 0.01207
   - (q=5, d=6): geo 0.01013 vs uni 0.01213
   - (q=3, d=8): geo 0.02184 vs uni 0.02454
-- The result holds at both shallow (d=4) and deep (d=8) depths, and at both
-  low (q=3) and moderate (q=5) parameter budgets.
-- Gap reduction from layer dependence is substantial on both partition kinds
-  and is larger on geometric at most, but not all, tested points.
+- At q=3 with alpha=1/2, the layer-dependent bands are now filled in across
+  d=4, 5, 6, 7, 8:
+  - geometric: 0.021838, 0.021864, 0.021915, 0.021844, 0.021838
+  - uniform:   0.024510, 0.024520, 0.024520, 0.024630, 0.024538
+- Initial alpha=1/3 robustness checks also preserve geo < uni:
+  - (q=3, d=4): geo 0.01238 vs uni 0.01457
+  - (q=5, d=6): geo 0.00582 vs uni 0.00744
 
-Earlier evidence (lodestone sweep, 2026-03-11):
+Reciprocal-control evidence (2026-03-12):
 
-- At (q=3, d=6): geometric 0.02191 vs uniform 0.02452 (first observation).
+- Layer-dependent rankings at alpha=1/2:
+  - (q=3, d=4): har 0.01922 < geo 0.02184 < uni 0.02451 — harmonic wins
+  - (q=5, d=4): geo 0.01025 < har 0.01091 < uni 0.01207 — geometric wins
+  - (q=5, d=6): geo 0.01013 < har 0.01103 < uni 0.01213 — geometric wins
+  - (q=3, d=8): har 0.01922 < geo 0.02184 < uni 0.02454 — harmonic wins
+- The actual opposite-end control mirror_harmonic_x loses to uniform_x at all
+  tested layer-dependent points:
+  - (q=3, d=4): mir 0.02833 > uni 0.02451
+  - (q=5, d=4): mir 0.01897 > uni 0.01207
+  - (q=5, d=6): mir 0.01902 > uni 0.01213
+  - (q=3, d=8): mir 0.02833 > uni 0.02454
+- In the layer-invariant model, the picture is different: mirror_harmonic_x is
+  competitive at shallow depth and is best at the tested deep points
+  `(q=5, d=6)` and `(q=3, d=8)`.
 
-Note: at q=3, the geometric layer-dependent `opt_err` is very close across
-d=4, 6, 8, with d=4 and d=8 matching to full precision and d=6 slightly
-higher. This suggests, but does not yet establish, a q=3 automaton floor.
+Interpretation:
+
+- Under layer-dependent sharing, direction matters. The tested x=1-heavy
+  redistributions beat uniform, while the x=2-heavy control does not.
+- Geometric is not unique among x=1-heavy partitions, so L1a is not the whole
+  story under sharing. The shared-delta mechanism still cares about how cell
+  resolution is distributed inside that broad family.
+- Under layer-invariant sharing, the opposite-end control becoming competitive
+  or best at deeper points shows that the sharing geometry can favor very
+  different partitions than the free-per-cell geometry does.
 
 Next test:
 
-- test at non-1/2 alpha values
-- investigate the q=3 opt_err plateau across depths
+- investigate why layer-dependent sharing prefers the x=1-heavy families while
+  layer-invariant sharing can favor mirror_harmonic_x at deeper points
+- check whether the q-dependence of the harmonic_x vs geometric_x ranking
+  persists at other alpha values
+- add non-`1/2` alpha checks for mirror_harmonic_x, not just geo vs uniform
 
 ### L2. Log-organized schemes behave more naturally across depth than x-organized schemes
 
