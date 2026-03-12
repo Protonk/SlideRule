@@ -244,6 +244,223 @@ def cell_exact_logerr(bits, p_num, q_den, c_rat):
     return float(log2_zmin), float(log2_zmax), float(worst), float(ratio)
 
 
+# ── Arbitrary-cell evaluator ──────────────────────────────────────────
+
+def _d_candidate_valid(xp_D_plog, k, p_num, q_den, c_rat):
+    """
+    Verify that the D-candidate at plog=xp_D_plog actually lies on
+    the segment where floor(u) = k.
+
+    This is the mandatory second check from the plan: the stationary
+    formula and the floor(u)=k verification must agree.
+    """
+    alpha_q = QQ(p_num) / QQ(q_den)
+    c = QQ(c_rat)
+    u = c - alpha_q * QQ(xp_D_plog)
+    return Integer(floor(u)) == Integer(k)
+
+
+def _assert_z_positive(log2_z_val, x_plog, context=""):
+    """
+    Assert that z(x) > 0 at an evaluated candidate.
+
+    Under the current pexp, z > 0 holds on [1,2) because pexp(u) > 0
+    and x > 0.  This guard catches future pexp changes.
+    """
+    if not (HiR(log2_z_val) > HiR(-1e30)):
+        raise AssertionError(
+            f"z(x) non-positive at plog={float(x_plog)}: "
+            f"log2(z)={float(log2_z_val)} {context}"
+        )
+
+
+def cell_breakpoints_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
+    """
+    H-grid breakpoints for a cell with arbitrary plog-domain bounds.
+
+    Returns a sorted list of plog values.  Cell endpoints are HiR;
+    interior H-candidates are QQ (exact).  All comparisons use HiR.
+    """
+    alpha = QQ(p_num) / QQ(q_den)
+    c = QQ(c_rat)
+
+    lo = HiR(plog_lo)
+    hi = HiR(plog_hi)
+
+    points = [lo, hi]
+
+    if alpha == 0:
+        return points
+
+    u_at_lo = HiR(c) - HiR(alpha) * lo
+    u_at_hi = HiR(c) - HiR(alpha) * hi
+
+    for k in range(floor(u_at_hi), ceil(u_at_lo) + 1):
+        xp = (c - QQ(k)) / alpha          # exact QQ
+        if lo < HiR(xp) < hi:
+            points.append(xp)
+
+    return sorted(points, key=lambda p: HiR(p))
+
+
+def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
+    """
+    Arbitrary-cell evaluator — same H/D candidate logic as the exact
+    evaluator, with high-precision HiR evaluation.
+
+    Parameters
+    ----------
+    plog_lo, plog_hi : plog-domain cell bounds (QQ or HiR)
+    p_num, q_den     : alpha = p_num / q_den
+    c_rat            : QQ intercept
+
+    Returns (log2_zmin, log2_zmax, worst_abs, log2_ratio, meta)
+    where meta carries candidate metadata.
+    """
+    alpha_q = QQ(p_num) / QQ(q_den)
+    c = QQ(c_rat)
+
+    breakpoints = cell_breakpoints_arb(plog_lo, plog_hi, p_num, q_den, c_rat)
+    n_bp = len(breakpoints)
+
+    # Build candidate set: breakpoints + D-candidates per segment
+    candidates = []
+
+    for idx, bp in enumerate(breakpoints):
+        if idx == 0 or idx == n_bp - 1:
+            candidates.append((bp, 'endpoint'))
+        else:
+            candidates.append((bp, 'H'))
+
+    for i in range(n_bp - 1):
+        seg_lo = breakpoints[i]
+        seg_hi = breakpoints[i + 1]
+
+        seg_mid_hi = (HiR(seg_lo) + HiR(seg_hi)) / 2
+        u_mid = HiR(c) - HiR(alpha_q) * seg_mid_hi
+        k = Integer(floor(u_mid))
+
+        xp_D = (c - QQ(k)) / (1 + alpha_q)    # exact QQ
+
+        # Check 1: strictly inside segment
+        if not (HiR(seg_lo) < HiR(xp_D) < HiR(seg_hi)):
+            continue
+
+        # Check 2: floor(u(x_D)) = k  (mandatory validity check)
+        if not _d_candidate_valid(xp_D, k, p_num, q_den, c_rat):
+            continue
+
+        candidates.append((xp_D, 'D'))
+
+    # Evaluate at all candidates
+    evaluated = []
+    for plog_val, ctype in candidates:
+        val = log2_z_at(plog_val, p_num, q_den, c_rat)
+        _assert_z_positive(val, plog_val)
+        evaluated.append((plog_val, val, ctype))
+
+    # Concavity consistency check (alpha > 0)
+    if alpha_q > 0:
+        for i in range(n_bp - 1):
+            _segment_concavity_check(i, breakpoints, evaluated)
+
+    values = [v for _, v, _ in evaluated]
+    log2_zmin = min(values)
+    log2_zmax = max(values)
+    worst = max(abs(log2_zmin), abs(log2_zmax))
+    ratio = log2_zmax - log2_zmin
+
+    worst_entry = max(evaluated, key=lambda e: abs(e[1]))
+
+    meta = {
+        'candidates': [(float(HiR(p)), float(v), t) for p, v, t in evaluated],
+        'n_candidates': len(evaluated),
+        'worst_type': worst_entry[2],
+        'worst_plog': float(HiR(worst_entry[0])),
+    }
+
+    return float(log2_zmin), float(log2_zmax), float(worst), float(ratio), meta
+
+
+def _segment_concavity_check(seg_idx, breakpoints, evaluated):
+    """
+    On a fixed-k segment with alpha > 0, f = log2(z) is strictly concave.
+    A valid D point must be the segment maximizer; the minimum must be
+    at a boundary.  Raises AssertionError on violation.
+    """
+    seg_lo = HiR(breakpoints[seg_idx])
+    seg_hi = HiR(breakpoints[seg_idx + 1])
+    eps = HiR(10)^(-50)
+
+    d_vals = []
+    boundary_vals = []
+
+    for plog_val, val, ctype in evaluated:
+        p = HiR(plog_val)
+        if p < seg_lo - eps or p > seg_hi + eps:
+            continue
+        if ctype == 'D':
+            d_vals.append(val)
+        else:
+            boundary_vals.append(val)
+
+    if d_vals and boundary_vals:
+        d_max = max(d_vals)
+        b_max = max(boundary_vals)
+        if d_max < b_max - 1e-10:
+            raise AssertionError(
+                f"concavity violation on segment {seg_idx}: "
+                f"D value {d_max:.15e} < boundary max {b_max:.15e}"
+            )
+
+
+def validate_arb_against_exact(depth, p_num, q_den, c_rat, tol=1e-12, hard_tol=1e-8):
+    """
+    Validate the arbitrary-cell evaluator against the exact evaluator
+    on all uniform_x cells at the given depth.
+
+    Returns (max_discrepancy, n_cells_checked, rows).
+    Raises AssertionError if any cell exceeds hard_tol.
+    """
+    partition = build_partition(depth, kind='uniform_x')
+    max_disc = 0.0
+    rows = []
+
+    for row in partition:
+        exact_zmin, exact_zmax, exact_worst, exact_ratio = cell_exact_logerr(
+            row['bits'], p_num, q_den, c_rat
+        )
+        arb_zmin, arb_zmax, arb_worst, arb_ratio, meta = cell_logerr_arb(
+            row['plog_lo'], row['plog_hi'], p_num, q_den, c_rat
+        )
+
+        disc_worst = abs(exact_worst - arb_worst)
+        disc_ratio = abs(exact_ratio - arb_ratio)
+        disc = max(disc_worst, disc_ratio)
+
+        if disc > hard_tol:
+            raise AssertionError(
+                f"arb-cell evaluator disagrees with exact on cell {row['index']} "
+                f"(bits={row['bits']}): disc_worst={disc_worst:.2e}, "
+                f"disc_ratio={disc_ratio:.2e}, hard_tol={hard_tol}"
+            )
+
+        rows.append({
+            'index': row['index'],
+            'bits': row['bits'],
+            'exact_worst': exact_worst,
+            'arb_worst': arb_worst,
+            'disc_worst': disc_worst,
+            'disc_ratio': disc_ratio,
+            'n_candidates': meta['n_candidates'],
+        })
+
+        if disc > max_disc:
+            max_disc = disc
+
+    return max_disc, len(partition), rows
+
+
 def cell_active_pattern(bits, p_num, q_den, c_rat):
     """
     Extract an exact Day-induced signature for one leaf cell.

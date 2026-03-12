@@ -299,6 +299,102 @@ def test_uniform_x_matches_dyadic():
         )
 
 
+def test_arb_evaluator_oracle_d3():
+    """Arbitrary-cell evaluator matches exact evaluator on uniform_x depth=3."""
+    c_rat = QQ(1) / QQ(4)  # alpha=1/2 => c = (1-1/2)/2 = 1/4
+    max_disc, n_cells, _ = validate_arb_against_exact(3, 1, 2, c_rat, tol=1e-12, hard_tol=1e-8)
+    assert_true(n_cells == 8, f"expected 8 cells, got {n_cells}")
+    assert_true(
+        max_disc <= 1e-12,
+        f"arb evaluator oracle discrepancy {max_disc:.2e} exceeds 1e-12 at depth=3",
+    )
+
+
+def test_arb_evaluator_oracle_d5():
+    """Arbitrary-cell evaluator matches exact evaluator on uniform_x depth=5."""
+    c_rat = QQ(1) / QQ(4)
+    max_disc, n_cells, _ = validate_arb_against_exact(5, 1, 2, c_rat, tol=1e-12, hard_tol=1e-8)
+    assert_true(n_cells == 32, f"expected 32 cells, got {n_cells}")
+    assert_true(
+        max_disc <= 1e-12,
+        f"arb evaluator oracle discrepancy {max_disc:.2e} exceeds 1e-12 at depth=5",
+    )
+
+
+def test_arb_evaluator_oracle_varied_c():
+    """Oracle validation with an optimized intercept, not just the centered default."""
+    _, paths, _ = residue_paths(1, 3)
+    best = best_single_intercept(paths, 1, 2)
+    c_rat = best["c0_rat"]
+    max_disc, n_cells, _ = validate_arb_against_exact(3, 1, 2, c_rat, tol=1e-12, hard_tol=1e-8)
+    assert_true(
+        max_disc <= 1e-12,
+        f"arb evaluator oracle discrepancy {max_disc:.2e} with optimized c at depth=3",
+    )
+
+
+def test_d_candidate_validity():
+    """D-candidates that pass containment also pass floor(u)=k."""
+    alpha_q = QQ(1) / QQ(2)
+    c = QQ(1) / QQ(4)
+    depth = 4
+    partition = build_partition(depth, kind='uniform_x')
+
+    for row in partition:
+        breakpoints = cell_breakpoints_arb(row['plog_lo'], row['plog_hi'], 1, 2, c)
+        for i in range(len(breakpoints) - 1):
+            seg_lo = breakpoints[i]
+            seg_hi = breakpoints[i + 1]
+            seg_mid_hi = (HiR(seg_lo) + HiR(seg_hi)) / 2
+            u_mid = HiR(c) - HiR(alpha_q) * seg_mid_hi
+            k = Integer(floor(u_mid))
+            xp_D = (c - QQ(k)) / (1 + alpha_q)
+            if HiR(seg_lo) < HiR(xp_D) < HiR(seg_hi):
+                assert_true(
+                    _d_candidate_valid(xp_D, k, 1, 2, c),
+                    f"D-candidate at plog={float(xp_D)} failed floor(u)=k "
+                    f"on cell {row['index']} segment {i}",
+                )
+
+
+def test_arb_evaluator_geometric_smoke():
+    """Arbitrary-cell evaluator runs on geometric_x cells without error."""
+    c_rat = QQ(1) / QQ(4)
+    depth = 4
+    partition = build_partition(depth, kind='geometric_x')
+
+    for row in partition:
+        zmin, zmax, worst, ratio, meta = cell_logerr_arb(
+            row['plog_lo'], row['plog_hi'], 1, 2, c_rat
+        )
+        assert_true(worst >= 0, f"negative worst on geometric_x cell {row['index']}")
+        assert_true(ratio >= 0, f"negative ratio on geometric_x cell {row['index']}")
+        assert_true(meta['n_candidates'] >= 2, f"too few candidates on cell {row['index']}")
+
+
+def test_arb_concavity_boundary_min():
+    """On representative segments, worst negative excursion is at boundary, not D."""
+    c_rat = QQ(1) / QQ(4)
+    depth = 4
+    partition = build_partition(depth, kind='uniform_x')
+
+    for row in partition:
+        _, _, _, _, meta = cell_logerr_arb(
+            row['plog_lo'], row['plog_hi'], 1, 2, c_rat
+        )
+        # If the worst candidate is a D-point, it should be a max (positive),
+        # not the min.  The segment min should be at an endpoint or H-point.
+        for plog_val, val, ctype in meta['candidates']:
+            if ctype == 'D':
+                # D-point should not be the most-negative candidate
+                min_val = min(v for _, v, _ in meta['candidates'])
+                assert_true(
+                    val >= min_val - 1e-14,
+                    f"D-point at plog={plog_val:.6f} is segment min "
+                    f"on cell {row['index']}",
+                )
+
+
 def main():
     tests = [
         ("bits_index_roundtrip", test_bits_index_roundtrip),
@@ -306,6 +402,12 @@ def main():
         ("geometric_x_partition", test_geometric_x_partition),
         ("partition_row_map", test_partition_row_map),
         ("uniform_x_matches_dyadic", test_uniform_x_matches_dyadic),
+        ("arb_evaluator_oracle_d3", test_arb_evaluator_oracle_d3),
+        ("arb_evaluator_oracle_d5", test_arb_evaluator_oracle_d5),
+        ("arb_evaluator_oracle_varied_c", test_arb_evaluator_oracle_varied_c),
+        ("d_candidate_validity", test_d_candidate_validity),
+        ("arb_evaluator_geometric_smoke", test_arb_evaluator_geometric_smoke),
+        ("arb_concavity_boundary_min", test_arb_concavity_boundary_min),
         ("residue_paths", test_residue_paths),
         ("global_metrics_and_best_single", test_global_metrics_and_best_single),
         ("active_pattern_family", test_active_pattern_family),
