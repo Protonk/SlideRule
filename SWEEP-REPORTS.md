@@ -11,6 +11,7 @@ Explanations belong in [`LODESTONE.md`](LODESTONE.md) and
 
 - Legacy `uniform_x` baseline sweeps (2026-03-09).
 - First direct `L1`–`L3` partition-comparison sweep (2026-03-11).
+- L1c grid sweep: layer-dependent comparison across (q, depth) (2026-03-12).
 
 ## 2026-03-09 — Baseline minimax sweep
 
@@ -236,6 +237,66 @@ Direct observations:
 
 - Results are qualitatively similar to alpha=1/2 at this point: geometric has
   lower `free_err` but higher `gap`.
+
+## 2026-03-12 — L1c grid sweep
+
+Driver:
+
+- [`experiments/l1c_grid_sweep.sage`](experiments/l1c_grid_sweep.sage)
+
+Artifacts:
+
+- [`experiments/results/lodestone/l1c_grid_2026-03-12/summary.csv`](experiments/results/lodestone/l1c_grid_2026-03-12/summary.csv)
+- [`experiments/results/lodestone/l1c_grid_2026-03-12/percell.csv`](experiments/results/lodestone/l1c_grid_2026-03-12/percell.csv)
+- [`experiments/results/lodestone/l1c_grid_2026-03-12/README.md`](experiments/results/lodestone/l1c_grid_2026-03-12/README.md)
+
+Role in current program:
+
+- This is the follow-up test of L1c, checking whether the geometric advantage
+  under layer-dependent sharing holds beyond the single (q=3, d=6) benchmark.
+
+### Stage 1 — (q=3, d=4), (q=5, d=4), (q=5, d=6), alpha=1/2
+
+| kind | q | d | mode | opt_err | free_err | gap | gap reduction |
+|------|---|---|------|---------|----------|-----|---------------|
+| uniform_x | 3 | 4 | layer-inv | 0.031873 | 0.010423 | 0.021450 | — |
+| geometric_x | 3 | 4 | layer-inv | 0.033031 | 0.007554 | 0.025477 | — |
+| uniform_x | 3 | 4 | layer-dep | 0.024510 | 0.010423 | 0.014088 | 34.3% |
+| geometric_x | 3 | 4 | layer-dep | 0.021838 | 0.007554 | 0.014284 | 43.9% |
+| uniform_x | 5 | 4 | layer-inv | 0.022005 | 0.010423 | 0.011582 | — |
+| geometric_x | 5 | 4 | layer-inv | 0.023075 | 0.007554 | 0.015521 | — |
+| uniform_x | 5 | 4 | layer-dep | 0.012065 | 0.010423 | 0.001642 | 85.8% |
+| geometric_x | 5 | 4 | layer-dep | 0.010251 | 0.007554 | 0.002697 | 82.6% |
+| uniform_x | 5 | 6 | layer-inv | 0.034749 | 0.002763 | 0.031986 | — |
+| geometric_x | 5 | 6 | layer-inv | 0.037989 | 0.001937 | 0.036051 | — |
+| uniform_x | 5 | 6 | layer-dep | 0.012127 | 0.002763 | 0.009364 | 70.7% |
+| geometric_x | 5 | 6 | layer-dep | 0.010127 | 0.001937 | 0.008190 | 77.3% |
+
+Direct observations:
+
+- Geometric layer-dependent `opt_err` < uniform layer-dependent `opt_err` at
+  all three Stage 1 points.
+- Gap reduction from layer dependence is larger on geometric at two of the
+  three Stage 1 points, but not at (q=5, d=4).
+- At (q=5, d=4), the layer-dependent gap nearly closes on both partition kinds.
+
+### Stage 2 — (q=3, d=8), alpha=1/2
+
+| kind | q | d | mode | opt_err | free_err | gap | gap reduction |
+|------|---|---|------|---------|----------|-----|---------------|
+| uniform_x | 3 | 8 | layer-inv | 0.044895 | 0.000701 | 0.044194 | — |
+| geometric_x | 3 | 8 | layer-inv | 0.046349 | 0.000487 | 0.045862 | — |
+| uniform_x | 3 | 8 | layer-dep | 0.024538 | 0.000701 | 0.023837 | 46.1% |
+| geometric_x | 3 | 8 | layer-dep | 0.021838 | 0.000487 | 0.021351 | 53.5% |
+
+Direct observations:
+
+- L1c continues to hold at d=8.
+- The geometric layer-dependent `opt_err` at (q=3, d=8) matches (q=3, d=4) to
+  full precision and is close to, but not identical with, the earlier
+  (q=3, d=6) result. This suggests a q=3 floor but does not establish one.
+- Uniform layer-dependent `opt_err` is also nearly stable across d=4, 6, 8 at
+  q=3 (~0.0245).
 
 ## Where to look next
 

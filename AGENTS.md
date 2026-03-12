@@ -1,3 +1,7 @@
+# How to work here
+
+> Logistical guidance lives here, see `LODESTONE.md` for mathematical direction
+
 ## Task -> Document
 
 - Repo orientation -> `README.md`
@@ -17,3 +21,10 @@ files, local to the activity being planned. Prefer these files (or an
 equivalent `SUBJECT-PLAN.md`) over embedding stateful planning information in
 documentation. Generate, use, and eventually dissolve these `PLAN`s as you
 work.
+
+### Handoff REPORTing
+
+Use the `REPORT.md` document to keep a best-effort running log of the following:
+* Useful procedural context about your current workset.
+* Recent, active "gotchas" or wrinkles in practice
+The reporting handoff should NOT recapitulate or route to existing docs. The repo is small and `REPORT.md` space is precious.

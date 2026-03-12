@@ -63,7 +63,7 @@ cell level but the sharing penalty can erase that advantage.
 
 ### L1c. Under layer-dependent parameterization, the geometric advantage propagates
 
-Status: supported at (q=3, d=6)
+Status: supported across tested grid (2026-03-12)
 
 Claim:
 
@@ -71,17 +71,31 @@ Claim:
   geometric free-per-cell advantage from L1a propagates through to lower
   `opt_err`.
 
-Evidence (lodestone sweep, alpha=1/2):
+Evidence (L1c grid sweep, alpha=1/2, 2026-03-12):
 
-- At (q=3, d=6) with layer-dependent deltas: geometric `opt_err` = 0.02191 vs
-  uniform `opt_err` = 0.02452.
-- Layer-dependent parameterization reduces the gap on both partition kinds
-  (~40–50%), but the geometric partition ends up with a lower residual.
+- Geometric layer-dependent `opt_err` < uniform layer-dependent `opt_err` at
+  all 4 tested grid points:
+  - (q=3, d=4): geo 0.02184 vs uni 0.02451
+  - (q=5, d=4): geo 0.01025 vs uni 0.01207
+  - (q=5, d=6): geo 0.01013 vs uni 0.01213
+  - (q=3, d=8): geo 0.02184 vs uni 0.02454
+- The result holds at both shallow (d=4) and deep (d=8) depths, and at both
+  low (q=3) and moderate (q=5) parameter budgets.
+- Gap reduction from layer dependence is substantial on both partition kinds
+  and is larger on geometric at most, but not all, tested points.
+
+Earlier evidence (lodestone sweep, 2026-03-11):
+
+- At (q=3, d=6): geometric 0.02191 vs uniform 0.02452 (first observation).
+
+Note: at q=3, the geometric layer-dependent `opt_err` is very close across
+d=4, 6, 8, with d=4 and d=8 matching to full precision and d=6 slightly
+higher. This suggests, but does not yet establish, a q=3 automaton floor.
 
 Next test:
 
-- run layer-dependent comparison at more (q, depth) points to test whether L1c
-  holds broadly or only at this one benchmark
+- test at non-1/2 alpha values
+- investigate the q=3 opt_err plateau across depths
 
 ### L2. Log-organized schemes behave more naturally across depth than x-organized schemes
 

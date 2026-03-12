@@ -81,8 +81,8 @@ yield lower `opt_err`. *Not generally supported* — at intermediate depths,
 the sharing penalty on geometric cells erases the cell-level advantage.
 
 **L1c** (layer-dependent): under layer-dependent parameterization, the
-geometric advantage from L1a propagates to lower `opt_err`. *Supported* at
-(q=3, d=6).
+geometric advantage from L1a propagates to lower `opt_err`. *Supported* across
+tested grid (2026-03-12): (q=3, d=4), (q=5, d=4), (q=5, d=6), (q=3, d=8).
 
 Key insight: the FSM sharing constraint is bitwise/additive in structure, which
 may align better with uniform-x cell boundaries. The "sharing penalty"
