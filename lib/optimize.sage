@@ -29,9 +29,10 @@ def _cell_worst_scalar(c_val, bits, p_num, q_den):
     return worst
 
 
-def _cell_worst_scalar_arb(c_val, plog_lo, plog_hi, p_num, q_den):
+def _cell_worst_scalar_arb(c_val, plog_lo, plog_hi, p_num, q_den, x_start=1):
     """Objective: worst |log2(z)| for an arbitrary cell as a function of c."""
-    _, _, worst, _, _ = cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, QQ(c_val))
+    _, _, worst, _, _ = cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, QQ(c_val),
+                                         x_start=x_start)
     return worst
 
 
@@ -56,7 +57,8 @@ def optimal_cell_intercept(bits, p_num, q_den, c_init=None):
     return c_opt, worst
 
 
-def optimal_cell_intercept_arb(plog_lo, plog_hi, p_num, q_den, c_init=None):
+def optimal_cell_intercept_arb(plog_lo, plog_hi, p_num, q_den, c_init=None,
+                               x_start=1):
     """
     Find the intercept c minimizing worst |log2(z)| on an arbitrary cell.
 
@@ -69,15 +71,17 @@ def optimal_cell_intercept_arb(plog_lo, plog_hi, p_num, q_den, c_init=None):
         _cell_worst_scalar_arb,
         bounds=(c_init - 2.0, c_init + 2.0),
         method='bounded',
-        args=(plog_lo, plog_hi, p_num, q_den),
+        args=(plog_lo, plog_hi, p_num, q_den, x_start),
         options={'xatol': 1e-15},
     )
     c_opt = dyadic_rational(res.x, bits=20)
-    _, _, worst, _, _ = cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_opt)
+    _, _, worst, _, _ = cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_opt,
+                                         x_start=x_start)
     return c_opt, worst
 
 
-def free_per_cell_optimum(depth, p_num, q_den, partition_kind=None):
+def free_per_cell_optimum(depth, p_num, q_den, partition_kind=None,
+                          x_start=1, x_width=1):
     """
     Optimize c independently per cell (no sharing constraint).
 
@@ -85,20 +89,23 @@ def free_per_cell_optimum(depth, p_num, q_den, partition_kind=None):
     Returns (global_worst, cell_list) where each entry is
     (bits, c_opt, cell_worst).
     """
-    metrics = free_per_cell_metrics(depth, p_num, q_den, partition_kind=partition_kind)
+    metrics = free_per_cell_metrics(depth, p_num, q_den,
+                                    partition_kind=partition_kind,
+                                    x_start=x_start, x_width=x_width)
     return metrics["worst_abs"], [
         (row["bits"], row["c_opt"], row["cell_worst"]) for row in metrics["rows"]
     ]
 
 
-def free_per_cell_metrics(depth, p_num, q_den, partition_kind=None):
+def free_per_cell_metrics(depth, p_num, q_den, partition_kind=None,
+                          x_start=1, x_width=1):
     """
     Per-cell optimum metrics under independent intercepts.
 
     When partition_kind is specified, uses the arbitrary-cell evaluator.
     When partition_kind is None, uses the legacy exact evaluator.
     """
-    c_init = float(QQ(1 - QQ(p_num) / QQ(q_den)) / 2)
+    c_init = float(default_c0(QQ(p_num) / QQ(q_den), x_width))
 
     rows = []
     worst_abs = 0.0
@@ -106,12 +113,15 @@ def free_per_cell_metrics(depth, p_num, q_den, partition_kind=None):
     union_log2_zmax = None
 
     if partition_kind is not None:
-        partition = build_partition(depth, kind=partition_kind)
+        partition = build_partition(depth, kind=partition_kind,
+                                    x_start=x_start, x_width=x_width)
         for row in partition:
             c_opt, w = optimal_cell_intercept_arb(
-                row['plog_lo'], row['plog_hi'], p_num, q_den, c_init=c_init)
+                row['plog_lo'], row['plog_hi'], p_num, q_den, c_init=c_init,
+                x_start=x_start)
             zmin, zmax, cell_worst, cell_ratio, _ = cell_logerr_arb(
-                row['plog_lo'], row['plog_hi'], p_num, q_den, c_opt)
+                row['plog_lo'], row['plog_hi'], p_num, q_den, c_opt,
+                x_start=x_start)
             rows.append({
                 "bits": row['bits'],
                 "index": row['index'],
@@ -205,13 +215,14 @@ def _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau, tol=1e-13):
 
 
 def _cell_feasible_interval_arb(plog_lo, plog_hi, p_num, q_den,
-                                c_star, f_star, tau, tol=1e-13):
+                                c_star, f_star, tau, tol=1e-13, x_start=1):
     """Like _cell_feasible_interval but using the arb evaluator."""
     if tau < f_star - tol:
         return None
 
     def f(c_val):
-        _, _, worst, _, _ = cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, QQ(c_val))
+        _, _, worst, _, _ = cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, QQ(c_val),
+                                             x_start=x_start)
         return worst
 
     return _bisect_feasible_interval(f, float(c_star), tau, tol)
@@ -337,7 +348,7 @@ def _build_feasible_intervals(cell_optima, p_num, q_den, tau):
     return lo_bounds, hi_bounds
 
 
-def _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau):
+def _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau, x_start=1):
     """Build per-cell feasible intervals using the arb evaluator.
 
     cell_optima_arb entries: (plog_lo, plog_hi, c_star, f_star).
@@ -346,7 +357,8 @@ def _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau):
     hi_bounds = []
     for plog_lo, plog_hi, c_star, f_star in cell_optima_arb:
         interval = _cell_feasible_interval_arb(
-            plog_lo, plog_hi, p_num, q_den, c_star, f_star, tau)
+            plog_lo, plog_hi, p_num, q_den, c_star, f_star, tau,
+            x_start=x_start)
         if interval is None:
             return None
         lo_bounds.append(interval[0])
@@ -410,7 +422,8 @@ def _worst_cell_metadata(metrics, row_map):
 
 
 def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
-                     layer_dependent=False, partition_kind=None):
+                     layer_dependent=False, partition_kind=None,
+                     x_start=1, x_width=1):
     """
     Numerical minimax solver via bisection on target error + LP feasibility.
 
@@ -427,14 +440,15 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
     Returns a policy dict compatible with optimize_shared_delta output.
     """
     alpha_q = QQ(p_num) / QQ(q_den)
-    c_init = float(QQ(1 - alpha_q) / 2)
+    c_init = float(default_c0(alpha_q, x_width))
     use_arb = (partition_kind is not None)
 
     _, paths, _ = residue_paths(q, depth)
     n_cells = len(paths)
 
     if use_arb:
-        partition = build_partition(depth, kind=partition_kind)
+        partition = build_partition(depth, kind=partition_kind,
+                                    x_start=x_start, x_width=x_width)
         row_map = partition_row_map(partition)
     else:
         row_map = None
@@ -447,7 +461,8 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
         if use_arb:
             row = row_map[P["bits"]]
             c_opt, f_opt = optimal_cell_intercept_arb(
-                row['plog_lo'], row['plog_hi'], p_num, q_den, c_init=c_init)
+                row['plog_lo'], row['plog_hi'], p_num, q_den, c_init=c_init,
+                x_start=x_start)
             cell_optima_arb.append((row['plog_lo'], row['plog_hi'], float(c_opt), f_opt))
         else:
             c_opt, f_opt = optimal_cell_intercept(P["bits"], p_num, q_den, c_init=c_init)
@@ -459,14 +474,15 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
     else:
         tau_lo = max(f for _, _, f in cell_optima)
 
-    zero_c0 = QQ(1 - alpha_q) / 2
+    zero_c0 = default_c0(alpha_q, x_width)
     if layer_dependent:
         zero_delta = {(t, r, b): QQ(0) for t in range(depth) for r in range(q) for b in (0, 1)}
     else:
         zero_delta = {(r, b): QQ(0) for r in range(q) for b in (0, 1)}
 
     if use_arb:
-        zero_metrics = global_arb_metrics(paths, p_num, q_den, zero_c0, zero_delta, q, row_map)
+        zero_metrics = global_arb_metrics(paths, p_num, q_den, zero_c0, zero_delta, q, row_map,
+                                          x_start=x_start)
     else:
         zero_metrics = global_exact_metrics(paths, p_num, q_den, zero_c0, zero_delta, q)
     tau_hi = max(zero_metrics["worst_abs"], tau_lo + 0.1)
@@ -485,12 +501,14 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
 
     def _build_intervals(tau_val):
         if use_arb:
-            return _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau_val)
+            return _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau_val,
+                                                  x_start=x_start)
         return _build_feasible_intervals(cell_optima, p_num, q_den, tau_val)
 
     def _eval_metrics(c0, delta):
         if use_arb:
-            return global_arb_metrics(paths, p_num, q_den, c0, delta, q, row_map)
+            return global_arb_metrics(paths, p_num, q_den, c0, delta, q, row_map,
+                                      x_start=x_start)
         return global_exact_metrics(paths, p_num, q_den, c0, delta, q)
 
     for _ in range(70):  # ~70 steps gives ~1e-21 precision
@@ -539,7 +557,7 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
             x_continuous, q, dyadic_bits, depth=depth, layer_dependent=layer_dependent)
     else:
         fallback_used = True
-        c0_opt = QQ(1 - alpha_q) / 2
+        c0_opt = default_c0(alpha_q, x_width)
         if layer_dependent:
             delta_opt = {(t, r, b): QQ(0) for t in range(depth) for r in range(q) for b in (0, 1)}
         else:
@@ -651,7 +669,7 @@ def _shared_objective(params, paths, p_num, q_den, q, dyadic_bits):
 def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
                           maxiter=5000, n_restarts=3, seed=42,
                           dyadic_bits=12, method='minimax', layer_dependent=False,
-                          partition_kind=None):
+                          partition_kind=None, x_start=1, x_width=1):
     """
     Optimize c0 and delta to minimize worst-case error over all leaf cells.
 
@@ -666,7 +684,8 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
     if method == 'minimax':
         return optimize_minimax(q, depth, p_num, q_den, dyadic_bits=dyadic_bits,
                                 layer_dependent=layer_dependent,
-                                partition_kind=partition_kind)
+                                partition_kind=partition_kind,
+                                x_start=x_start, x_width=x_width)
     if partition_kind is not None:
         raise ValueError("partition_kind requires method='minimax'")
     if layer_dependent:

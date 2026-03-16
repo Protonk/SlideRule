@@ -575,6 +575,87 @@ def test_partition_aware_best_single():
     )
 
 
+def test_nondefault_domain_partition():
+    """Partition on [2, 4) — all four kinds cover the domain contiguously."""
+    depth = 3
+    N = 2^depth
+    tol = HiR(10)^(-50)
+    xs, xw = 2, 2  # domain [2, 4)
+
+    for kind in PARTITION_KINDS:
+        part = build_partition(depth, kind=kind, x_start=xs, x_width=xw)
+        assert_true(len(part) == N, f"{kind} [2,4): expected {N} cells")
+        assert_true(
+            abs(part[0]['x_lo'] - HiR(xs)) < tol,
+            f"{kind} [2,4): should start at {xs}",
+        )
+        assert_true(
+            abs(part[-1]['x_hi'] - HiR(xs + xw)) < tol,
+            f"{kind} [2,4): should end at {xs + xw}",
+        )
+        for j in range(N - 1):
+            assert_true(
+                abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+                f"{kind} [2,4): contiguity gap at j={j}",
+            )
+        # x_start and x_width stored in rows
+        assert_true(
+            abs(part[0]['x_start'] - HiR(xs)) < tol,
+            f"{kind}: x_start not stored",
+        )
+        assert_true(
+            abs(part[0]['x_width'] - HiR(xw)) < tol,
+            f"{kind}: x_width not stored",
+        )
+
+
+def test_nondefault_domain_evaluator():
+    """D-candidate and evaluator work on [2, 4) with uniform_x."""
+    depth = 3
+    xs, xw = 2, 2
+    p_num, q_den = 1, 2
+    alpha_q = QQ(p_num) / QQ(q_den)
+    c0 = default_c0(alpha_q, xw)
+
+    part = build_partition(depth, kind='uniform_x', x_start=xs, x_width=xw)
+    for row in part:
+        zmin, zmax, worst, ratio, meta = cell_logerr_arb(
+            row['plog_lo'], row['plog_hi'], p_num, q_den, c0,
+            x_start=xs)
+        assert_true(worst >= 0, f"cell {row['index']}: negative worst error")
+        assert_true(
+            meta['worst_x'] >= xs and meta['worst_x'] <= xs + xw,
+            f"cell {row['index']}: worst_x outside domain",
+        )
+
+
+def test_nondefault_domain_minimax():
+    """Minimax optimizer converges on [2, 4) with geometric_x."""
+    q, depth = 3, 3
+    p_num, q_den = 1, 2
+    xs, xw = 2, 2
+
+    result = optimize_minimax(
+        q, depth, p_num, q_den,
+        partition_kind='geometric_x',
+        x_start=xs, x_width=xw,
+    )
+    assert_true(result['converged'], "minimax on [2,4) should converge")
+    assert_true(result['worst_err'] > 0, "minimax on [2,4) should have positive error")
+
+    # Free-per-cell bound should also work
+    free_worst, _ = free_per_cell_optimum(
+        depth, p_num, q_den,
+        partition_kind='geometric_x',
+        x_start=xs, x_width=xw,
+    )
+    assert_true(free_worst > 0, "free-per-cell on [2,4) should have positive error")
+    assert_true(
+        result['worst_err'] >= free_worst - 1e-8,
+        "minimax should be >= free-per-cell bound on [2,4)",
+    )
+
+
 def main():
     tests = [
         ("bits_index_roundtrip", test_bits_index_roundtrip),
@@ -608,6 +689,9 @@ def main():
         ("layer_dependent_smoke", test_layer_dependent_smoke),
         ("layer_dependent_beats_invariant", test_layer_dependent_beats_invariant),
         ("layer_dependent_above_free_bound", test_layer_dependent_above_free_bound),
+        ("nondefault_domain_partition", test_nondefault_domain_partition),
+        ("nondefault_domain_evaluator", test_nondefault_domain_evaluator),
+        ("nondefault_domain_minimax", test_nondefault_domain_minimax),
     ]
 
     print("=" * 80)

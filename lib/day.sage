@@ -184,7 +184,7 @@ def _token_key(token):
     return repr(token)
 
 
-def log2_z_at(x_plog, p_num, q_den, c_rat):
+def log2_z_at(x_plog, p_num, q_den, c_rat, x_start=1):
     """
     Evaluate log2(z) at a single plog-domain point.
 
@@ -198,7 +198,7 @@ def log2_z_at(x_plog, p_num, q_den, c_rat):
     s = floor(u)
     f = u - s
 
-    x_hi = HiR(1) + HiR(x_plog)
+    x_hi = HiR(x_start) + HiR(x_plog)
     alpha_hi = HiR(alpha_q)
 
     log2_pexp = HiR(s) + (HiR(1) + HiR(f)).log() / LN2
@@ -303,7 +303,7 @@ def cell_breakpoints_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
     return sorted(points, key=lambda p: HiR(p))
 
 
-def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
+def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat, x_start=1):
     """
     Arbitrary-cell evaluator — same H/D candidate logic as the exact
     evaluator, with high-precision HiR evaluation.
@@ -313,12 +313,14 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
     plog_lo, plog_hi : plog-domain cell bounds (QQ or HiR)
     p_num, q_den     : alpha = p_num / q_den
     c_rat            : QQ intercept
+    x_start          : domain left endpoint (default 1)
 
     Returns (log2_zmin, log2_zmax, worst_abs, log2_ratio, meta)
     where meta carries candidate metadata.
     """
     alpha_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
+    xs = QQ(x_start)
 
     breakpoints = cell_breakpoints_arb(plog_lo, plog_hi, p_num, q_den, c_rat)
     n_bp = len(breakpoints)
@@ -340,7 +342,9 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
         u_mid = HiR(c) - HiR(alpha_q) * seg_mid_hi
         k = Integer(floor(u_mid))
 
-        xp_D = (c - QQ(k)) / (1 + alpha_q)    # exact QQ
+        # D-candidate: stationary point of log2(z) on segment with floor(u)=k.
+        # Derived from d/dx_plog[log2(z)] = 0 with x = x_start + x_plog.
+        xp_D = (1 - xs + c - QQ(k)) / (1 + alpha_q)    # exact QQ
 
         # Check 1: strictly inside segment
         if not (HiR(seg_lo) < HiR(xp_D) < HiR(seg_hi)):
@@ -355,7 +359,7 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
     # Evaluate at all candidates
     evaluated = []
     for plog_val, ctype in candidates:
-        val = log2_z_at(plog_val, p_num, q_den, c_rat)
+        val = log2_z_at(plog_val, p_num, q_den, c_rat, x_start=x_start)
         _assert_z_positive(val, plog_val)
         evaluated.append((plog_val, val, ctype))
 
@@ -376,7 +380,7 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
         'candidates': [(float(HiR(p)), float(v), t) for p, v, t in evaluated],
         'n_candidates': len(evaluated),
         'worst_type': worst_entry[2],
-        'worst_x': float(HiR(1) + HiR(worst_entry[0])),
+        'worst_x': float(HiR(x_start) + HiR(worst_entry[0])),
         'worst_plog': float(HiR(worst_entry[0])),
     }
 
@@ -606,7 +610,8 @@ def global_exact_metrics(paths, p_num, q_den, c0_rat, delta_rat, q):
     }
 
 
-def global_arb_metrics(paths, p_num, q_den, c0_rat, delta_rat, q, row_map):
+def global_arb_metrics(paths, p_num, q_den, c0_rat, delta_rat, q, row_map,
+                       x_start=1):
     """
     Global metrics using the arbitrary-cell evaluator with partition geometry.
 
@@ -623,7 +628,8 @@ def global_arb_metrics(paths, p_num, q_den, c0_rat, delta_rat, q, row_map):
         c = path_intercept(P["bits"], c0_rat, delta_rat, q)
         row = row_map[P["bits"]]
         zmin, zmax, cell_worst, cell_ratio, meta = cell_logerr_arb(
-            row['plog_lo'], row['plog_hi'], p_num, q_den, c
+            row['plog_lo'], row['plog_hi'], p_num, q_den, c,
+            x_start=x_start
         )
         cell_data.append((P["bits"], zmin, zmax, cell_worst, cell_ratio, meta))
 
@@ -731,7 +737,8 @@ def _golden_section_minimize(func, lo, hi, tol=1e-12, maxiter=200):
 
 
 def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0,
-                          dyadic_bits=20, partition_kind=None, depth=None):
+                          dyadic_bits=20, partition_kind=None, depth=None,
+                          x_start=1, x_width=1):
     """
     Optimize a single global intercept c with delta = 0.
 
@@ -743,18 +750,19 @@ def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0,
     """
     alpha_q = QQ(p_num) / QQ(q_den)
     if c_init is None:
-        c_init = float(QQ(1 - alpha_q) / 2)
+        c_init = float(default_c0(alpha_q, x_width))
 
     if partition_kind is not None:
         if depth is None:
             depth = len(paths[0]["bits"])
-        partition = build_partition(depth, kind=partition_kind)
+        partition = build_partition(depth, kind=partition_kind,
+                                    x_start=x_start, x_width=x_width)
         row_map = partition_row_map(partition)
 
         def objective(c_val):
             metrics = global_arb_metrics(
                 paths, p_num, q_den, dyadic_rational(c_val, dyadic_bits),
-                None, 1, row_map
+                None, 1, row_map, x_start=x_start
             )
             return metrics["worst_abs"]
     else:
@@ -776,7 +784,8 @@ def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0,
     c_opt = dyadic_rational(c_float, dyadic_bits)
 
     if partition_kind is not None:
-        metrics = global_arb_metrics(paths, p_num, q_den, c_opt, None, 1, row_map)
+        metrics = global_arb_metrics(paths, p_num, q_den, c_opt, None, 1,
+                                     row_map, x_start=x_start)
     else:
         metrics = global_exact_metrics(paths, p_num, q_den, c_opt, None, 1)
 

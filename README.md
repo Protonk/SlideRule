@@ -25,7 +25,6 @@ against `geometric_x`.
 - [`experiments/README.md`](experiments/README.md): experiment drivers, output
   columns, and which scripts support the lodestone program.
 - [`lib/README.md`](lib/README.md): module graph, data contracts, and numerical caveats.
-- [`REPORT.md`](REPORT.md): current-cycle handoff, not canonical science.
 
 ## Terminology
 
@@ -35,66 +34,6 @@ against `geometric_x`.
 - `index`: integer cell id `0 .. 2^depth - 1`.
 - Historical notes may still say "dyadic" for binary addressing or the older
   baseline; in current repo docs, it is not the canonical geometry name.
-
-## Current State
-
-- The first lodestone partition-comparison sweep exists (2026-03-11) and
-  compares `uniform_x` against `geometric_x` under the same optimizer.
-- `L1` has split into three claims: `L1a` is supported, `L1b` is not generally
-  supported under layer-invariant sharing, and `L1c` has first positive
-  evidence at `(q, d) = (3, 6)` under layer-dependent sharing.
-- `L2` is currently mixed, and `L3` now has first partition-dependent evidence.
-- The older H1 sweeps remain useful as legacy `uniform_x` baseline evidence and
-  wall diagnostics.
-
-## Reading Order
-
-1. [`README.md`](README.md)
-2. [`LODESTONE.md`](LODESTONE.md)
-3. [`HYPOTHESES.md`](HYPOTHESES.md)
-4. [`WALL.md`](WALL.md)
-5. [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md)
-6. [`experiments/README.md`](experiments/README.md)
-7. [`lib/README.md`](lib/README.md)
-8. [`PLAN.md`](PLAN.md)
-9. [`REPORT.md`](REPORT.md)
-
-## Layout
-
-```
-smale/
-├── sagew
-├── README.md
-├── LODESTONE.md
-├── HYPOTHESES.md
-├── WALL.md
-├── SWEEP-REPORTS.md
-├── PLAN.md
-├── REPORT.md
-├── lib/
-│   ├── README.md
-│   ├── paths.sage
-│   ├── policies.sage
-│   ├── day.sage
-│   ├── partitions.sage
-│   ├── jukna.sage
-│   ├── optimize.sage
-│   └── trajectory.py
-├── experiments/
-│   ├── README.md
-│   ├── fsm_coarse.sage
-│   ├── optimize_delta.sage
-│   ├── h1_sweep.sage
-│   ├── lodestone_sweep.sage
-│   └── smoke_test.sage
-├── tests/
-│   └── run_tests.sage
-└── sources/
-    ├── day_generalize_frsr.pdf
-    ├── jukna_2016_tropical_sidon.pdf
-    ├── rojas_2013_ultrametric.pdf
-    └── koiran_portier_rojas_2024_tropical_permanent.pdf
-```
 
 ## Running
 

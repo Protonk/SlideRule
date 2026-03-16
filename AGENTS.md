@@ -22,6 +22,19 @@ equivalent `SUBJECT-PLAN.md`) over embedding stateful planning information in
 documentation. Generate, use, and eventually dissolve these `PLAN`s as you
 work.
 
+### Python environment
+
+The project runs Python through Sage's bundled environment, not the system
+Python. Sage ships its own venv with known-good versions of SymPy, NumPy,
+matplotlib, and SciPy. The `sagew` wrapper provides `--python3` and `--pip`
+subcommands that exec Sage's bundled Python directly.
+
+```
+./sagew --python3 sympy/plog_error_chain.py
+```
+
+Do not use the system `python3` for project scripts.
+
 ### Handoff REPORTing
 
 Use the `REPORT.md` document to keep a best-effort running log of the following:
