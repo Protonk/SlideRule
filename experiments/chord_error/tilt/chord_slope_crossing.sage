@@ -1,13 +1,12 @@
 """
-tilt_decomp_vis.sage — Tilt profile across the full domain (uniform only).
+chord_slope_crossing.sage — Cell chord slope across the uniform partition.
 
-Top panel: per-cell error E(m) as a 100-tooth sawtooth with peak envelope.
-Teeth are taller on the left (front-loaded curvature).
+Shows the per-cell chord slope sigma_j as a step function across [1, 2].
+Cells on the left have steeper chords than the global chord (sigma > 1);
+cells on the right have shallower chords (sigma < 1).  The crossover
+happens at m* = 1/ln 2, the peak of the global approximation error.
 
-Bottom panel: tilt slope (sigma_j - 1) step function showing each cell's
-chord slope deviation from the global chord.
-
-Run:  ./sagew experiments/error/tilt_decomp_vis.sage
+Run:  ./sagew experiments/error/tilt/chord_slope_crossing.sage
 """
 
 import matplotlib
@@ -19,7 +18,7 @@ from math import log, log2 as math_log2
 
 # ── Configuration ────────────────────────────────────────────────────
 
-N = 100
+N = 8
 M_PER_CELL = 20
 
 
@@ -74,7 +73,7 @@ def build_profiles(cells):
 
 # ── Verification ─────────────────────────────────────────────────────
 
-def verify(cells, m_all, E_all):
+def verify(cells, m_all, E_all, peak_Es):
     assert E_all.min() > -1e-14, f"negative E, min = {E_all.min():.2e}"
     for i, (a, b) in enumerate(cells):
         idx_lo = i * M_PER_CELL
@@ -82,69 +81,67 @@ def verify(cells, m_all, E_all):
         assert abs(E_all[idx_lo]) < 1e-13, f"cell {i}: E(a) != 0"
         assert abs(E_all[idx_hi]) < 1e-13, f"cell {i}: E(b) != 0"
 
+    # Peak envelope must be monotonically decreasing (curvature falls with m).
+    for i in range(len(peak_Es) - 1):
+        assert peak_Es[i] >= peak_Es[i + 1], (
+            f"peak envelope not decreasing: cell {i} ({peak_Es[i]:.4e}) "
+            f"< cell {i+1} ({peak_Es[i+1]:.4e})")
+
+    # Peak ratio should approach 4:1 from below.  At N=8 it's ~3.3.
+    ratio = peak_Es.max() / peak_Es.min()
+    assert 2.5 < ratio < 4.0, f"peak ratio {ratio:.4f} outside expected range (2.5, 4.0)"
+
 
 # ── Plotting ─────────────────────────────────────────────────────────
 
 def make_plot():
     cells = uniform_partition(N)
     m_all, E_all, midpoints, slopes, peak_ms, peak_Es = build_profiles(cells)
-    verify(cells, m_all, E_all)
+    verify(cells, m_all, E_all, peak_Es)
 
-    fig, (ax_top, ax_bot) = plt.subplots(
-        2, 1,
-        figsize=(8, 6),
-        gridspec_kw={'height_ratios': [2, 1]},
-        sharex=True,
-    )
+    fig, ax = plt.subplots(figsize=(9, 4), constrained_layout=True)
 
-    # ── Top: E(m) sawtooth ───────────────────────────────────────────
+    # Continuous limit: 1/(m ln 2) - 1, the chord slope deviation in the
+    # small-cell limit.
+    ms_cont = np.linspace(1.0, 2.0, 300)
+    ax.plot(ms_cont, 1.0 / (ms_cont * log(2.0)) - 1.0,
+            '--', color='#cccccc', linewidth=1.2, zorder=1)
 
-    ax_top.fill_between(m_all, 0, E_all, color='#1f77b4', alpha=0.4)
-    ax_top.plot(m_all, E_all, '-', color='#1f77b4', linewidth=0.3)
-    ax_top.plot(peak_ms, peak_Es, '-', color='#d62728', linewidth=1.5,
-                label='peak envelope')
-
-    ax_top.set_ylim(0, peak_Es.max() * 1.15)
-    ax_top.set_ylabel('per-cell error $E(m)$', fontsize=10)
-    ax_top.tick_params(labelsize=8)
-    ax_top.legend(fontsize=8, loc='upper right')
-
-    ratio = peak_Es.max() / peak_Es.min()
-    ax_top.text(
-        0.03, 0.88,
-        f'peak ratio: {ratio:.2f}:1',
-        transform=ax_top.transAxes, fontsize=9,
-        bbox=dict(boxstyle='round,pad=0.3', facecolor='white',
-                  edgecolor='#888888', alpha=0.8),
-    )
-
-    # ── Bottom: tilt slope ───────────────────────────────────────────
-
+    # Step function via ax.step with vertical risers.
+    # Build boundary x-values and slope values for a "post" step plot.
+    step_x = [cells[0][0]]
+    step_y = [slopes[0]]
     for i, (a, b) in enumerate(cells):
-        ax_bot.plot([a, b], [slopes[i], slopes[i]], '-',
-                    color='#e67e22', linewidth=1.2)
+        step_x.append(b)
+        step_y.append(slopes[i])
+    ax.step(step_x, step_y, where='post', color='#e67e22', linewidth=1.8,
+            zorder=2)
 
-    ax_bot.axhline(0, color='black', linewidth=0.8, linestyle='--')
-    ax_bot.set_ylabel(r'tilt slope ($\sigma - 1$)', fontsize=10)
-    ax_bot.set_xlabel('m', fontsize=10)
-    ax_bot.tick_params(labelsize=8)
+    ax.axhline(0, color='black', linewidth=0.8, linestyle='--', zorder=1)
 
-    zero_idx = np.argmin(np.abs(slopes))
-    ax_bot.annotate(
-        f'$\\sigma = 1$ near m = {midpoints[zero_idx]:.2f}',
-        xy=(midpoints[zero_idx], 0),
-        xytext=(midpoints[zero_idx] + 0.15, slopes.max() * 0.5),
-        fontsize=8, color='#e67e22',
-        arrowprops=dict(arrowstyle='->', color='#e67e22', lw=0.8),
+    # m* = 1/ln 2 crossing
+    m_star = 1.0 / log(2.0)
+    ax.axvline(m_star, color='#888888', linewidth=1.0, linestyle=':',
+               zorder=1)
+    ax.annotate(
+        r'$m^* = 1/\ln 2$',
+        xy=(m_star, 0),
+        xytext=(m_star + 0.25, slopes.max() * 0.6),
+        fontsize=9, color='#555555',
+        arrowprops=dict(arrowstyle='->', color='#888888', lw=0.8),
     )
+
+    ax.set_ylabel(r'chord slope deviation  $\sigma_j - 1$', fontsize=10)
+    ax.set_xlabel('$m$', fontsize=10)
+    ax.tick_params(labelsize=8)
 
     fig.suptitle(
-        f'Tilt decomposition — uniform partition, N = {N}',
+        'Cell chord slopes cross the global slope at $m^* = 1/\\ln 2$\n'
+        f'Uniform partition, $N = {N}$ cells on $[1,\\, 2)$',
         fontsize=12, fontweight='bold',
     )
-    fig.tight_layout(rect=[0, 0, 1, 0.96])
 
-    out_path = 'experiments/error/tilt_decomp.png'
+    out_path = 'experiments/error/tilt/chord_slope_crossing.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print(f"Saved: {out_path}")
 
@@ -154,7 +151,7 @@ def make_plot():
 def print_diagnostics():
     cells = uniform_partition(N)
     m_all, E_all, midpoints, slopes, peak_ms, peak_Es = build_profiles(cells)
-    verify(cells, m_all, E_all)
+    verify(cells, m_all, E_all, peak_Es)
 
     ratio = peak_Es.max() / peak_Es.min()
     print()

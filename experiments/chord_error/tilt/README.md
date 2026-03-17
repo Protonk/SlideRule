@@ -53,7 +53,14 @@ The ratio E_uniform(a) / E_geometric = 1/(a^2 ln^2 2), independent of N.
 At a=1 the uniform peak is ~2.08x the geometric peak; at a=2 it is ~0.52x.
 They cross at a = 1/ln 2 — the same m* again.
 
-## Script
+## Scripts
 
-`tilt_decomp_vis.sage` — run with `./sagew experiments/error/tilt_decomp_vis.sage`.
-Writes `tilt_decomp.png`.
+`chord_slope_crossing.sage` — cell chord slope step function showing the
+zero crossing at m* = 1/ln 2.  Run with
+`./sagew experiments/error/tilt/chord_slope_crossing.sage`.
+Writes `chord_slope_crossing.png`.
+
+`uniform_vs_geometric_peaks.sage` — three-panel comparison of uniform vs
+geometric per-cell error and peak envelopes.  Run with
+`./sagew experiments/error/tilt/uniform_vs_geometric_peaks.sage`.
+Writes `uniform_vs_geometric_peaks.png`.

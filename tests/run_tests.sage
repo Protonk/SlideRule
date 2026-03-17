@@ -552,6 +552,449 @@ def test_minimax_mirror_harmonic_x_smoke():
     assert_true("worst_cell_index" in opt, "result should have worst_cell_index")
 
 
+def test_ruler_x_partition():
+    """Ruler partition: contiguity, covers [1,2), widths follow 2-adic valuation."""
+    depth = 4
+    part = build_partition(depth, kind='ruler_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"ruler_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "ruler_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "ruler_x should end at 2")
+
+    # Cell 0 (j+1=1, v2=0) should be widest; cell N-1 (j+1=N, v2=depth) narrowest.
+    widths = [float(r['width_x']) for r in part]
+    assert_true(widths[0] == max(widths), "ruler_x cell 0 should be widest")
+    assert_true(widths[-1] == min(widths), "ruler_x cell N-1 should be narrowest")
+
+    # Width ratios should be powers of 2.
+    w0 = widths[0]
+    for j in range(N):
+        ratio = w0 / widths[j]
+        log_ratio = round(float(log(ratio, 2)))
+        assert_true(
+            abs(ratio - 2**log_ratio) < 1e-10,
+            f"ruler_x width ratio at j={j} is not a power of 2: {ratio}",
+        )
+
+
+def test_sinusoidal_x_partition():
+    """Sinusoidal partition: contiguity, covers [1,2), widths oscillate."""
+    depth = 4
+    part = build_partition(depth, kind='sinusoidal_x', sin_k=3, sin_alpha=0.6)
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-10)   # bisection gives ~18 digits, not exact arithmetic
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"sinusoidal_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "sinusoidal_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "sinusoidal_x should end at 2")
+
+    # Widths should NOT be monotone (oscillating density).
+    widths = [float(r['width_x']) for r in part]
+    diffs = [widths[j+1] - widths[j] for j in range(len(widths) - 1)]
+    has_increase = any(d > 0 for d in diffs)
+    has_decrease = any(d < 0 for d in diffs)
+    assert_true(has_increase and has_decrease,
+                "sinusoidal_x widths should oscillate (not monotone)")
+
+    # alpha=0 should recover geometric (uniform in log-space).
+    part0 = build_partition(depth, kind='sinusoidal_x', sin_k=3, sin_alpha=0.0)
+    geo = build_partition(depth, kind='geometric_x')
+    for j in range(N):
+        assert_true(
+            abs(float(part0[j]['width_x']) - float(geo[j]['width_x'])) < 1e-10,
+            f"sinusoidal_x with alpha=0 should match geometric at j={j}",
+        )
+
+
+def test_minimax_ruler_x_smoke():
+    """Minimax with ruler_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='ruler_x')
+    assert_true(opt["converged"], "ruler_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "ruler_x worst_err should be positive")
+
+
+def test_minimax_sinusoidal_x_smoke():
+    """Minimax with sinusoidal_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='sinusoidal_x')
+    assert_true(opt["converged"], "sinusoidal_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "sinusoidal_x worst_err should be positive")
+
+
+def test_chebyshev_x_partition():
+    """Chebyshev partition: contiguity, covers [1,2), dense at both endpoints."""
+    depth = 4
+    part = build_partition(depth, kind='chebyshev_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"chebyshev_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "chebyshev_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "chebyshev_x should end at 2")
+
+    # Cells at endpoints should be narrower than cells in the middle.
+    mid = N // 2
+    assert_true(
+        part[0]['width_x'] < part[mid]['width_x'],
+        "chebyshev_x: first cell should be narrower than middle cell",
+    )
+    assert_true(
+        part[-1]['width_x'] < part[mid]['width_x'],
+        "chebyshev_x: last cell should be narrower than middle cell",
+    )
+
+
+def test_minimax_chebyshev_x_smoke():
+    """Minimax with chebyshev_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='chebyshev_x')
+    assert_true(opt["converged"], "chebyshev_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "chebyshev_x worst_err should be positive")
+
+
+def test_thuemorse_x_partition():
+    """Thue-Morse partition: contiguity, covers [1,2), exactly two distinct widths."""
+    depth = 4
+    part = build_partition(depth, kind='thuemorse_x', tm_ratio=2)
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"thuemorse_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "thuemorse_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "thuemorse_x should end at 2")
+
+    # Exactly two distinct widths with ratio tm_ratio.
+    widths = sorted(set(float(r['width_x']) for r in part))
+    assert_true(len(widths) == 2, f"thuemorse_x should have 2 distinct widths, got {len(widths)}")
+    ratio = widths[1] / widths[0]
+    assert_true(
+        abs(ratio - 2.0) < 1e-10,
+        f"thuemorse_x width ratio should be 2:1, got {ratio}",
+    )
+
+
+def test_minimax_thuemorse_x_smoke():
+    """Minimax with thuemorse_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='thuemorse_x')
+    assert_true(opt["converged"], "thuemorse_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "thuemorse_x worst_err should be positive")
+
+
+def test_bitrev_geometric_x_partition():
+    """Bitrev-geometric partition: contiguity, covers [1,2), same width multiset as geometric."""
+    depth = 4
+    part = build_partition(depth, kind='bitrev_geometric_x')
+    geo = build_partition(depth, kind='geometric_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"bitrev_geometric_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "bitrev_geometric_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "bitrev_geometric_x should end at 2")
+
+    # Same multiset of widths as geometric (sorted widths should match).
+    br_widths = sorted(float(r['width_x']) for r in part)
+    geo_widths = sorted(float(r['width_x']) for r in geo)
+    for j in range(N):
+        assert_true(
+            abs(br_widths[j] - geo_widths[j]) < 1e-12,
+            f"bitrev_geometric_x sorted width mismatch at j={j}",
+        )
+
+    # But the order should differ (not identical to geometric).
+    order_differs = any(
+        abs(float(part[j]['width_x']) - float(geo[j]['width_x'])) > 1e-12
+        for j in range(N)
+    )
+    assert_true(order_differs, "bitrev_geometric_x should differ in cell order from geometric")
+
+
+def test_minimax_bitrev_geometric_x_smoke():
+    """Minimax with bitrev_geometric_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='bitrev_geometric_x')
+    assert_true(opt["converged"], "bitrev_geometric_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "bitrev_geometric_x worst_err should be positive")
+
+
+def test_stern_brocot_x_partition():
+    """Stern-Brocot partition: contiguity, covers [1,2), known depth-2 boundaries."""
+    depth = 4
+    part = build_partition(depth, kind='stern_brocot_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"stern_brocot_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "stern_brocot_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "stern_brocot_x should end at 2")
+
+    # All boundaries should be rationals.
+    for row in part:
+        # HiR values from QQ should be exact rationals.
+        x_lo_f = float(row['x_lo'])
+        assert_true(x_lo_f > 0, f"stern_brocot_x cell {row['index']} has non-positive x_lo")
+
+    # Known depth-2 boundaries: [1, 4/3, 3/2, 5/3, 2].
+    part2 = build_partition(2, kind='stern_brocot_x')
+    expected = [QQ(1), QQ(4)/QQ(3), QQ(3)/QQ(2), QQ(5)/QQ(3), QQ(2)]
+    boundaries = [part2[0]['x_lo']] + [r['x_hi'] for r in part2]
+    for j in range(5):
+        assert_true(
+            abs(boundaries[j] - HiR(expected[j])) < tol,
+            f"stern_brocot_x depth-2 boundary {j}: expected {expected[j]}, "
+            f"got {float(boundaries[j])}",
+        )
+
+
+def test_minimax_stern_brocot_x_smoke():
+    """Minimax with stern_brocot_x partition converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='stern_brocot_x')
+    assert_true(opt["converged"], "stern_brocot_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "stern_brocot_x worst_err should be positive")
+
+
+def test_reverse_geometric_x_partition():
+    """Reverse geometric: contiguity, covers [1,2), widths increase left to right."""
+    depth = 4
+    part = build_partition(depth, kind='reverse_geometric_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-50)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"reverse_geometric_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "reverse_geometric_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "reverse_geometric_x should end at 2")
+
+    # Widths should decrease (opposite of geometric, which increases).
+    widths = [float(r['width_x']) for r in part]
+    for j in range(N - 1):
+        assert_true(widths[j] > widths[j + 1],
+                    f"reverse_geometric_x widths should decrease at j={j}")
+
+
+def test_minimax_reverse_geometric_x_smoke():
+    """Minimax with reverse_geometric_x converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='reverse_geometric_x')
+    assert_true(opt["converged"], "reverse_geometric_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "reverse_geometric_x worst_err should be positive")
+
+
+def test_random_x_partition():
+    """Random partition: contiguity, covers [1,2), deterministic with fixed seed."""
+    depth = 4
+    part = build_partition(depth, kind='random_x', random_seed=42)
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-10)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"random_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "random_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "random_x should end at 2")
+
+    # Deterministic: same seed gives same partition.
+    part2 = build_partition(depth, kind='random_x', random_seed=42)
+    for j in range(N):
+        assert_true(
+            abs(float(part[j]['width_x']) - float(part2[j]['width_x'])) < 1e-14,
+            f"random_x should be deterministic at j={j}",
+        )
+
+
+def test_minimax_random_x_smoke():
+    """Minimax with random_x converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='random_x')
+    assert_true(opt["converged"], "random_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "random_x worst_err should be positive")
+
+
+def test_dyadic_x_partition():
+    """Dyadic partition: contiguity, covers [1,2), all boundaries are dyadic rationals."""
+    depth = 4
+    part = build_partition(depth, kind='dyadic_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-10)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"dyadic_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "dyadic_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "dyadic_x should end at 2")
+
+    # All interior boundaries should be dyadic rationals (denominator is power of 2).
+    R = depth + 4
+    scale = 2**R
+    for j in range(1, N):
+        val = float(part[j]['x_lo'])
+        snapped = round(val * scale) / scale
+        assert_true(
+            abs(val - snapped) < 1e-12,
+            f"dyadic_x boundary at j={j} is not dyadic: {val}",
+        )
+
+
+def test_minimax_dyadic_x_smoke():
+    """Minimax with dyadic_x converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='dyadic_x')
+    assert_true(opt["converged"], "dyadic_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "dyadic_x worst_err should be positive")
+
+
+def test_powerlaw_x_partition():
+    """Power-law partition: contiguity, covers [1,2), first cell narrower than last."""
+    depth = 4
+    part = build_partition(depth, kind='powerlaw_x', pl_exponent=3)
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-10)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"powerlaw_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "powerlaw_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "powerlaw_x should end at 2")
+
+    # Aggressive left-packing: first cell much narrower than last.
+    assert_true(
+        float(part[0]['width_x']) < float(part[-1]['width_x']),
+        "powerlaw_x: first cell should be narrower than last cell",
+    )
+    # Check ratio is substantial (p=3 should give big difference).
+    ratio = float(part[-1]['width_x']) / float(part[0]['width_x'])
+    assert_true(ratio > 5, f"powerlaw_x width ratio should be large, got {ratio:.1f}")
+
+
+def test_minimax_powerlaw_x_smoke():
+    """Minimax with powerlaw_x converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='powerlaw_x')
+    assert_true(opt["converged"], "powerlaw_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "powerlaw_x worst_err should be positive")
+
+
+def test_golden_x_partition():
+    """Golden-ratio partition: contiguity, covers [1,2), N-1 distinct interior points."""
+    depth = 4
+    part = build_partition(depth, kind='golden_x')
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-10)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"golden_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "golden_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "golden_x should end at 2")
+
+    # Widths should be non-uniform (multiple distinct values).
+    widths = [round(float(r['width_x']), 12) for r in part]
+    assert_true(
+        len(set(widths)) > 1,
+        "golden_x should have non-uniform widths",
+    )
+
+    # Widths should be non-monotone (quasi-random scattering).
+    raw_widths = [float(r['width_x']) for r in part]
+    diffs = [raw_widths[j+1] - raw_widths[j] for j in range(len(raw_widths) - 1)]
+    has_inc = any(d > 1e-15 for d in diffs)
+    has_dec = any(d < -1e-15 for d in diffs)
+    assert_true(has_inc and has_dec,
+                "golden_x widths should be non-monotone")
+
+
+def test_minimax_golden_x_smoke():
+    """Minimax with golden_x converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='golden_x')
+    assert_true(opt["converged"], "golden_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "golden_x worst_err should be positive")
+
+
+def test_cantor_x_partition():
+    """Cantor dust partition: contiguity, covers [1,2), non-monotone widths."""
+    depth = 4
+    part = build_partition(depth, kind='cantor_x', cantor_levels=3)
+    N = 2^depth
+    assert_true(len(part) == N, f"expected {N} cells, got {len(part)}")
+
+    tol = HiR(10)^(-10)
+    for j in range(N - 1):
+        assert_true(
+            abs(part[j]['x_hi'] - part[j + 1]['x_lo']) < tol,
+            f"cantor_x contiguity gap at j={j}",
+        )
+    assert_true(abs(part[0]['x_lo'] - HiR(1)) < tol, "cantor_x should start at 1")
+    assert_true(abs(part[-1]['x_hi'] - HiR(2)) < tol, "cantor_x should end at 2")
+
+    # Widths should be non-monotone (clustered structure with gaps).
+    widths = [float(r['width_x']) for r in part]
+    diffs = [widths[j+1] - widths[j] for j in range(len(widths) - 1)]
+    has_increase = any(d > 1e-15 for d in diffs)
+    has_decrease = any(d < -1e-15 for d in diffs)
+    assert_true(has_increase and has_decrease,
+                "cantor_x widths should be non-monotone")
+
+
+def test_minimax_cantor_x_smoke():
+    """Minimax with cantor_x converges and returns positive worst_err."""
+    q, depth = 1, 2
+    opt = optimize_shared_delta(q, depth, 1, 2, partition_kind='cantor_x')
+    assert_true(opt["converged"], "cantor_x minimax should converge")
+    assert_true(opt["worst_err"] > 0, "cantor_x worst_err should be positive")
+
+
 def test_partition_aware_best_single():
     """best_single_intercept works with partition_kind."""
     _, paths, _ = residue_paths(1, 3)
@@ -576,10 +1019,10 @@ def test_partition_aware_best_single():
 
 
 def test_nondefault_domain_partition():
-    """Partition on [2, 4) — all four kinds cover the domain contiguously."""
+    """Partition on [2, 4) — all sixteen kinds cover the domain contiguously."""
     depth = 3
     N = 2^depth
-    tol = HiR(10)^(-50)
+    tol = HiR(10)^(-10)  # relaxed for float-based partitions
     xs, xw = 2, 2  # domain [2, 4)
 
     for kind in PARTITION_KINDS:
@@ -676,6 +1119,30 @@ def main():
         ("mirror_harmonic_x_partition", test_mirror_harmonic_x_partition),
         ("minimax_harmonic_x_smoke", test_minimax_harmonic_x_smoke),
         ("minimax_mirror_harmonic_x_smoke", test_minimax_mirror_harmonic_x_smoke),
+        ("ruler_x_partition", test_ruler_x_partition),
+        ("sinusoidal_x_partition", test_sinusoidal_x_partition),
+        ("minimax_ruler_x_smoke", test_minimax_ruler_x_smoke),
+        ("minimax_sinusoidal_x_smoke", test_minimax_sinusoidal_x_smoke),
+        ("chebyshev_x_partition", test_chebyshev_x_partition),
+        ("minimax_chebyshev_x_smoke", test_minimax_chebyshev_x_smoke),
+        ("thuemorse_x_partition", test_thuemorse_x_partition),
+        ("minimax_thuemorse_x_smoke", test_minimax_thuemorse_x_smoke),
+        ("bitrev_geometric_x_partition", test_bitrev_geometric_x_partition),
+        ("minimax_bitrev_geometric_x_smoke", test_minimax_bitrev_geometric_x_smoke),
+        ("stern_brocot_x_partition", test_stern_brocot_x_partition),
+        ("minimax_stern_brocot_x_smoke", test_minimax_stern_brocot_x_smoke),
+        ("reverse_geometric_x_partition", test_reverse_geometric_x_partition),
+        ("minimax_reverse_geometric_x_smoke", test_minimax_reverse_geometric_x_smoke),
+        ("random_x_partition", test_random_x_partition),
+        ("minimax_random_x_smoke", test_minimax_random_x_smoke),
+        ("dyadic_x_partition", test_dyadic_x_partition),
+        ("minimax_dyadic_x_smoke", test_minimax_dyadic_x_smoke),
+        ("powerlaw_x_partition", test_powerlaw_x_partition),
+        ("minimax_powerlaw_x_smoke", test_minimax_powerlaw_x_smoke),
+        ("golden_x_partition", test_golden_x_partition),
+        ("minimax_golden_x_smoke", test_minimax_golden_x_smoke),
+        ("cantor_x_partition", test_cantor_x_partition),
+        ("minimax_cantor_x_smoke", test_minimax_cantor_x_smoke),
         ("geometric_x_above_free_bound", test_geometric_x_above_free_bound),
         ("partition_aware_best_single", test_partition_aware_best_single),
         ("residue_paths", test_residue_paths),

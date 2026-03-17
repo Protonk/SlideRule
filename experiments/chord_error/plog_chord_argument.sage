@@ -16,7 +16,7 @@ error of plog(m) = m - 1 on the octave [1, 2]:
      of the chord), but has a different slope, a different peak location,
      and a different peak value on every cell.
 
-Run from project root:  ./sagew experiments/plog_chord_argument.sage
+Run from :  ./sagew experiments/chord_error/plog_chord_argument.sage
 """
 
 
