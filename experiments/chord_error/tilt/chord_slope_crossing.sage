@@ -6,8 +6,14 @@ Cells on the left have steeper chords than the global chord (sigma > 1);
 cells on the right have shallower chords (sigma < 1).  The crossover
 happens at m* = 1/ln 2, the peak of the global approximation error.
 
-Run:  ./sagew experiments/error/tilt/chord_slope_crossing.sage
+Run:  ./sagew experiments/chord_error/tilt/chord_slope_crossing.sage
 """
+
+import os
+_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__)))))
+load(os.path.join(_root, 'lib', 'day.sage'))
+load(os.path.join(_root, 'lib', 'partitions.sage'))
 
 import matplotlib
 matplotlib.use('Agg')
@@ -18,14 +24,8 @@ from math import log, log2 as math_log2
 
 # ── Configuration ────────────────────────────────────────────────────
 
-N = 8
+DEPTH = 3       # N = 8
 M_PER_CELL = 20
-
-
-# ── Partition ────────────────────────────────────────────────────────
-
-def uniform_partition(N):
-    return [(1.0 + j / N, 1.0 + (j + 1) / N) for j in range(N)]
 
 
 # ── Math ─────────────────────────────────────────────────────────────
@@ -39,7 +39,6 @@ def log_mean(a, b):
 
 
 def build_profiles(cells):
-    """Build the per-cell error sawtooth and tilt slope step function."""
     m_segments = []
     E_segments = []
     midpoints = []
@@ -74,41 +73,36 @@ def build_profiles(cells):
 # ── Verification ─────────────────────────────────────────────────────
 
 def verify(cells, m_all, E_all, peak_Es):
-    assert E_all.min() > -1e-14, f"negative E, min = {E_all.min():.2e}"
+    assert E_all.min() > -1e-14, "negative E, min = %.2e" % E_all.min()
     for i, (a, b) in enumerate(cells):
         idx_lo = i * M_PER_CELL
         idx_hi = (i + 1) * M_PER_CELL - 1
-        assert abs(E_all[idx_lo]) < 1e-13, f"cell {i}: E(a) != 0"
-        assert abs(E_all[idx_hi]) < 1e-13, f"cell {i}: E(b) != 0"
+        assert abs(E_all[idx_lo]) < 1e-13, "cell %d: E(a) != 0" % i
+        assert abs(E_all[idx_hi]) < 1e-13, "cell %d: E(b) != 0" % i
 
-    # Peak envelope must be monotonically decreasing (curvature falls with m).
     for i in range(len(peak_Es) - 1):
         assert peak_Es[i] >= peak_Es[i + 1], (
-            f"peak envelope not decreasing: cell {i} ({peak_Es[i]:.4e}) "
-            f"< cell {i+1} ({peak_Es[i+1]:.4e})")
+            "peak envelope not decreasing: cell %d (%.4e) < cell %d (%.4e)" %
+            (i, peak_Es[i], i + 1, peak_Es[i + 1]))
 
-    # Peak ratio should approach 4:1 from below.  At N=8 it's ~3.3.
     ratio = peak_Es.max() / peak_Es.min()
-    assert 2.5 < ratio < 4.0, f"peak ratio {ratio:.4f} outside expected range (2.5, 4.0)"
+    assert 2.5 < ratio < 4.0, "peak ratio %.4f outside expected range (2.5, 4.0)" % ratio
 
 
 # ── Plotting ─────────────────────────────────────────────────────────
 
 def make_plot():
-    cells = uniform_partition(N)
+    N = 2**DEPTH
+    cells = float_cells(DEPTH, 'uniform_x')
     m_all, E_all, midpoints, slopes, peak_ms, peak_Es = build_profiles(cells)
     verify(cells, m_all, E_all, peak_Es)
 
     fig, ax = plt.subplots(figsize=(9, 4), constrained_layout=True)
 
-    # Continuous limit: 1/(m ln 2) - 1, the chord slope deviation in the
-    # small-cell limit.
     ms_cont = np.linspace(1.0, 2.0, 300)
     ax.plot(ms_cont, 1.0 / (ms_cont * log(2.0)) - 1.0,
             '--', color='#cccccc', linewidth=1.2, zorder=1)
 
-    # Step function via ax.step with vertical risers.
-    # Build boundary x-values and slope values for a "post" step plot.
     step_x = [cells[0][0]]
     step_y = [slopes[0]]
     for i, (a, b) in enumerate(cells):
@@ -119,7 +113,6 @@ def make_plot():
 
     ax.axhline(0, color='black', linewidth=0.8, linestyle='--', zorder=1)
 
-    # m* = 1/ln 2 crossing
     m_star = 1.0 / log(2.0)
     ax.axvline(m_star, color='#888888', linewidth=1.0, linestyle=':',
                zorder=1)
@@ -137,19 +130,20 @@ def make_plot():
 
     fig.suptitle(
         'Cell chord slopes cross the global slope at $m^* = 1/\\ln 2$\n'
-        f'Uniform partition, $N = {N}$ cells on $[1,\\, 2)$',
+        'Uniform partition, $N = %d$ cells on $[1,\\, 2)$' % N,
         fontsize=12, fontweight='bold',
     )
 
-    out_path = 'experiments/error/tilt/chord_slope_crossing.png'
+    out_path = 'experiments/chord_error/tilt/chord_slope_crossing.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
-    print(f"Saved: {out_path}")
+    print("Saved: %s" % out_path)
 
 
 # ── Diagnostics ──────────────────────────────────────────────────────
 
 def print_diagnostics():
-    cells = uniform_partition(N)
+    N = 2**DEPTH
+    cells = float_cells(DEPTH, 'uniform_x')
     m_all, E_all, midpoints, slopes, peak_ms, peak_Es = build_profiles(cells)
     verify(cells, m_all, E_all, peak_Es)
 
@@ -157,12 +151,12 @@ def print_diagnostics():
     print()
     print("Tilt profile diagnostics  (uniform)")
     print("=" * 50)
-    print(f"  N = {N}")
-    print(f"  tilt slope range: [{slopes.min():+.4f}, {slopes.max():+.4f}]")
-    print(f"  zero crossing:    m ~ {midpoints[np.argmin(np.abs(slopes))]:.4f}")
-    print(f"  max peak E:       {peak_Es.max():.6e}")
-    print(f"  min peak E:       {peak_Es.min():.6e}")
-    print(f"  peak ratio:       {ratio:.2f}:1")
+    print("  N = %d" % N)
+    print("  tilt slope range: [%+.4f, %+.4f]" % (slopes.min(), slopes.max()))
+    print("  zero crossing:    m ~ %.4f" % midpoints[np.argmin(np.abs(slopes))])
+    print("  max peak E:       %.6e" % peak_Es.max())
+    print("  min peak E:       %.6e" % peak_Es.min())
+    print("  peak ratio:       %.2f:1" % ratio)
     print()
 
 

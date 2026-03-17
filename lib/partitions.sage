@@ -433,3 +433,50 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
 def partition_row_map(partition):
     """Build a dict from bits -> row for quick lookup."""
     return {row['bits']: row for row in partition}
+
+
+# ── Float interface for visualizations ───────────────────────────────
+
+def float_cells(depth, kind='geometric_x', x_start=1, x_width=1, **kwargs):
+    """Return partition as [(a_float, b_float), ...] for lightweight use.
+
+    Thin wrapper around build_partition — same arguments, but returns
+    simple float tuples instead of rich row dicts.
+    """
+    rows = build_partition(depth, kind=kind, x_start=x_start,
+                           x_width=x_width, **kwargs)
+    return [(float(r['x_lo']), float(r['x_hi'])) for r in rows]
+
+
+def depth_for_N(N):
+    """Return depth such that 2^depth == N, or raise ValueError."""
+    d = 0
+    tmp = int(N)
+    while tmp > 1:
+        if tmp % 2 != 0:
+            raise ValueError("N=%d is not a power of 2" % N)
+        tmp //= 2
+        d += 1
+    return d
+
+
+# Canonical ordering, display names, and colors for all sixteen partitions.
+# Used by visualization scripts to iterate the 4x4 zoo grid.
+PARTITION_ZOO = [
+    ('uniform',           '#1f77b4', 'uniform_x'),
+    ('geometric',         '#9467bd', 'geometric_x'),
+    ('harmonic',          '#2ca02c', 'harmonic_x'),
+    ('mirror-harmonic',   '#d62728', 'mirror_harmonic_x'),
+    ('ruler',             '#e67e22', 'ruler_x'),
+    ('sinusoidal',        '#17becf', 'sinusoidal_x'),
+    ('chebyshev',         '#8c564b', 'chebyshev_x'),
+    ('thue-morse',        '#e377c2', 'thuemorse_x'),
+    ('bitrev-geometric',  '#7f7f7f', 'bitrev_geometric_x'),
+    ('stern-brocot',      '#bcbd22', 'stern_brocot_x'),
+    ('reverse-geometric', '#ff7f0e', 'reverse_geometric_x'),
+    ('random',            '#aec7e8', 'random_x'),
+    ('dyadic',            '#98df8a', 'dyadic_x'),
+    ('power-law',         '#ff9896', 'powerlaw_x'),
+    ('golden',            '#c5b0d5', 'golden_x'),
+    ('cantor',            '#c49c94', 'cantor_x'),
+]

@@ -1099,6 +1099,49 @@ def test_nondefault_domain_minimax():
     )
 
 
+def test_float_cells():
+    """float_cells returns correct float tuples matching build_partition."""
+    depth = 4
+    N = 2^depth
+    for kind in PARTITION_KINDS:
+        cells = float_cells(depth, kind)
+        rows = build_partition(depth, kind)
+        assert_true(len(cells) == N, "%s: expected %d cells" % (kind, N))
+        for j in range(N):
+            a, b = cells[j]
+            assert_true(isinstance(a, float), "%s cell %d: x_lo not float" % (kind, j))
+            assert_true(isinstance(b, float), "%s cell %d: x_hi not float" % (kind, j))
+            assert_close(a, float(rows[j]['x_lo']), 1e-12,
+                         "%s cell %d: x_lo mismatch" % (kind, j))
+            assert_close(b, float(rows[j]['x_hi']), 1e-12,
+                         "%s cell %d: x_hi mismatch" % (kind, j))
+
+
+def test_depth_for_N():
+    """depth_for_N inverts 2^depth correctly and rejects non-powers."""
+    assert_true(depth_for_N(1) == 0, "depth_for_N(1) should be 0")
+    assert_true(depth_for_N(2) == 1, "depth_for_N(2) should be 1")
+    assert_true(depth_for_N(64) == 6, "depth_for_N(64) should be 6")
+    assert_true(depth_for_N(512) == 9, "depth_for_N(512) should be 9")
+    try:
+        depth_for_N(100)
+        assert_true(False, "depth_for_N(100) should raise ValueError")
+    except ValueError:
+        pass
+
+
+def test_partition_zoo():
+    """PARTITION_ZOO has 16 entries, all valid kinds, all unique colors."""
+    assert_true(len(PARTITION_ZOO) == 16, "PARTITION_ZOO should have 16 entries")
+    kinds = [kind for _, _, kind in PARTITION_ZOO]
+    colors = [color for _, color, _ in PARTITION_ZOO]
+    for kind in kinds:
+        assert_true(kind in PARTITION_KINDS,
+                    "PARTITION_ZOO kind %s not in PARTITION_KINDS" % kind)
+    assert_true(len(set(kinds)) == 16, "PARTITION_ZOO has duplicate kinds")
+    assert_true(len(set(colors)) == 16, "PARTITION_ZOO has duplicate colors")
+
+
 def main():
     tests = [
         ("bits_index_roundtrip", test_bits_index_roundtrip),
@@ -1159,6 +1202,9 @@ def main():
         ("nondefault_domain_partition", test_nondefault_domain_partition),
         ("nondefault_domain_evaluator", test_nondefault_domain_evaluator),
         ("nondefault_domain_minimax", test_nondefault_domain_minimax),
+        ("float_cells", test_float_cells),
+        ("depth_for_N", test_depth_for_N),
+        ("partition_zoo", test_partition_zoo),
     ]
 
     print("=" * 80)

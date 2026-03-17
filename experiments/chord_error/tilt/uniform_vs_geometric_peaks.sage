@@ -1,13 +1,19 @@
 """
 uniform_vs_geometric_peaks.sage — Three-panel comparison of partition geometries.
 
-Top:    uniform sawtooth with peak envelope (decaying 1/(8N²m²ln2))
+Top:    uniform sawtooth with peak envelope (decaying 1/(8N^2 m^2 ln2))
 Middle: both peak envelopes only — uniform (decaying) vs geometric (flat)
         with m* = 1/ln2 crossing marked
-Bottom: geometric sawtooth with peak envelope (flat ln2/(8N²))
+Bottom: geometric sawtooth with peak envelope (flat ln2/(8N^2))
 
-Run:  ./sagew experiments/error/tilt/uniform_vs_geometric_peaks.sage
+Run:  ./sagew experiments/chord_error/tilt/uniform_vs_geometric_peaks.sage
 """
+
+import os
+_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__)))))
+load(os.path.join(_root, 'lib', 'day.sage'))
+load(os.path.join(_root, 'lib', 'partitions.sage'))
 
 import matplotlib
 matplotlib.use('Agg')
@@ -18,19 +24,8 @@ from math import log, log2 as math_log2
 
 # ── Configuration ────────────────────────────────────────────────────
 
-N = 100
+DEPTH = 7       # N = 128 (was 100, rounded to power of 2)
 M_PER_CELL = 40
-
-
-# ── Partitions ──────────────────────────────────────────────────────
-
-def uniform_partition(N):
-    return [(1.0 + j / N, 1.0 + (j + 1) / N) for j in range(N)]
-
-
-def geometric_partition(N):
-    """Equal-width in log space: x_j = 2^{j/N}."""
-    return [(2.0 ** (j / N), 2.0 ** ((j + 1) / N)) for j in range(N)]
 
 
 # ── Math ─────────────────────────────────────────────────────────────
@@ -77,20 +72,19 @@ GEO_ENV_COLOR = '#2ca02c'
 
 
 def make_plot():
-    u_cells = uniform_partition(N)
-    g_cells = geometric_partition(N)
+    N = 2**DEPTH
+    u_cells = float_cells(DEPTH, 'uniform_x')
+    g_cells = float_cells(DEPTH, 'geometric_x')
 
     u_m, u_E, u_pk_m, u_pk_E = build_profiles(u_cells)
     g_m, g_E, g_pk_m, g_pk_E = build_profiles(g_cells)
 
-    # Asymptotic envelopes — hard stop at [1, 2].
     env_ms = np.linspace(1.0, 2.0, 400)
     env_uniform = 1.0 / (8.0 * N**2 * env_ms**2 * log(2.0))
     geo_level = log(2.0) / (8.0 * N**2)
 
     m_star = 1.0 / log(2.0)
 
-    # Shared y-max for top and bottom sawtooth panels
     y_max = max(u_pk_E.max(), g_pk_E.max()) * 1.15
 
     fig, (ax_u, ax_env, ax_g) = plt.subplots(
@@ -110,7 +104,7 @@ def make_plot():
     ax_u.set_ylabel('per-cell error $E(m)$', fontsize=10)
     ax_u.set_title('uniform', fontsize=11, fontweight='bold')
     ax_u.legend(fontsize=8, loc='upper right')
-    ax_u.ticklabel_format(axis='y', style='scientific', scilimits=(0,0), useMathText=True)
+    ax_u.ticklabel_format(axis='y', style='scientific', scilimits=(0, 0), useMathText=True)
     ax_u.yaxis.get_offset_text().set_visible(False)
     ax_u.tick_params(labelsize=8)
 
@@ -132,7 +126,7 @@ def make_plot():
 
     ax_env.set_ylim(0, u_pk_E.max() * 1.15)
     ax_env.legend(fontsize=8, loc='upper right')
-    ax_env.ticklabel_format(axis='y', style='scientific', scilimits=(0,0), useMathText=True)
+    ax_env.ticklabel_format(axis='y', style='scientific', scilimits=(0, 0), useMathText=True)
     ax_env.yaxis.get_offset_text().set_visible(False)
     ax_env.tick_params(labelsize=8)
 
@@ -147,26 +141,27 @@ def make_plot():
     ax_g.set_xlabel('$m$', fontsize=10)
     ax_g.set_title('geometric', fontsize=11, fontweight='bold')
     ax_g.legend(fontsize=8, loc='upper right')
-    ax_g.ticklabel_format(axis='y', style='scientific', scilimits=(0,0), useMathText=True)
+    ax_g.ticklabel_format(axis='y', style='scientific', scilimits=(0, 0), useMathText=True)
     ax_g.yaxis.get_offset_text().set_visible(False)
     ax_g.tick_params(labelsize=8)
 
     fig.suptitle(
-        f'Per-cell chord error: uniform vs geometric\n'
-        f'$N = {N}$ cells on $[1,\\, 2)$',
+        'Per-cell chord error: uniform vs geometric\n'
+        '$N = %d$ cells on $[1,\\, 2)$' % N,
         fontsize=13, fontweight='bold',
     )
 
-    out_path = 'experiments/error/tilt/uniform_vs_geometric_peaks.png'
+    out_path = 'experiments/chord_error/tilt/uniform_vs_geometric_peaks.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
-    print(f"Saved: {out_path}")
+    print("Saved: %s" % out_path)
 
 
 # ── Diagnostics ──────────────────────────────────────────────────────
 
 def print_diagnostics():
-    u_cells = uniform_partition(N)
-    g_cells = geometric_partition(N)
+    N = 2**DEPTH
+    u_cells = float_cells(DEPTH, 'uniform_x')
+    g_cells = float_cells(DEPTH, 'geometric_x')
     _, _, _, u_pk_E = build_profiles(u_cells)
     _, _, _, g_pk_E = build_profiles(g_cells)
 
@@ -175,13 +170,13 @@ def print_diagnostics():
     print()
     print("Uniform vs geometric diagnostics")
     print("=" * 55)
-    print(f"  N = {N}")
-    print(f"  uniform  peak range: {u_pk_E.min():.6e} .. {u_pk_E.max():.6e}  "
-          f"(ratio {u_pk_E.max()/u_pk_E.min():.2f}:1)")
-    print(f"  geometric peak range: {g_pk_E.min():.6e} .. {g_pk_E.max():.6e}  "
-          f"(ratio {g_pk_E.max()/g_pk_E.min():.4f}:1)")
-    print(f"  geometric flat level: {geo_level:.6e}")
-    print(f"  crossing m* = 1/ln2 = {1.0/log(2.0):.6f}")
+    print("  N = %d" % N)
+    print("  uniform  peak range: %.6e .. %.6e  (ratio %.2f:1)" %
+          (u_pk_E.min(), u_pk_E.max(), u_pk_E.max() / u_pk_E.min()))
+    print("  geometric peak range: %.6e .. %.6e  (ratio %.4f:1)" %
+          (g_pk_E.min(), g_pk_E.max(), g_pk_E.max() / g_pk_E.min()))
+    print("  geometric flat level: %.6e" % geo_level)
+    print("  crossing m* = 1/ln2 = %.6f" % (1.0 / log(2.0)))
     print()
 
 
