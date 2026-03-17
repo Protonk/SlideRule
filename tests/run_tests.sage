@@ -4,14 +4,13 @@ Project test runner.
 Run from project root:  ./sagew tests/run_tests.sage
 """
 
-import os
-_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load(os.path.join(_root, 'lib', 'paths.sage'))
-load(os.path.join(_root, 'lib', 'day.sage'))
-load(os.path.join(_root, 'lib', 'partitions.sage'))
-load(os.path.join(_root, 'lib', 'policies.sage'))
-load(os.path.join(_root, 'lib', 'jukna.sage'))
-load(os.path.join(_root, 'lib', 'optimize.sage'))
+from helpers import pathing
+load(pathing('lib', 'paths.sage'))
+load(pathing('lib', 'day.sage'))
+load(pathing('lib', 'partitions.sage'))
+load(pathing('lib', 'policies.sage'))
+load(pathing('lib', 'jukna.sage'))
+load(pathing('lib', 'optimize.sage'))
 
 
 def assert_true(condition, message):

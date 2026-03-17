@@ -22,13 +22,13 @@ import os
 import csv
 import time
 
-_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load(os.path.join(_root, 'lib', 'paths.sage'))
-load(os.path.join(_root, 'lib', 'day.sage'))
-load(os.path.join(_root, 'lib', 'partitions.sage'))
-load(os.path.join(_root, 'lib', 'policies.sage'))
-load(os.path.join(_root, 'lib', 'jukna.sage'))
-load(os.path.join(_root, 'lib', 'optimize.sage'))
+from helpers import pathing
+load(pathing('lib', 'paths.sage'))
+load(pathing('lib', 'day.sage'))
+load(pathing('lib', 'partitions.sage'))
+load(pathing('lib', 'policies.sage'))
+load(pathing('lib', 'jukna.sage'))
+load(pathing('lib', 'optimize.sage'))
 
 RUN_SOURCE = 'harmonic_diag_v2'
 REUSED_L1C_SOURCE = 'l1c_grid_2026-03-12'
@@ -257,11 +257,9 @@ def print_row(r):
 # ── Main ───────────────────────────────────────────────────────────────
 
 def main():
-    run_dir = os.path.join(
-        _root, 'experiments', 'results', 'lodestone',
-        'harmonic_diagnostic_2026-03-12')
-    l1c_dir = os.path.join(
-        _root, 'experiments', 'results', 'lodestone', 'l1c_grid_2026-03-12')
+    run_dir = pathing('experiments', 'results', 'lodestone',
+                       'harmonic_diagnostic_2026-03-12')
+    l1c_dir = pathing('experiments', 'results', 'lodestone', 'l1c_grid_2026-03-12')
     existing_dir = run_dir
 
     # Load existing L1c results for reuse

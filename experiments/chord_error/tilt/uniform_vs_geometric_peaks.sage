@@ -9,11 +9,9 @@ Bottom: geometric sawtooth with peak envelope (flat ln2/(8N^2))
 Run:  ./sagew experiments/chord_error/tilt/uniform_vs_geometric_peaks.sage
 """
 
-import os
-_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
-    os.path.abspath(__file__)))))
-load(os.path.join(_root, 'lib', 'day.sage'))
-load(os.path.join(_root, 'lib', 'partitions.sage'))
+from helpers import pathing
+load(pathing('lib', 'day.sage'))
+load(pathing('lib', 'partitions.sage'))
 
 import matplotlib
 matplotlib.use('Agg')

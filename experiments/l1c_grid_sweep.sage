@@ -23,13 +23,13 @@ import os
 import csv
 import time
 
-_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load(os.path.join(_root, 'lib', 'paths.sage'))
-load(os.path.join(_root, 'lib', 'day.sage'))
-load(os.path.join(_root, 'lib', 'partitions.sage'))
-load(os.path.join(_root, 'lib', 'policies.sage'))
-load(os.path.join(_root, 'lib', 'jukna.sage'))
-load(os.path.join(_root, 'lib', 'optimize.sage'))
+from helpers import pathing
+load(pathing('lib', 'paths.sage'))
+load(pathing('lib', 'day.sage'))
+load(pathing('lib', 'partitions.sage'))
+load(pathing('lib', 'policies.sage'))
+load(pathing('lib', 'jukna.sage'))
+load(pathing('lib', 'optimize.sage'))
 
 # ── Per-case runner ────────────────────────────────────────────────────
 
@@ -188,8 +188,7 @@ def print_row(r):
 # ── Main ───────────────────────────────────────────────────────────────
 
 def main():
-    run_dir = os.path.join(
-        _root, 'experiments', 'results', 'lodestone', 'l1c_grid_2026-03-12')
+    run_dir = pathing('experiments', 'results', 'lodestone', 'l1c_grid_2026-03-12')
     summary_rows = []
     percell_rows = []
     kinds = ['uniform_x', 'geometric_x']

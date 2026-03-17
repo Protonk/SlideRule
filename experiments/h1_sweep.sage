@@ -21,12 +21,12 @@ import csv
 import time
 import math
 
-_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load(os.path.join(_root, 'lib', 'paths.sage'))
-load(os.path.join(_root, 'lib', 'day.sage'))
-load(os.path.join(_root, 'lib', 'policies.sage'))
-load(os.path.join(_root, 'lib', 'jukna.sage'))
-load(os.path.join(_root, 'lib', 'optimize.sage'))
+from helpers import pathing
+load(pathing('lib', 'paths.sage'))
+load(pathing('lib', 'day.sage'))
+load(pathing('lib', 'policies.sage'))
+load(pathing('lib', 'jukna.sage'))
+load(pathing('lib', 'optimize.sage'))
 
 
 # ── Delta-shape statistics (H1d) ────────────────────────────────────────
@@ -184,7 +184,7 @@ def write_csv(rows, filepath):
 
 def main():
     p_num, q_den = 1, 2
-    results_dir = os.path.join(_root, 'experiments', 'results')
+    results_dir = pathing('experiments', 'results')
 
     # ── Sweep 1: H1b — depth scaling at fixed q ─────────────────────────
 

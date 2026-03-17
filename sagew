@@ -30,6 +30,7 @@ fi
 
 mkdir -p "$DOT_SAGE_DIR"
 export DOT_SAGE="$DOT_SAGE_DIR"
+export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH:-}"
 SAGE_BIN_DIR="$(dirname "$SAGE_BIN_PATH")"
 SAGE_PYTHON="$SAGE_BIN_DIR/python3"
 export PATH="$SAGE_BIN_DIR:$PATH"
