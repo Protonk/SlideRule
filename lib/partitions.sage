@@ -60,6 +60,24 @@ def normalize_partition_kind(kind):
     )
 
 
+def _validate_finite(*args):
+    """Raise ValueError if any argument is NaN or infinity."""
+    import math as _m
+    for v in args:
+        fv = float(v)
+        if not _m.isfinite(fv):
+            raise ValueError(f"parameter must be finite, got {v}")
+
+
+def _coerce_finite_int(name, value):
+    """Return int(value), but fail cleanly on NaN/infinity."""
+    _validate_finite(value)
+    try:
+        return int(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{name} must be integer-convertible, got {value}") from exc
+
+
 def bits_to_index(bits):
     """Convert a bit-prefix tuple to an integer cell index."""
     m = len(bits)
@@ -345,6 +363,14 @@ def _farey_rank_boundaries(N, a_qq, w_qq, farey_order=None):
 
     if farey_order is not None:
         Q = int(farey_order)
+        if Q < 1:
+            raise ValueError(f"farey_order must be >= 1, got {farey_order}")
+        fseq = build_farey(Q)
+        if len(fseq) < N + 1:
+            raise ValueError(
+                f"farey_order={Q} is too small for {N} cells: "
+                f"|F_Q|={len(fseq)} < {N + 1}"
+            )
     else:
         Q = 1
         while True:
@@ -400,7 +426,10 @@ def _sturmian_binary_boundaries(N, a_qq, w_qq, st_alpha, st_phase, st_ratio):
     Reduce alpha modulo 1 so the default slope lives in the standard
     binary Sturmian range 0 < alpha < 1.
     """
-    alpha_f = float(st_alpha) % 1.0
+    # Avoid Sage coercion: bare 1.0 is a Sage RealNumber whose __rmod__
+    # can return a negative value for positive floats.  Use int divisor.
+    _alpha_raw = float(st_alpha)
+    alpha_f = _alpha_raw - int(_alpha_raw)          # fractional part, >= 0
     if alpha_f == 0.0:
         raise ValueError("st_alpha must have a nonzero fractional part")
     phase_f = float(st_phase)
@@ -428,35 +457,16 @@ def _sturmian_boundaries(N, a_qq, w_qq, st_alpha, st_phase, st_ratio):
 
 
 def _beta_boundaries(N, a_hir, w_hir, beta_alpha, beta_beta):
-    """Compute N+1 boundary points by inverting Beta CDF via bisection (HiR).
-
-    For each target j/N, bisect to find t such that
-    integral_0^t u^(a-1)(1-u)^(b-1) du / B(a,b) = j/N.
-    """
-    from sage.all import numerical_integral
+    """Compute N+1 boundary points via SciPy's inverse Beta CDF (HiR)."""
+    from scipy.special import betaincinv
     ba = float(beta_alpha)
     bb = float(beta_beta)
-
-    def integrand(u):
-        return u**(ba - 1.0) * (1.0 - u)**(bb - 1.0)
-
-    # Total = B(alpha, beta).
-    total, _ = numerical_integral(integrand, 0.0, 1.0)
 
     a_f = float(a_hir)
     w_f = float(w_hir)
     bdry = [a_hir]
     for j in range(1, int(N)):
-        target = j / int(N) * total
-        lo, hi = 0.0, 1.0
-        for _ in range(60):
-            mid = (lo + hi) / 2.0
-            val, _ = numerical_integral(integrand, 0.0, mid)
-            if val < target:
-                lo = mid
-            else:
-                hi = mid
-        t = (lo + hi) / 2.0
+        t = float(betaincinv(ba, bb, j / int(N)))
         bdry.append(HiR(a_f + w_f * t))
     bdry.append(a_hir + w_hir)
     return bdry
@@ -559,6 +569,13 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
     """
     kind = normalize_partition_kind(kind)
 
+    depth = _coerce_finite_int("depth", depth)
+    if depth < 0:
+        raise ValueError(f"depth must be non-negative, got {depth}")
+    _validate_finite(x_start, x_width)
+    if float(x_width) <= 0:
+        raise ValueError(f"x_width must be positive, got {x_width}")
+
     N = Integer(2^depth)
     a = HiR(x_start)
     w = HiR(x_width)
@@ -568,13 +585,18 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
     if kind == 'ruler_x':
         bdry = _ruler_boundaries(N, QQ(x_start), QQ(x_width))
     elif kind == 'sinusoidal_x':
-        sin_k = kwargs.get('sin_k', 3)
+        sin_k = _coerce_finite_int("sin_k", kwargs.get('sin_k', 3))
         sin_alpha = kwargs.get('sin_alpha', 0.6)
+        _validate_finite(sin_k, sin_alpha)
+        if float(sin_alpha) >= 1.0:
+            raise ValueError(
+                f"sin_alpha must be < 1.0 for F(t) to be monotone, got {sin_alpha}")
         bdry = _sinusoidal_boundaries(N, a, x_end, sin_k, sin_alpha)
     elif kind == 'chebyshev_x':
         bdry = _chebyshev_boundaries(N, a, w)
     elif kind == 'thuemorse_x':
         tm_ratio = kwargs.get('tm_ratio', 2)
+        _validate_finite(tm_ratio)
         bdry = _thuemorse_boundaries(N, QQ(x_start), QQ(x_width), tm_ratio)
     elif kind == 'bitrev_geometric_x':
         bdry = _bitrev_geometric_boundaries(N, depth, a, x_end)
@@ -583,41 +605,59 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
     elif kind == 'reverse_geometric_x':
         bdry = _reverse_geometric_boundaries(N, depth, a, x_end)
     elif kind == 'random_x':
-        random_seed = kwargs.get('random_seed', 42)
+        random_seed = _coerce_finite_int("random_seed", kwargs.get('random_seed', 42))
         bdry = _random_boundaries(N, a, w, random_seed)
     elif kind == 'dyadic_x':
-        dyadic_res = kwargs.get('dyadic_res', depth + 4)
+        dyadic_res = _coerce_finite_int("dyadic_res", kwargs.get('dyadic_res', depth + 4))
         bdry = _dyadic_boundaries(N, a, x_end, dyadic_res)
     elif kind == 'powerlaw_x':
         pl_exponent = kwargs.get('pl_exponent', 3)
+        _validate_finite(pl_exponent)
+        if float(pl_exponent) == 1.0:
+            raise ValueError(
+                "pl_exponent must not be 1.0 (division by zero in CDF inversion)")
         bdry = _powerlaw_boundaries(N, a, x_end, pl_exponent)
     elif kind == 'golden_x':
         bdry = _golden_boundaries(N, a, w)
     elif kind == 'cantor_x':
-        cantor_levels = kwargs.get('cantor_levels', 3)
+        cantor_levels = _coerce_finite_int("cantor_levels", kwargs.get('cantor_levels', 3))
         bdry = _cantor_boundaries(N, a, w, cantor_levels)
     elif kind == 'minkowski_x':
         bdry = _minkowski_boundaries(depth, QQ(x_start), QQ(x_width))
     elif kind == 'farey_rank_x':
         farey_order = kwargs.get('farey_order', None)
+        if farey_order is not None:
+            farey_order = _coerce_finite_int("farey_order", farey_order)
         bdry = _farey_rank_boundaries(N, QQ(x_start), QQ(x_width), farey_order)
     elif kind == 'radical_inverse_x':
-        vdc_base = kwargs.get('vdc_base', 2)
+        vdc_base = _coerce_finite_int("vdc_base", kwargs.get('vdc_base', 2))
+        if vdc_base < 2:
+            raise ValueError(f"vdc_base must be >= 2, got {vdc_base}")
         bdry = _radical_inverse_boundaries(N, a, w, vdc_base)
     elif kind == 'sturmian_x':
         import math as _math
         st_alpha = kwargs.get('st_alpha', (_math.sqrt(5.0) - 1.0) / 2.0)
         st_phase = kwargs.get('st_phase', 0.0)
         st_ratio = kwargs.get('st_ratio', 2)
+        _validate_finite(st_alpha, st_phase, st_ratio)
+        if float(st_ratio) <= 0:
+            raise ValueError(f"st_ratio must be positive, got {st_ratio}")
         bdry = _sturmian_binary_boundaries(N, QQ(x_start), QQ(x_width), st_alpha, st_phase, st_ratio)
     elif kind == 'beta_x':
         beta_alpha = kwargs.get('beta_alpha', 5.0)
         beta_beta = kwargs.get('beta_beta', 2.0)
+        _validate_finite(beta_alpha, beta_beta)
+        if float(beta_alpha) <= 0 or float(beta_beta) <= 0:
+            raise ValueError(
+                f"beta_alpha and beta_beta must be positive, got ({beta_alpha}, {beta_beta})")
         bdry = _beta_boundaries(N, a, w, beta_alpha, beta_beta)
     elif kind == 'arc_length_x':
         bdry = _arc_length_boundaries(N, a, x_end)
     elif kind == 'minimax_chord_x':
         minimax_tol = kwargs.get('minimax_tol', 1e-12)
+        _validate_finite(minimax_tol)
+        if float(minimax_tol) <= 0:
+            raise ValueError(f"minimax_tol must be positive, got {minimax_tol}")
         bdry = _minimax_chord_boundaries(N, a, x_end, minimax_tol)
 
     rows = []
