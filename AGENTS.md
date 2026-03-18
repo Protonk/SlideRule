@@ -12,7 +12,6 @@
 - Experiment usage and output interpretation -> `experiments/README.md`
 - Library/module structure and numerical caveats -> `lib/README.md`
 - Immediate next work -> `PLAN.md` or `SUBJECT-PLAN.md`
-- Latest work-cycle handoff -> `REPORT.md`
 
 ### PLANning
 
@@ -34,10 +33,3 @@ subcommands that exec Sage's bundled Python directly.
 ```
 
 Do not use the system `python3` for project scripts.
-
-### Handoff REPORTing
-
-Use the `REPORT.md` document to keep a best-effort running log of the following:
-* Useful procedural context about your current workset.
-* Recent, active "gotchas" or wrinkles in practice
-The reporting handoff should NOT recapitulate or route to existing docs. The repo is small and `REPORT.md` space is precious.

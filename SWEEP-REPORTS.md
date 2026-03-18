@@ -21,7 +21,7 @@ Explanations belong in [`LODESTONE.md`](LODESTONE.md) and
 
 Driver:
 
-- [`experiments/optimize_delta.sage`](experiments/optimize_delta.sage)
+- [`experiments/lodestone/optimize_delta.sage`](experiments/lodestone/optimize_delta.sage)
 
 Scope:
 
@@ -46,13 +46,13 @@ Artifacts:
 
 Driver:
 
-- [`experiments/h1_sweep.sage`](experiments/h1_sweep.sage)
+- [`experiments/lodestone/h1_sweep.sage`](experiments/lodestone/h1_sweep.sage)
 
 Artifacts:
 
-- [`experiments/results/h1b_depth_scaling.csv`](experiments/results/h1b_depth_scaling.csv)
-- [`experiments/results/h1a_gap_vs_q.csv`](experiments/results/h1a_gap_vs_q.csv)
-- [`experiments/results/h1c_layer_dependent.csv`](experiments/results/h1c_layer_dependent.csv)
+- [`experiments/lodestone/results/h1b_depth_scaling.csv`](experiments/lodestone/results/h1b_depth_scaling.csv)
+- [`experiments/lodestone/results/h1a_gap_vs_q.csv`](experiments/lodestone/results/h1a_gap_vs_q.csv)
+- [`experiments/lodestone/results/h1c_layer_dependent.csv`](experiments/lodestone/results/h1c_layer_dependent.csv)
 
 Role in current program:
 
@@ -160,12 +160,12 @@ Direct observations:
 
 Driver:
 
-- [`experiments/lodestone_sweep.sage`](experiments/lodestone_sweep.sage)
+- [`experiments/lodestone/lodestone_sweep.sage`](experiments/lodestone/lodestone_sweep.sage)
 
 Artifacts:
 
-- [`experiments/results/lodestone_summary.csv`](experiments/results/lodestone_summary.csv)
-- [`experiments/results/lodestone_percell.csv`](experiments/results/lodestone_percell.csv)
+- [`experiments/lodestone/results/lodestone_summary.csv`](experiments/lodestone/results/lodestone_summary.csv)
+- [`experiments/lodestone/results/lodestone_percell.csv`](experiments/lodestone/results/lodestone_percell.csv)
 
 Role in current program:
 
@@ -246,13 +246,13 @@ Direct observations:
 
 Driver:
 
-- [`experiments/l1c_grid_sweep.sage`](experiments/l1c_grid_sweep.sage)
+- [`experiments/lodestone/l1c_grid_sweep.sage`](experiments/lodestone/l1c_grid_sweep.sage)
 
 Artifacts:
 
-- [`experiments/results/lodestone/l1c_grid_2026-03-12/summary.csv`](experiments/results/lodestone/l1c_grid_2026-03-12/summary.csv)
-- [`experiments/results/lodestone/l1c_grid_2026-03-12/percell.csv`](experiments/results/lodestone/l1c_grid_2026-03-12/percell.csv)
-- [`experiments/results/lodestone/l1c_grid_2026-03-12/README.md`](experiments/results/lodestone/l1c_grid_2026-03-12/README.md)
+- [`experiments/lodestone/results/l1c_grid_2026-03-12/summary.csv`](experiments/lodestone/results/l1c_grid_2026-03-12/summary.csv)
+- [`experiments/lodestone/results/l1c_grid_2026-03-12/percell.csv`](experiments/lodestone/results/l1c_grid_2026-03-12/percell.csv)
+- [`experiments/lodestone/results/l1c_grid_2026-03-12/README.md`](experiments/lodestone/results/l1c_grid_2026-03-12/README.md)
 
 Role in current program:
 
@@ -306,13 +306,13 @@ Direct observations:
 
 Driver:
 
-- [`experiments/l1c_stability_sweep.sage`](experiments/l1c_stability_sweep.sage)
+- [`experiments/lodestone/l1c_stability_sweep.sage`](experiments/lodestone/l1c_stability_sweep.sage)
 
 Artifacts:
 
-- [`experiments/results/lodestone/l1c_stability_2026-03-12/summary.csv`](experiments/results/lodestone/l1c_stability_2026-03-12/summary.csv)
-- [`experiments/results/lodestone/l1c_stability_2026-03-12/percell.csv`](experiments/results/lodestone/l1c_stability_2026-03-12/percell.csv)
-- [`experiments/results/lodestone/l1c_stability_2026-03-12/README.md`](experiments/results/lodestone/l1c_stability_2026-03-12/README.md)
+- [`experiments/lodestone/results/l1c_stability_2026-03-12/summary.csv`](experiments/lodestone/results/l1c_stability_2026-03-12/summary.csv)
+- [`experiments/lodestone/results/l1c_stability_2026-03-12/percell.csv`](experiments/lodestone/results/l1c_stability_2026-03-12/percell.csv)
+- [`experiments/lodestone/results/l1c_stability_2026-03-12/README.md`](experiments/lodestone/results/l1c_stability_2026-03-12/README.md)
 
 Role in current program:
 
@@ -356,13 +356,13 @@ Direct observations:
 
 Driver:
 
-- [`experiments/harmonic_diagnostic_sweep.sage`](experiments/harmonic_diagnostic_sweep.sage)
+- [`experiments/lodestone/harmonic_diagnostic_sweep.sage`](experiments/lodestone/harmonic_diagnostic_sweep.sage)
 
 Artifacts:
 
-- [`experiments/results/lodestone/harmonic_diagnostic_2026-03-12/summary.csv`](experiments/results/lodestone/harmonic_diagnostic_2026-03-12/summary.csv)
-- [`experiments/results/lodestone/harmonic_diagnostic_2026-03-12/percell.csv`](experiments/results/lodestone/harmonic_diagnostic_2026-03-12/percell.csv)
-- [`experiments/results/lodestone/harmonic_diagnostic_2026-03-12/README.md`](experiments/results/lodestone/harmonic_diagnostic_2026-03-12/README.md)
+- [`experiments/lodestone/results/harmonic_diagnostic_2026-03-12/summary.csv`](experiments/lodestone/results/harmonic_diagnostic_2026-03-12/summary.csv)
+- [`experiments/lodestone/results/harmonic_diagnostic_2026-03-12/percell.csv`](experiments/lodestone/results/harmonic_diagnostic_2026-03-12/percell.csv)
+- [`experiments/lodestone/results/harmonic_diagnostic_2026-03-12/README.md`](experiments/lodestone/results/harmonic_diagnostic_2026-03-12/README.md)
 
 Role in current program:
 

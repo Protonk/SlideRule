@@ -40,10 +40,10 @@ against `geometric_x`.
 All commands below are run from project root.
 
 ```sh
-./sagew experiments/fsm_coarse.sage
-./sagew experiments/optimize_delta.sage
-./sagew experiments/h1_sweep.sage
-./sagew experiments/lodestone_sweep.sage
+./sagew experiments/lodestone/lodestone_sweep.sage
+./sagew experiments/lodestone/fsm_coarse.sage
+./sagew experiments/lodestone/optimize_delta.sage
+./sagew experiments/lodestone/h1_sweep.sage
 python3 lib/trajectory.py
 ./sagew tests/run_tests.sage
 ./sagew
@@ -54,12 +54,12 @@ python3 lib/trajectory.py
 - SageMath is required for the `.sage` drivers.
 - The optimizer in [`lib/optimize.sage`](lib/optimize.sage) uses `numpy` and
   `scipy.optimize.linprog`.
-- [`experiments/fsm_coarse.sage`](experiments/fsm_coarse.sage) is the
+- [`experiments/lodestone/fsm_coarse.sage`](experiments/lodestone/fsm_coarse.sage) is the
   legacy/exploratory entry point.
-- [`experiments/optimize_delta.sage`](experiments/optimize_delta.sage) and
-  [`experiments/h1_sweep.sage`](experiments/h1_sweep.sage) are the legacy
+- [`experiments/lodestone/optimize_delta.sage`](experiments/lodestone/optimize_delta.sage) and
+  [`experiments/lodestone/h1_sweep.sage`](experiments/lodestone/h1_sweep.sage) are the legacy
   baseline drivers on the exact `uniform_x` oracle path.
-- [`experiments/lodestone_sweep.sage`](experiments/lodestone_sweep.sage) is
+- [`experiments/lodestone/lodestone_sweep.sage`](experiments/lodestone/lodestone_sweep.sage) is
   the current primary comparison driver for `L1`-`L3`.
 - The minimax optimizer is implemented as float bisection plus LP feasibility,
   followed by dyadic snapping of the returned parameters. Treat it as a strong
