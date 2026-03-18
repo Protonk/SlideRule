@@ -23,7 +23,7 @@ from math import log2 as math_log2
 
 # ── Configuration ────────────────────────────────────────────────────
 
-DEPTH = 6   # N = 64
+DEPTH = 6   # N = 64 is the sweet spot to see structure but avoid ringing
 M = 200     # angular resolution per arch
 
 
@@ -54,7 +54,9 @@ def build_heatmap(cells):
 
 def make_plot():
     N = 2**DEPTH
-    fig, axes = plt.subplots(4, 4, figsize=(18, 18),
+    _n_rows, _n_cols = zoo_grid_shape()
+    fig, axes = plt.subplots(_n_rows, _n_cols,
+                             figsize=(4.5 * _n_cols, 4.5 * _n_rows),
                              subplot_kw={'projection': 'polar'},
                              constrained_layout=True)
 
@@ -89,6 +91,9 @@ def make_plot():
         ratio = peak_vals.max() / peak_vals.min() if peak_vals.min() > 0 else float('inf')
         ax.set_title('%s: %.2f:1' % (name, ratio),
                      fontsize=9, fontweight='bold', pad=12)
+
+    for ax in axes.flat[len(PARTITION_ZOO):]:
+        ax.set_visible(False)
 
     fig.suptitle(
         'Polar heatmaps: per-cell error wrapped around the circle\n'

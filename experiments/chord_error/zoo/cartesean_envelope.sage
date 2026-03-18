@@ -20,7 +20,7 @@ from math import log, log2 as math_log2
 
 # ── Configuration ────────────────────────────────────────────────────
 
-DEPTH = 6   # N = 64
+DEPTH = 5   # N = 32 works well for visual presentation
 M_PER_CELL = 40
 
 
@@ -63,7 +63,9 @@ def build_profiles(cells):
 
 def make_plot():
     N = 2**DEPTH
-    fig, axes = plt.subplots(4, 4, figsize=(18, 14),
+    _n_rows, _n_cols = zoo_grid_shape()
+    fig, axes = plt.subplots(_n_rows, _n_cols,
+                             figsize=(4.5 * _n_cols, 3.5 * _n_rows),
                              sharey=False,
                              constrained_layout=True)
 
@@ -85,13 +87,16 @@ def make_plot():
         ax.set_title('%s: %.4f peak ratio' % (name, ratio),
                      fontsize=9, fontweight='bold')
 
+    for ax in axes.flat[len(PARTITION_ZOO):]:
+        ax.set_visible(False)
+
     for ax in axes[:, 0]:
         ax.set_ylabel('per-cell error', fontsize=8)
-    for ax in axes[3, :]:
+    for ax in axes[-1, :]:
         ax.set_xlabel('$m$', fontsize=8)
 
     fig.suptitle(
-        'Peak envelope shapes across sixteen partition geometries\n'
+        'Peak envelope shapes across partition geometries\n'
         '$N = %d$ cells on $[1,\\, 2)$' % N,
         fontsize=13, fontweight='bold',
     )

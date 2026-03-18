@@ -1,7 +1,7 @@
 """
 lib/partitions.sage — Partition geometry for [x_start, x_start + x_width).
 
-Sixteen partition kinds:
+Twenty-three partition kinds:
     uniform_x            — equal additive width
     geometric_x          — equal log-width
     harmonic_x           — equal spacing in 1/x (finer near x_start)
@@ -18,6 +18,13 @@ Sixteen partition kinds:
     powerlaw_x           — density ~ m^{-p}, aggressive left-packing
     golden_x             — golden-ratio Kronecker sequence breakpoints
     cantor_x             — Cantor dust: cells in surviving middle-third intervals
+    minkowski_x          — dyadic-to-Stern-Brocot conjugacy (Minkowski ? function)
+    farey_rank_x         — Farey sequence rank-subsampled boundaries
+    radical_inverse_x    — van der Corput low-discrepancy sequence
+    sturmian_x           — Sturmian word (irrational rotation) widths
+    beta_x               — Beta distribution CDF-inverted breakpoints
+    arc_length_x         — equal arc-length cells on 1/(x ln 2)
+    minimax_chord_x      — minimax chord error equi-oscillation
 
 Default domain is [1, 2) (x_start=1, x_width=1).
 
@@ -32,7 +39,9 @@ Depends on: lib/day.sage must be loaded first (provides HiR, LN2).
 PARTITION_KINDS = ('uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x',
                    'ruler_x', 'sinusoidal_x', 'chebyshev_x', 'thuemorse_x',
                    'bitrev_geometric_x', 'stern_brocot_x', 'reverse_geometric_x',
-                   'random_x', 'dyadic_x', 'powerlaw_x', 'golden_x', 'cantor_x')
+                   'random_x', 'dyadic_x', 'powerlaw_x', 'golden_x', 'cantor_x',
+                   'minkowski_x', 'farey_rank_x', 'radical_inverse_x',
+                   'sturmian_x', 'beta_x', 'arc_length_x', 'minimax_chord_x')
 PARTITION_KIND_ALIASES = {
     'reciprocal_x': 'harmonic_x',
     'mirror_reciprocal_x': 'mirror_harmonic_x',
@@ -165,22 +174,24 @@ def _bitrev_geometric_boundaries(N, depth, a_hir, x_end_hir):
 
 
 def _stern_brocot_boundaries(depth, a_qq, x_end_qq):
-    """Compute 2^depth + 1 boundary points by iterated mediant insertion in QQ."""
-    # Represent each boundary as a QQ value.  At each round, insert the
-    # mediant (p1+p2)/(q1+q2) between every adjacent pair.
-    # We store as fractions: QQ handles this natively.
-    bdry = [QQ(a_qq), QQ(x_end_qq)]
+    """Compute 2^depth + 1 boundary points by mediants on [0,1], then scale."""
+    # The Stern-Brocot refinement lives naturally on [0,1].  Building it there
+    # and then affinely scaling preserves the claimed Minkowski equivalence on
+    # arbitrary domains, rather than only on [1,2).
+    unit = [QQ(0), QQ(1)]
     for _ in range(depth):
-        new_bdry = [bdry[0]]
-        for i in range(len(bdry) - 1):
+        new_unit = [unit[0]]
+        for i in range(len(unit) - 1):
             # Mediant of p1/q1 and p2/q2 = (p1+p2)/(q1+q2).
-            p1, q1 = bdry[i].numerator(), bdry[i].denominator()
-            p2, q2 = bdry[i + 1].numerator(), bdry[i + 1].denominator()
+            p1, q1 = unit[i].numerator(), unit[i].denominator()
+            p2, q2 = unit[i + 1].numerator(), unit[i + 1].denominator()
             med = QQ(p1 + p2) / QQ(q1 + q2)
-            new_bdry.append(med)
-            new_bdry.append(bdry[i + 1])
-        bdry = new_bdry
-    return bdry
+            new_unit.append(med)
+            new_unit.append(unit[i + 1])
+        unit = new_unit
+    a = QQ(a_qq)
+    w = QQ(x_end_qq) - a
+    return [a + w * t for t in unit]
 
 
 def _reverse_geometric_boundaries(N, depth, a_hir, x_end_hir):
@@ -286,6 +297,225 @@ def _cantor_boundaries(N, a_hir, w_hir, cantor_levels):
     return bdry
 
 
+def _minkowski_boundaries(depth, a_qq, w_qq):
+    """Compute 2^depth+1 boundary points via dyadic-to-Stern-Brocot conjugacy (QQ).
+
+    The inverse Minkowski question-mark function maps j/2^depth to
+    Stern-Brocot mediants.  For each j we descend the Stern-Brocot tree
+    using the binary digits of j (after stripping trailing zeros) to
+    navigate left/right, collecting mediants in QQ.
+    """
+    N = int(2**depth)
+    bdry = [a_qq]
+    for j in range(1, N):
+        # Strip trailing zeros: effective depth and odd core.
+        v = Integer(j).valuation(2)
+        d_eff = depth - v
+        j_stripped = j >> v
+        # Descend Stern-Brocot tree for d_eff levels.
+        pL, qL = Integer(0), Integer(1)
+        pR, qR = Integer(1), Integer(1)
+        med = QQ(0)
+        for bit_pos in range(d_eff - 1, -1, -1):
+            bit = (j_stripped >> bit_pos) & 1
+            med = QQ(pL + pR) / QQ(qL + qR)
+            if bit == 0:
+                pR, qR = pL + pR, qL + qR
+            else:
+                pL, qL = pL + pR, qL + qR
+        val = med
+        bdry.append(a_qq + w_qq * val)
+    bdry.append(a_qq + w_qq)
+    return bdry
+
+
+def _farey_rank_boundaries(N, a_qq, w_qq, farey_order=None):
+    """Compute N+1 boundary points by rank-subsampling a Farey sequence (QQ).
+
+    Build F_Q in [0,1] and subsample at equally-spaced ranks.
+    If farey_order is None, find minimal Q with |F_Q| >= N+1.
+    """
+    def build_farey(Q):
+        """Return sorted Farey sequence F_Q in [0,1] as list of QQ."""
+        seq = set()
+        for q in range(1, Q + 1):
+            for p in range(0, q + 1):
+                seq.add(QQ(p) / QQ(q))
+        return sorted(seq)
+
+    if farey_order is not None:
+        Q = int(farey_order)
+    else:
+        Q = 1
+        while True:
+            fseq = build_farey(Q)
+            if len(fseq) >= N + 1:
+                break
+            Q += 1
+        return _farey_subsample(fseq, N, a_qq, w_qq)
+
+    fseq = build_farey(Q)
+    return _farey_subsample(fseq, N, a_qq, w_qq)
+
+
+def _farey_subsample(fseq, N, a_qq, w_qq):
+    """Subsample a Farey sequence to N+1 boundary points."""
+    M = len(fseq) - 1  # last index
+    bdry = []
+    for j in range(N + 1):
+        idx = int(j * M) // int(N)
+        bdry.append(a_qq + w_qq * fseq[idx])
+    # Force exact endpoints.
+    bdry[0] = a_qq
+    bdry[N] = a_qq + w_qq
+    return bdry
+
+
+def _radical_inverse_boundaries(N, a_hir, w_hir, vdc_base):
+    """Compute N+1 boundary points from sorted van der Corput sequence (HiR)."""
+    base = int(vdc_base)
+
+    def van_der_corput(k, b):
+        """Radical inverse of k in base b."""
+        result = 0.0
+        denom = 1.0
+        n = k
+        while n > 0:
+            denom *= b
+            n, remainder = divmod(n, b)
+            result += remainder / denom
+        return result
+
+    pts = sorted([van_der_corput(k, base) for k in range(1, int(N))])
+    a_f = float(a_hir)
+    w_f = float(w_hir)
+    return [a_hir] + [HiR(a_f + w_f * t) for t in pts] + [a_hir + w_hir]
+
+
+def _sturmian_binary_boundaries(N, a_qq, w_qq, st_alpha, st_phase, st_ratio):
+    """Compute N+1 boundary points from binary Sturmian word widths (QQ).
+
+    s_j = floor((j+1)*alpha + phase) - floor(j*alpha + phase).
+    Width is st_ratio if s_j=1, else 1.  Cumsum, normalize, scale.
+    Reduce alpha modulo 1 so the default slope lives in the standard
+    binary Sturmian range 0 < alpha < 1.
+    """
+    alpha_f = float(st_alpha) % 1.0
+    if alpha_f == 0.0:
+        raise ValueError("st_alpha must have a nonzero fractional part")
+    phase_f = float(st_phase)
+    st_ratio_qq = QQ(st_ratio)
+    import math
+    raw = []
+    for j in range(int(N)):
+        s_j = int(math.floor((j + 1) * alpha_f + phase_f)) - int(math.floor(j * alpha_f + phase_f))
+        if s_j:
+            raw.append(st_ratio_qq)
+        else:
+            raw.append(QQ(1))
+    W = sum(raw)
+    cum = [QQ(0)]
+    s = QQ(0)
+    for wj in raw:
+        s += wj
+        cum.append(s)
+    return [a_qq + w_qq * c / W for c in cum]
+
+
+def _sturmian_boundaries(N, a_qq, w_qq, st_alpha, st_phase, st_ratio):
+    """Backward-compatible wrapper for the binary Sturmian implementation."""
+    return _sturmian_binary_boundaries(N, a_qq, w_qq, st_alpha, st_phase, st_ratio)
+
+
+def _beta_boundaries(N, a_hir, w_hir, beta_alpha, beta_beta):
+    """Compute N+1 boundary points by inverting Beta CDF via bisection (HiR).
+
+    For each target j/N, bisect to find t such that
+    integral_0^t u^(a-1)(1-u)^(b-1) du / B(a,b) = j/N.
+    """
+    from sage.all import numerical_integral
+    ba = float(beta_alpha)
+    bb = float(beta_beta)
+
+    def integrand(u):
+        return u**(ba - 1.0) * (1.0 - u)**(bb - 1.0)
+
+    # Total = B(alpha, beta).
+    total, _ = numerical_integral(integrand, 0.0, 1.0)
+
+    a_f = float(a_hir)
+    w_f = float(w_hir)
+    bdry = [a_hir]
+    for j in range(1, int(N)):
+        target = j / int(N) * total
+        lo, hi = 0.0, 1.0
+        for _ in range(60):
+            mid = (lo + hi) / 2.0
+            val, _ = numerical_integral(integrand, 0.0, mid)
+            if val < target:
+                lo = mid
+            else:
+                hi = mid
+        t = (lo + hi) / 2.0
+        bdry.append(HiR(a_f + w_f * t))
+    bdry.append(a_hir + w_hir)
+    return bdry
+
+
+def _arc_length_boundaries(N, a_hir, x_end_hir):
+    """Compute N+1 boundary points with equal arc-length cells on 1/(x ln 2) (HiR).
+
+    Integrand for arc length: sqrt(1 + (d/dx[1/(x ln 2)])^2) = sqrt(1 + 1/(x^4 ln(2)^2)).
+    Bisect on x for each target fraction of total arc length.
+    """
+    import math
+    from sage.all import numerical_integral
+    ln2 = math.log(2.0)
+    ln2sq = ln2 * ln2
+
+    def ds(x):
+        return math.sqrt(1.0 + 1.0 / (x**4 * ln2sq))
+
+    a_f = float(a_hir)
+    xe_f = float(x_end_hir)
+    total_S, _ = numerical_integral(ds, a_f, xe_f)
+
+    bdry = [a_hir]
+    for j in range(1, int(N)):
+        target = j * total_S / int(N)
+        lo, hi = a_f, xe_f
+        for _ in range(60):
+            mid = (lo + hi) / 2.0
+            val, _ = numerical_integral(ds, a_f, mid)
+            if val < target:
+                lo = mid
+            else:
+                hi = mid
+        bdry.append(HiR((lo + hi) / 2.0))
+    bdry.append(x_end_hir)
+    return bdry
+
+
+def _minimax_chord_boundaries(N, a_hir, x_end_hir, minimax_tol):
+    """Compute the closed-form minimax partition for 1/(x ln 2) - 1 (HiR).
+
+    For c(x) = 1/(x ln 2) - 1, the maximum chord-to-curve gap on [a,b] is
+    proportional to (a^(-1/2) - b^(-1/2))^2.  The minimax partition therefore
+    has equal spacing in u = x^(-1/2).  minimax_tol is retained only for API
+    compatibility with the old iterative solver.
+    """
+    _ = minimax_tol
+    u_start = HiR(1) / a_hir.sqrt()
+    u_end = HiR(1) / x_end_hir.sqrt()
+    bdry = []
+    for j in range(int(N) + 1):
+        u_j = u_start + (u_end - u_start) * HiR(j) / HiR(N)
+        bdry.append(HiR(1) / (u_j ^ 2))
+    bdry[0] = a_hir
+    bdry[-1] = x_end_hir
+    return bdry
+
+
 def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
     """
     Build a partition of [x_start, x_start + x_width) into 2^depth cells.
@@ -304,6 +534,14 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
         dyadic_res   : int    — bit resolution for dyadic_x (default depth+4)
         pl_exponent  : float  — power-law exponent for powerlaw_x (default 3)
         cantor_levels: int    — recursion depth for cantor_x (default 3)
+        farey_order  : int    — Farey sequence order Q for farey_rank_x (default auto)
+        vdc_base     : int    — base for radical_inverse_x (default 2)
+        st_alpha     : float  — irrational slope for sturmian_x (default 1/phi, reduced mod 1)
+        st_phase     : float  — phase offset for sturmian_x (default 0)
+        st_ratio     : number — width ratio for sturmian_x (default 2)
+        beta_alpha   : float  — alpha param for beta_x (default 5)
+        beta_beta    : float  — beta param for beta_x (default 2)
+        minimax_tol  : float  — compatibility knob for minimax_chord_x (default 1e-12)
 
     Returns a list of row dicts sorted by cell index.
     Each row:
@@ -358,6 +596,29 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
     elif kind == 'cantor_x':
         cantor_levels = kwargs.get('cantor_levels', 3)
         bdry = _cantor_boundaries(N, a, w, cantor_levels)
+    elif kind == 'minkowski_x':
+        bdry = _minkowski_boundaries(depth, QQ(x_start), QQ(x_width))
+    elif kind == 'farey_rank_x':
+        farey_order = kwargs.get('farey_order', None)
+        bdry = _farey_rank_boundaries(N, QQ(x_start), QQ(x_width), farey_order)
+    elif kind == 'radical_inverse_x':
+        vdc_base = kwargs.get('vdc_base', 2)
+        bdry = _radical_inverse_boundaries(N, a, w, vdc_base)
+    elif kind == 'sturmian_x':
+        import math as _math
+        st_alpha = kwargs.get('st_alpha', (_math.sqrt(5.0) - 1.0) / 2.0)
+        st_phase = kwargs.get('st_phase', 0.0)
+        st_ratio = kwargs.get('st_ratio', 2)
+        bdry = _sturmian_binary_boundaries(N, QQ(x_start), QQ(x_width), st_alpha, st_phase, st_ratio)
+    elif kind == 'beta_x':
+        beta_alpha = kwargs.get('beta_alpha', 5.0)
+        beta_beta = kwargs.get('beta_beta', 2.0)
+        bdry = _beta_boundaries(N, a, w, beta_alpha, beta_beta)
+    elif kind == 'arc_length_x':
+        bdry = _arc_length_boundaries(N, a, x_end)
+    elif kind == 'minimax_chord_x':
+        minimax_tol = kwargs.get('minimax_tol', 1e-12)
+        bdry = _minimax_chord_boundaries(N, a, x_end, minimax_tol)
 
     rows = []
 
@@ -402,8 +663,19 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
         elif kind == 'stern_brocot_x':
             x_lo = HiR(bdry[j])
             x_hi = HiR(bdry[j + 1])
+        elif kind == 'minkowski_x':
+            x_lo = HiR(bdry[j])
+            x_hi = HiR(bdry[j + 1])
+        elif kind == 'farey_rank_x':
+            x_lo = HiR(bdry[j])
+            x_hi = HiR(bdry[j + 1])
+        elif kind == 'sturmian_x':
+            x_lo = HiR(bdry[j])
+            x_hi = HiR(bdry[j + 1])
         elif kind in ('reverse_geometric_x', 'random_x', 'dyadic_x',
-                       'powerlaw_x', 'golden_x', 'cantor_x'):
+                       'powerlaw_x', 'golden_x', 'cantor_x',
+                       'radical_inverse_x', 'beta_x', 'arc_length_x',
+                       'minimax_chord_x'):
             x_lo = bdry[j]
             x_hi = bdry[j + 1]
 
@@ -460,8 +732,8 @@ def depth_for_N(N):
     return d
 
 
-# Canonical ordering, display names, and colors for all sixteen partitions.
-# Used by visualization scripts to iterate the 4x4 zoo grid.
+# Canonical ordering, display names, and colors for all partitions.
+# Used by visualization scripts to iterate zoo grids.
 PARTITION_ZOO = [
     ('uniform',           '#1f77b4', 'uniform_x'),
     ('geometric',         '#9467bd', 'geometric_x'),
@@ -479,4 +751,21 @@ PARTITION_ZOO = [
     ('power-law',         '#ff9896', 'powerlaw_x'),
     ('golden',            '#c5b0d5', 'golden_x'),
     ('cantor',            '#c49c94', 'cantor_x'),
+    ('minkowski',         '#e41a1c', 'minkowski_x'),
+    ('farey-rank',        '#377eb8', 'farey_rank_x'),
+    ('radical-inverse',   '#4daf4a', 'radical_inverse_x'),
+    ('sturmian',          '#984ea3', 'sturmian_x'),
+    ('beta',              '#ff7f00', 'beta_x'),
+    ('arc-length',        '#a65628', 'arc_length_x'),
+    ('minimax-chord',     '#f781bf', 'minimax_chord_x'),
 ]
+
+
+def zoo_grid_shape(zoo=None):
+    """Return (n_rows, n_cols) for a compact grid layout of a zoo list."""
+    n = len(zoo) if zoo is not None else len(PARTITION_ZOO)
+    c = int(n ** 0.5)
+    if c * c < n:
+        c += 1
+    r = (n + c - 1) // c
+    return r, c

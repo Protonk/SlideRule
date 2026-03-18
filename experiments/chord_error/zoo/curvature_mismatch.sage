@@ -43,7 +43,9 @@ def cell_mismatch(a, b, N):
 
 def make_plot():
     N = 2**DEPTH
-    fig, axes = plt.subplots(4, 4, figsize=(18, 14),
+    _n_rows, _n_cols = zoo_grid_shape()
+    fig, axes = plt.subplots(_n_rows, _n_cols,
+                             figsize=(4.5 * _n_cols, 3.5 * _n_rows),
                              sharey=False,
                              constrained_layout=True)
 
@@ -68,9 +70,12 @@ def make_plot():
 
         ax.set_title(name, fontsize=9, fontweight='bold')
 
+    for ax in axes.flat[len(PARTITION_ZOO):]:
+        ax.set_visible(False)
+
     for ax in axes[:, 0]:
         ax.set_ylabel('width / optimal width', fontsize=8)
-    for ax in axes[3, :]:
+    for ax in axes[-1, :]:
         ax.set_xlabel('$m_{\\mathrm{peak}}$', fontsize=8)
 
     fig.suptitle(

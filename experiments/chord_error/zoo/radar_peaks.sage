@@ -47,7 +47,9 @@ def make_plot():
     q2 = N // 2
     q3 = 3 * N // 4
 
-    fig, axes = plt.subplots(4, 4, figsize=(18, 18),
+    _n_rows, _n_cols = zoo_grid_shape()
+    fig, axes = plt.subplots(_n_rows, _n_cols,
+                             figsize=(4.5 * _n_cols, 4.5 * _n_rows),
                              subplot_kw={'projection': 'polar'},
                              constrained_layout=True)
 
@@ -78,6 +80,9 @@ def make_plot():
         ratio = peaks.max() / peaks.min() if peaks.min() > 0 else float('inf')
         ax.set_title('%s: %.2f:1' % (name, ratio),
                      fontsize=9, fontweight='bold', pad=12)
+
+    for ax in axes.flat[len(PARTITION_ZOO):]:
+        ax.set_visible(False)
 
     fig.suptitle(
         'Radar: per-cell peak error by cell index\n'

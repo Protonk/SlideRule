@@ -1130,15 +1130,15 @@ def test_depth_for_N():
 
 
 def test_partition_zoo():
-    """PARTITION_ZOO has 16 entries, all valid kinds, all unique colors."""
-    assert_true(len(PARTITION_ZOO) == 16, "PARTITION_ZOO should have 16 entries")
+    """PARTITION_ZOO has 23 entries, all valid kinds, all unique colors."""
+    assert_true(len(PARTITION_ZOO) == 23, "PARTITION_ZOO should have 23 entries")
     kinds = [kind for _, _, kind in PARTITION_ZOO]
     colors = [color for _, color, _ in PARTITION_ZOO]
     for kind in kinds:
         assert_true(kind in PARTITION_KINDS,
                     "PARTITION_ZOO kind %s not in PARTITION_KINDS" % kind)
-    assert_true(len(set(kinds)) == 16, "PARTITION_ZOO has duplicate kinds")
-    assert_true(len(set(colors)) == 16, "PARTITION_ZOO has duplicate colors")
+    assert_true(len(set(kinds)) == 23, "PARTITION_ZOO has duplicate kinds")
+    assert_true(len(set(colors)) == 23, "PARTITION_ZOO has duplicate colors")
 
 
 def main():

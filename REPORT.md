@@ -135,6 +135,12 @@ They are not where the repo's main scientific motion is now.
 - The per-cell artifact contract matters. Keep both `worst_candidate_x` and
   `worst_candidate_plog`.
 - The summary artifact is not enough by itself for the lodestone claims.
+- `minimax_chord_x` is now closed-form: equal spacing in `x^(-1/2)`. Do not
+  reintroduce the old iterative march without checking for degenerate tail
+  cells.
+- `stern_brocot_x` now refines on normalized `[0,1]` before scaling, so it
+  matches `minkowski_x` on nondefault domains. The intended control defaults
+  are `sturmian_x: st_alpha = 1/phi` and `beta_x: Beta(5,2)`.
 - The new `l1c_stability` artifact set mixes reused and newly generated rows on
   purpose; use the `source_run` column instead of assuming every row was
   generated in one execution.

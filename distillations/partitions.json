@@ -1,0 +1,451 @@
+{
+  "meta": {
+    "version": 1,
+    "source": "lib/partitions.sage",
+    "n_kinds": 23
+  },
+  "partitions": [
+    {
+      "kind": "uniform_x",
+      "display_name": "uniform",
+      "zoo_index": 0,
+      "color": "#1f77b4",
+      "category": "elementary_geometric",
+      "description": "Equal additive width",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "symmetric",
+      "density": "flat",
+      "params": {},
+      "equivalences": ["radical_inverse_x(base=2)"]
+    },
+    {
+      "kind": "geometric_x",
+      "display_name": "geometric",
+      "zoo_index": 1,
+      "color": "#9467bd",
+      "category": "elementary_geometric",
+      "description": "Equal log-width (scale equivariant)",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "log_symmetric",
+      "density": "log_uniform",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "harmonic_x",
+      "display_name": "harmonic",
+      "zoo_index": 2,
+      "color": "#2ca02c",
+      "category": "elementary_geometric",
+      "description": "Equal spacing in 1/x (dense near x_start)",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "left_dense",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "mirror_harmonic_x",
+      "display_name": "mirror-harmonic",
+      "zoo_index": 3,
+      "color": "#d62728",
+      "category": "elementary_geometric",
+      "description": "Mirrored reciprocal (dense near x_end)",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "right_dense",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "ruler_x",
+      "display_name": "ruler",
+      "zoo_index": 4,
+      "color": "#e67e22",
+      "category": "fractal",
+      "description": "Widths from 2-adic valuation (fractal, self-similar)",
+      "arithmetic": "QQ",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "fractal_scattered",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "sinusoidal_x",
+      "display_name": "sinusoidal",
+      "zoo_index": 5,
+      "color": "#17becf",
+      "category": "approximation_parametric",
+      "description": "Density oscillates in log-space (periodic ripple)",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "fractal_scattered",
+      "params": {"sin_k": 3, "sin_alpha": 0.6},
+      "equivalences": []
+    },
+    {
+      "kind": "chebyshev_x",
+      "display_name": "chebyshev",
+      "zoo_index": 6,
+      "color": "#8c564b",
+      "category": "approximation_parametric",
+      "description": "Clenshaw-Curtis nodes (dense at both endpoints)",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "symmetric",
+      "density": "both_endpoints",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "thuemorse_x",
+      "display_name": "thue-morse",
+      "zoo_index": 7,
+      "color": "#e377c2",
+      "category": "fractal",
+      "description": "Thue-Morse binary sequence widths (anti-ruler)",
+      "arithmetic": "QQ",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "fractal_scattered",
+      "params": {"tm_ratio": 2},
+      "equivalences": []
+    },
+    {
+      "kind": "bitrev_geometric_x",
+      "display_name": "bitrev-geometric",
+      "zoo_index": 8,
+      "color": "#7f7f7f",
+      "category": "fractal",
+      "description": "Geometric widths scattered by bit-reversal permutation",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "fractal_scattered",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "stern_brocot_x",
+      "display_name": "stern-brocot",
+      "zoo_index": 9,
+      "color": "#bcbd22",
+      "category": "number_theory",
+      "description": "Boundaries from iterated mediant insertion",
+      "arithmetic": "QQ",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "rational_dense",
+      "params": {},
+      "equivalences": ["minkowski_x"]
+    },
+    {
+      "kind": "reverse_geometric_x",
+      "display_name": "reverse-geometric",
+      "zoo_index": 10,
+      "color": "#ff7f0e",
+      "category": "elementary_geometric",
+      "description": "Geometric widths reversed (dense near x_end)",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "right_dense",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "random_x",
+      "display_name": "random",
+      "zoo_index": 11,
+      "color": "#aec7e8",
+      "category": "null_model",
+      "description": "Sorted uniform random breakpoints (null model)",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "quasi_uniform",
+      "params": {"random_seed": 42},
+      "equivalences": []
+    },
+    {
+      "kind": "dyadic_x",
+      "display_name": "dyadic",
+      "zoo_index": 12,
+      "color": "#98df8a",
+      "category": "null_model",
+      "description": "Geometric targets snapped to dyadic rationals",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "quantized_log_uniform",
+      "params": {"dyadic_res": "depth+4"},
+      "equivalences": []
+    },
+    {
+      "kind": "powerlaw_x",
+      "display_name": "power-law",
+      "zoo_index": 13,
+      "color": "#ff9896",
+      "category": "approximation_parametric",
+      "description": "Density ~ m^{-p}, aggressive left-packing",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "left_dense",
+      "params": {"pl_exponent": 3},
+      "equivalences": []
+    },
+    {
+      "kind": "golden_x",
+      "display_name": "golden",
+      "zoo_index": 14,
+      "color": "#c5b0d5",
+      "category": "symbolic_dynamics",
+      "description": "Golden-ratio Kronecker sequence breakpoints",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "quasi_uniform",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "cantor_x",
+      "display_name": "cantor",
+      "zoo_index": 15,
+      "color": "#c49c94",
+      "category": "fractal",
+      "description": "Cells distributed in Cantor-dust intervals",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "fractal_scattered",
+      "params": {"cantor_levels": 3},
+      "equivalences": []
+    },
+    {
+      "kind": "minkowski_x",
+      "display_name": "minkowski",
+      "zoo_index": 16,
+      "color": "#e41a1c",
+      "category": "number_theory",
+      "description": "Dyadic-to-Stern-Brocot conjugacy (Minkowski ? function)",
+      "arithmetic": "QQ",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "rational_dense",
+      "params": {},
+      "equivalences": ["stern_brocot_x"]
+    },
+    {
+      "kind": "farey_rank_x",
+      "display_name": "farey-rank",
+      "zoo_index": 17,
+      "color": "#377eb8",
+      "category": "number_theory",
+      "description": "Farey sequence rank-subsampled boundaries",
+      "arithmetic": "QQ",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "rational_dense",
+      "params": {"farey_order": "auto"},
+      "equivalences": []
+    },
+    {
+      "kind": "radical_inverse_x",
+      "display_name": "radical-inverse",
+      "zoo_index": 18,
+      "color": "#4daf4a",
+      "category": "number_theory",
+      "description": "Van der Corput low-discrepancy sequence",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "quasi_uniform",
+      "params": {"vdc_base": 2},
+      "equivalences": ["uniform_x (when vdc_base=2)"]
+    },
+    {
+      "kind": "sturmian_x",
+      "display_name": "sturmian",
+      "zoo_index": 19,
+      "color": "#984ea3",
+      "category": "symbolic_dynamics",
+      "description": "Sturmian word (irrational rotation) widths",
+      "arithmetic": "QQ",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "quasi_uniform",
+      "params": {"st_alpha": "inverse_golden_ratio", "st_phase": 0, "st_ratio": 2},
+      "equivalences": []
+    },
+    {
+      "kind": "beta_x",
+      "display_name": "beta",
+      "zoo_index": 20,
+      "color": "#ff7f00",
+      "category": "approximation_parametric",
+      "description": "Beta distribution CDF-inverted breakpoints",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "right_dense",
+      "params": {"beta_alpha": 5, "beta_beta": 2},
+      "equivalences": []
+    },
+    {
+      "kind": "arc_length_x",
+      "display_name": "arc-length",
+      "zoo_index": 21,
+      "color": "#a65628",
+      "category": "curve_aware",
+      "description": "Equal arc-length cells on 1/(x ln 2)",
+      "arithmetic": "HiR",
+      "curve_aware": true,
+      "symmetry": "asymmetric",
+      "density": "left_dense",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "minimax_chord_x",
+      "display_name": "minimax-chord",
+      "zoo_index": 22,
+      "color": "#f781bf",
+      "category": "curve_aware",
+      "description": "Minimax chord error equi-oscillation",
+      "arithmetic": "HiR",
+      "curve_aware": true,
+      "symmetry": "asymmetric",
+      "density": "left_dense",
+      "params": {"minimax_tol": 1e-12},
+      "equivalences": []
+    }
+  ],
+  "categories": {
+    "elementary_geometric": {"label": "Elementary Geometric", "group": "A"},
+    "number_theory": {"label": "Number Theory / Rational Trees", "group": "B"},
+    "fractal": {"label": "Fractal & Self-Similar", "group": "C"},
+    "symbolic_dynamics": {"label": "Symbolic Dynamics", "group": "D"},
+    "approximation_parametric": {"label": "Approximation / Parametric", "group": "E"},
+    "curve_aware": {"label": "Curve-Aware", "group": "F"},
+    "null_model": {"label": "Null Model", "group": "G"}
+  },
+  "equivalences": [
+    {"pair": ["minkowski_x", "stern_brocot_x"], "condition": null},
+    {"pair": ["radical_inverse_x", "uniform_x"], "condition": "vdc_base=2"}
+  ],
+  "presets": {
+    "geo_vs_elementary": {
+      "dimensions": [3, 3],
+      "center": [1, 1],
+      "fill": "full",
+      "narrative": "Thesis winner surrounded by naive spacing alternatives and optimization targets. Top row = first ideas (equal width, reciprocal, Chebyshev). Middle = geometric flanked by two x_end-dense reversals: log-reversal and reciprocal mirror. Bottom = optimization (power-law, arc-length, minimax).",
+      "cells": [
+        [0, 0, "uniform_x"], [0, 1, "harmonic_x"], [0, 2, "chebyshev_x"],
+        [1, 0, "reverse_geometric_x"], [1, 1, "geometric_x"], [1, 2, "mirror_harmonic_x"],
+        [2, 0, "powerlaw_x"], [2, 1, "arc_length_x"], [2, 2, "minimax_chord_x"]
+      ]
+    },
+    "geo_vs_number_theory": {
+      "dimensions": [3, 3],
+      "center": [1, 1],
+      "fill": "full",
+      "narrative": "Thesis winner surrounded by number-theoretic and hierarchical constructions. Top = rational-tree and low-discrepancy. Middle = irrational-rotation, geometric, Sturmian. Bottom = hierarchical/fractal structure.",
+      "cells": [
+        [0, 0, "stern_brocot_x"], [0, 1, "farey_rank_x"], [0, 2, "radical_inverse_x"],
+        [1, 0, "golden_x"], [1, 1, "geometric_x"], [1, 2, "sturmian_x"],
+        [2, 0, "minkowski_x"], [2, 1, "dyadic_x"], [2, 2, "ruler_x"]
+      ]
+    },
+    "geo_vs_chaos": {
+      "dimensions": [3, 3],
+      "center": [1, 1],
+      "fill": "full",
+      "narrative": "Thesis winner surrounded by fractal, stochastic, and parametric perturbations. Top = internal complexity (Thue-Morse, Cantor, bit-reversal). Middle = parametric modulation. Bottom = baselines.",
+      "cells": [
+        [0, 0, "thuemorse_x"], [0, 1, "cantor_x"], [0, 2, "bitrev_geometric_x"],
+        [1, 0, "sinusoidal_x"], [1, 1, "geometric_x"], [1, 2, "beta_x"],
+        [2, 0, "random_x"], [2, 1, "dyadic_x"], [2, 2, "ruler_x"]
+      ]
+    },
+    "density_gradient": {
+      "dimensions": [4, 4],
+      "center": null,
+      "fill": "full",
+      "narrative": "Reading order traces density centroid from extreme left-packing to right-packing. R0 = strongest left-packing. R1 = moderate structure. R2 = near-uniform. R3 = right-heavy and controls.",
+      "cells": [
+        [0, 0, "harmonic_x"], [0, 1, "powerlaw_x"], [0, 2, "minimax_chord_x"], [0, 3, "arc_length_x"],
+        [1, 0, "stern_brocot_x"], [1, 1, "golden_x"], [1, 2, "geometric_x"], [1, 3, "chebyshev_x"],
+        [2, 0, "uniform_x"], [2, 1, "radical_inverse_x"], [2, 2, "sturmian_x"], [2, 3, "sinusoidal_x"],
+        [3, 0, "beta_x"], [3, 1, "reverse_geometric_x"], [3, 2, "mirror_harmonic_x"], [3, 3, "random_x"]
+      ]
+    },
+    "mathematical_sophistication": {
+      "dimensions": [4, 4],
+      "center": null,
+      "fill": "full",
+      "narrative": "Rows = increasing mathematical machinery. R0 = Calculus I (equal, equal-log, reciprocal, mirror). R1 = Approximation theory. R2 = Combinatorics & Dynamics. R3 = Deep structure & optimization.",
+      "cells": [
+        [0, 0, "uniform_x"], [0, 1, "geometric_x"], [0, 2, "harmonic_x"], [0, 3, "mirror_harmonic_x"],
+        [1, 0, "chebyshev_x"], [1, 1, "sinusoidal_x"], [1, 2, "powerlaw_x"], [1, 3, "beta_x"],
+        [2, 0, "ruler_x"], [2, 1, "thuemorse_x"], [2, 2, "golden_x"], [2, 3, "sturmian_x"],
+        [3, 0, "stern_brocot_x"], [3, 1, "minkowski_x"], [3, 2, "arc_length_x"], [3, 3, "minimax_chord_x"]
+      ]
+    },
+    "relational_triangle": {
+      "dimensions": [4, 4],
+      "center": null,
+      "fill": "lower_triangle",
+      "narrative": "Diagonal = 4 anchor philosophies (uniform, geometric, chebyshev, arc_length). Below-diagonal entries show connecting relationships between anchors.",
+      "cells": [
+        [0, 0, "uniform_x"],
+        [1, 0, "harmonic_x"], [1, 1, "geometric_x"],
+        [2, 0, "reverse_geometric_x"], [2, 1, "stern_brocot_x"], [2, 2, "chebyshev_x"],
+        [3, 0, "random_x"], [3, 1, "ruler_x"], [3, 2, "minimax_chord_x"], [3, 3, "arc_length_x"]
+      ]
+    },
+    "symmetry_spine": {
+      "dimensions": [3, 3],
+      "center": null,
+      "fill": "lower_triangle",
+      "narrative": "Diagonal = symmetric partitions (uniform, geometric, chebyshev). Below-diagonal = symmetry-breaking departures (harmonic, powerlaw, mirror_harmonic).",
+      "cells": [
+        [0, 0, "uniform_x"],
+        [1, 0, "harmonic_x"], [1, 1, "geometric_x"],
+        [2, 0, "powerlaw_x"], [2, 1, "mirror_harmonic_x"], [2, 2, "chebyshev_x"]
+      ]
+    },
+    "complete_atlas": {
+      "dimensions": [5, 5],
+      "center": [2, 2],
+      "fill": "partial",
+      "narrative": "All 23 partitions in concentric rings around geometric. Inner ring = 8 nearest relatives. Outer ring = fractal, number-theoretic, parametric, curve-aware. Blanks at opposite corners [0,4] and [4,0], framing the atlas along the anti-diagonal through center.",
+      "cells": [
+        [0, 0, "cantor_x"], [0, 1, "thuemorse_x"], [0, 2, "stern_brocot_x"], [0, 3, "farey_rank_x"],
+        [1, 0, "ruler_x"], [1, 1, "harmonic_x"], [1, 2, "uniform_x"], [1, 3, "radical_inverse_x"], [1, 4, "dyadic_x"],
+        [2, 0, "bitrev_geometric_x"], [2, 1, "reverse_geometric_x"], [2, 2, "geometric_x"], [2, 3, "mirror_harmonic_x"], [2, 4, "sinusoidal_x"],
+        [3, 0, "sturmian_x"], [3, 1, "golden_x"], [3, 2, "chebyshev_x"], [3, 3, "minkowski_x"], [3, 4, "beta_x"],
+        [4, 1, "minimax_chord_x"], [4, 2, "powerlaw_x"], [4, 3, "arc_length_x"], [4, 4, "random_x"]
+      ]
+    },
+    "four_pillars": {
+      "dimensions": [4, 4],
+      "center": null,
+      "fill": "diagonal",
+      "narrative": "Four fundamental partition design philosophies on the diagonal: (0) Agnostic simplicity (uniform). (1) Scale equivariance (geometric, thesis winner). (2) Classical approximation theory (chebyshev). (3) Curve-specific optimization (minimax_chord). The thesis claim: geometric achieves nearly the performance of minimax_chord while remaining curve-agnostic.",
+      "cells": [
+        [0, 0, "uniform_x"],
+        [1, 1, "geometric_x"],
+        [2, 2, "chebyshev_x"],
+        [3, 3, "minimax_chord_x"]
+      ]
+    }
+  }
+}

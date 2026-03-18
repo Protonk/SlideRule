@@ -110,15 +110,16 @@ def compute_ribbon(cells):
 
 def plot_ribbons(all_data):
     N = 2**DEPTH
+    _n_rows, _n_cols = zoo_grid_shape()
     fig, axes = plt.subplots(
-        4, 4,
-        figsize=(18, 12),
+        _n_rows, _n_cols,
+        figsize=(4.5 * _n_cols, 3.0 * _n_rows),
         sharex=True,
         squeeze=False,
     )
 
     for idx, (name, color, kind) in enumerate(PARTITION_ZOO):
-        row, col = divmod(idx, 4)
+        row, col = divmod(idx, _n_cols)
         ax = axes[row][col]
         x_pos, exp, inc = all_data[kind]
 
@@ -136,8 +137,11 @@ def plot_ribbons(all_data):
         ax.tick_params(axis='y', length=0)
         ax.tick_params(axis='x', labelsize=6)
 
-        if row == 3:
+        if row == _n_rows - 1:
             ax.set_xlabel('$m$', fontsize=9)
+
+    for ax in axes.flat[len(PARTITION_ZOO):]:
+        ax.set_visible(False)
 
     # Left-side labels: top half = exported, bottom half = incoming
     for ax in axes[:, 0]:
