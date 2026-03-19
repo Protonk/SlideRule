@@ -3,13 +3,8 @@ H1 hypothesis sweep: depth scaling (H1b), q scaling (H1a), and
 layer-dependent vs layer-invariant comparison (H1c).
 
 Sweep 1 (H1b): fixed q=5, alpha=1/2, depth in {4..10}.
-  Tests whether improve/single_err stabilizes or decays to zero.
-
 Sweep 2 (H1a): fixed depth=4, alpha=1/2, q in {1,2,3,5,7,9,11,13,15}.
-  Tests whether the gap closes as parameters grow relative to 2^depth.
-
 Sweep 3 (H1c): (q=3,d=6) and (q=5,d=6), layer-invariant vs layer-dependent.
-  Tests whether per-layer deltas close the structural wall.
 
 All sweeps report delta-shape statistics for H1d (sparsity signal).
 
@@ -17,27 +12,16 @@ Run from project root:  ./sagew experiments/lodestone/h1_sweep.sage
 """
 
 import os
-import time
 import math
 
 from helpers import pathing
-load(pathing('experiments', 'sweep_driver.sage'))
-load(pathing('lib', 'paths.sage'))
-load(pathing('lib', 'day.sage'))
-load(pathing('lib', 'policies.sage'))
-load(pathing('lib', 'jukna.sage'))
-load(pathing('lib', 'optimize.sage'))
+load(pathing('experiments', 'lodestone', 'lodestone_runner.sage'))
 
 
 # ── Delta-shape statistics (H1d) ────────────────────────────────────────
 
 def delta_shape_stats(delta_rat, q, m_opt):
-    """
-    Compute sparsity/concentration statistics from the optimized delta table.
-
-    delta_rat: dict keyed by (state, bit) or (layer, state, bit).
-    m_opt: continuous minimax max|delta| for threshold computation.
-    """
+    """Compute sparsity/concentration statistics from the optimized delta table."""
     vals = [float(v) for v in delta_rat.values()]
     abs_vals = [abs(v) for v in vals]
 
@@ -65,60 +49,35 @@ def delta_shape_stats(delta_rat, q, m_opt):
 
 # ── Per-case computation ────────────────────────────────────────────────
 
-def run_case(q, depth, p_num, q_den, layer_dependent=False):
-    """
-    Run one (q, depth) case and return a flat dict of all output columns.
-    """
-    t0 = time.time()
-    if layer_dependent:
-        n_params = 1 + 2 * q * depth
-    else:
-        n_params = 1 + 2 * q
+def run_h1_case(q, depth, p_num, q_den, layer_dependent=False):
+    """Run one case via compute_case and add H1-specific delta-shape stats."""
+    case = compute_case(q, depth, p_num, q_den, layer_dependent=layer_dependent)
 
-    edges, paths, edge_index = residue_paths(q, depth)
+    opt_pol = case["opt_pol"]
+    ds = delta_shape_stats(opt_pol["delta_rat"], q, opt_pol["m_opt"])
 
-    single_pol = best_single_intercept(paths, p_num, q_den)
-    single_err = single_pol["worst_abs"]
-    single_u = single_pol["union_log2_ratio"]
-
-    opt_pol = optimize_shared_delta(q, depth, p_num, q_den,
-                                    layer_dependent=layer_dependent)
-    opt_err = opt_pol["worst_err"]
-    opt_u = opt_pol["union_log2_ratio"]
-    m_opt = opt_pol["m_opt"]
-
-    free_metrics = free_per_cell_metrics(depth, p_num, q_den)
-    free_err = free_metrics["worst_abs"]
-    free_u = free_metrics["union_log2_ratio"]
-
-    improve = single_err - opt_err
-    gap = opt_err - free_err
-    available = single_err - free_err
-    improve_over_single = improve / single_err if single_err > 0 else 0.0
-    improve_over_available = improve / available if available > 0 else 0.0
-
-    ds = delta_shape_stats(opt_pol["delta_rat"], q, m_opt)
-
-    elapsed = time.time() - t0
+    available = case["single_err"] - case["free_err"]
+    improve_over_single = case["improve"] / case["single_err"] if case["single_err"] > 0 else 0.0
+    improve_over_available = case["improve"] / available if available > 0 else 0.0
 
     return {
         "alpha": f"{p_num}/{q_den}",
         "q": q,
         "depth": depth,
-        "n_params": n_params,
+        "n_params": case["n_params"],
         "layer_dependent": layer_dependent,
-        "paths": 2**depth,
-        "single_err": single_err,
-        "opt_err": opt_err,
-        "free_err": free_err,
-        "single_u": single_u,
-        "opt_u": opt_u,
-        "free_u": free_u,
-        "improve": improve,
-        "gap": gap,
+        "paths": case["n_paths"],
+        "single_err": case["single_err"],
+        "opt_err": case["opt_err"],
+        "free_err": case["free_err"],
+        "single_u": case["single_u"],
+        "opt_u": case["opt_u"],
+        "free_u": case["free_u"],
+        "improve": case["improve"],
+        "gap": case["gap"],
         "improve_over_single": improve_over_single,
         "improve_over_available": improve_over_available,
-        "Mopt": m_opt,
+        "Mopt": opt_pol["m_opt"],
         "max_delta_abs": opt_pol["max_delta_abs"],
         "tau_continuous": opt_pol["tau_continuous"],
         "tau_snapped": opt_pol["tau_snapped"],
@@ -129,7 +88,7 @@ def run_case(q, depth, p_num, q_den, layer_dependent=False):
         "nnz_1e3": ds["nnz_1e3"],
         "n_zero": ds["n_zero"],
         "top2_mass": ds["top2_mass"],
-        "time": elapsed,
+        "time": case["elapsed"],
     }
 
 
@@ -193,7 +152,7 @@ def main():
 
     h1b_rows = []
     for depth in h1b_depths:
-        r = run_case(h1b_q, depth, p_num, q_den)
+        r = run_h1_case(h1b_q, depth, p_num, q_den)
         print_row(r)
         h1b_rows.append(r)
 
@@ -215,7 +174,7 @@ def main():
 
     h1a_rows = []
     for q in h1a_qs:
-        r = run_case(q, h1a_depth, p_num, q_den)
+        r = run_h1_case(q, h1a_depth, p_num, q_den)
         print_row(r)
         h1a_rows.append(r)
 
@@ -236,11 +195,11 @@ def main():
 
     h1c_rows = []
     for q_val, d_val in h1c_cases:
-        r_li = run_case(q_val, d_val, p_num, q_den, layer_dependent=False)
+        r_li = run_h1_case(q_val, d_val, p_num, q_den, layer_dependent=False)
         print_row(r_li)
         h1c_rows.append(r_li)
 
-        r_ld = run_case(q_val, d_val, p_num, q_den, layer_dependent=True)
+        r_ld = run_h1_case(q_val, d_val, p_num, q_den, layer_dependent=True)
         print_row(r_ld)
         h1c_rows.append(r_ld)
 
@@ -253,8 +212,6 @@ def main():
         print()
 
     write_h1_csv(h1c_rows, os.path.join(results_dir, 'h1c_layer_dependent.csv'))
-
-    # ── Summary ──────────────────────────────────────────────────────────
 
     print()
     print("=" * 100)

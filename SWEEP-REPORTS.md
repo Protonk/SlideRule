@@ -21,7 +21,11 @@ Explanations belong in [`LODESTONE.md`](LODESTONE.md) and
 
 Driver:
 
-- [`experiments/lodestone/optimize_delta.sage`](experiments/lodestone/optimize_delta.sage)
+- Historical driver: `experiments/lodestone/optimize_delta.sage`
+  (removed; see git history).
+- Current nearest equivalents:
+  `experiments/lodestone/inspect_case.sage` for single-case delta inspection
+  and `experiments/lodestone/h1_sweep.sage` for structured baseline CSVs.
 
 Scope:
 
@@ -160,12 +164,14 @@ Direct observations:
 
 Driver:
 
-- [`experiments/lodestone/lodestone_sweep.sage`](experiments/lodestone/lodestone_sweep.sage)
+- Historical driver: `experiments/lodestone/lodestone_sweep.sage`
+  (removed; equivalent cases regenerate via
+  [`experiments/lodestone/partition_sweep.sage`](experiments/lodestone/partition_sweep.sage)).
 
 Artifacts:
 
-- [`experiments/lodestone/results/lodestone_summary.csv`](experiments/lodestone/results/lodestone_summary.csv)
-- [`experiments/lodestone/results/lodestone_percell.csv`](experiments/lodestone/results/lodestone_percell.csv)
+- [`experiments/lodestone/results/lodestone_2026-03-11/summary.csv`](experiments/lodestone/results/lodestone_2026-03-11/summary.csv)
+- [`experiments/lodestone/results/lodestone_2026-03-11/percell.csv`](experiments/lodestone/results/lodestone_2026-03-11/percell.csv)
 
 Role in current program:
 
@@ -246,13 +252,15 @@ Direct observations:
 
 Driver:
 
-- [`experiments/lodestone/l1c_grid_sweep.sage`](experiments/lodestone/l1c_grid_sweep.sage)
+- Historical driver: `experiments/lodestone/l1c_grid_sweep.sage`
+  (removed; equivalent cases regenerate via
+  [`experiments/lodestone/partition_sweep.sage`](experiments/lodestone/partition_sweep.sage)).
 
 Artifacts:
 
-- [`experiments/lodestone/results/l1c_grid_2026-03-12/summary.csv`](experiments/lodestone/results/l1c_grid_2026-03-12/summary.csv)
-- [`experiments/lodestone/results/l1c_grid_2026-03-12/percell.csv`](experiments/lodestone/results/l1c_grid_2026-03-12/percell.csv)
-- [`experiments/lodestone/results/l1c_grid_2026-03-12/README.md`](experiments/lodestone/results/l1c_grid_2026-03-12/README.md)
+- `experiments/lodestone/results/l1c_grid_2026-03-12/summary.csv` (historical, see git)
+- `experiments/lodestone/results/l1c_grid_2026-03-12/percell.csv` (historical, see git)
+- `experiments/lodestone/results/l1c_grid_2026-03-12/README.md` (historical, see git)
 
 Role in current program:
 
@@ -306,13 +314,16 @@ Direct observations:
 
 Driver:
 
-- [`experiments/lodestone/l1c_stability_sweep.sage`](experiments/lodestone/l1c_stability_sweep.sage)
+- Historical driver: `experiments/lodestone/l1c_stability_sweep.sage`
+  (removed; overlapping cases regenerate via
+  [`experiments/lodestone/partition_sweep.sage`](experiments/lodestone/partition_sweep.sage);
+  the exact staged reuse workflow remains historical-only).
 
 Artifacts:
 
-- [`experiments/lodestone/results/l1c_stability_2026-03-12/summary.csv`](experiments/lodestone/results/l1c_stability_2026-03-12/summary.csv)
-- [`experiments/lodestone/results/l1c_stability_2026-03-12/percell.csv`](experiments/lodestone/results/l1c_stability_2026-03-12/percell.csv)
-- [`experiments/lodestone/results/l1c_stability_2026-03-12/README.md`](experiments/lodestone/results/l1c_stability_2026-03-12/README.md)
+- `experiments/lodestone/results/l1c_stability_2026-03-12/summary.csv` (historical, see git)
+- `experiments/lodestone/results/l1c_stability_2026-03-12/percell.csv` (historical, see git)
+- `experiments/lodestone/results/l1c_stability_2026-03-12/README.md` (historical, see git)
 
 Role in current program:
 
@@ -356,13 +367,15 @@ Direct observations:
 
 Driver:
 
-- [`experiments/lodestone/harmonic_diagnostic_sweep.sage`](experiments/lodestone/harmonic_diagnostic_sweep.sage)
+- Historical driver: `experiments/lodestone/harmonic_diagnostic_sweep.sage`
+  (removed; equivalent cases regenerate via
+  [`experiments/lodestone/partition_sweep.sage`](experiments/lodestone/partition_sweep.sage)).
 
 Artifacts:
 
-- [`experiments/lodestone/results/harmonic_diagnostic_2026-03-12/summary.csv`](experiments/lodestone/results/harmonic_diagnostic_2026-03-12/summary.csv)
-- [`experiments/lodestone/results/harmonic_diagnostic_2026-03-12/percell.csv`](experiments/lodestone/results/harmonic_diagnostic_2026-03-12/percell.csv)
-- [`experiments/lodestone/results/harmonic_diagnostic_2026-03-12/README.md`](experiments/lodestone/results/harmonic_diagnostic_2026-03-12/README.md)
+- `experiments/lodestone/results/harmonic_diagnostic_2026-03-12/summary.csv` (historical, see git)
+- `experiments/lodestone/results/harmonic_diagnostic_2026-03-12/percell.csv` (historical, see git)
+- `experiments/lodestone/results/harmonic_diagnostic_2026-03-12/README.md` (historical, see git)
 
 Role in current program:
 

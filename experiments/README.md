@@ -11,8 +11,7 @@ Partition-comparison sweeps for the lodestone program. Tests whether
 geometric partitions beat uniform under shared-delta optimization.
 CSV results live in `lodestone/results/`.
 
-Scripts: `lodestone_sweep`, `l1c_grid_sweep`, `l1c_stability_sweep`,
-`harmonic_diagnostic_sweep`, `h1_sweep`, `fsm_coarse`, `optimize_delta`.
+Scripts: `partition_sweep`, `h1_sweep`, `inspect_case`, `error_profile`.
 
 ### `ripple/`
 

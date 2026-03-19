@@ -24,7 +24,8 @@ import numpy as np
 Q = 3
 DEPTH = 6
 ALPHA = '1/2'
-PERCELL_CSV = pathing('experiments', 'lodestone', 'results', 'lodestone_percell.csv')
+RUN_TAG = 'lodestone_2026-03-11'
+PERCELL_CSV = pathing('experiments', 'lodestone', 'results', RUN_TAG, 'percell.csv')
 OUT_PATH = pathing('experiments', 'lodestone', 'results', 'error_profile.png')
 
 

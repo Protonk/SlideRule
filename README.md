@@ -42,10 +42,9 @@ against `geometric_x`.
 All commands below are run from project root.
 
 ```sh
-./sagew experiments/lodestone/lodestone_sweep.sage
-./sagew experiments/lodestone/fsm_coarse.sage
-./sagew experiments/lodestone/optimize_delta.sage
+./sagew experiments/lodestone/partition_sweep.sage
 ./sagew experiments/lodestone/h1_sweep.sage
+./sagew experiments/lodestone/inspect_case.sage
 python3 lib/trajectory.py
 ./sagew tests/run_tests.sage
 ./sagew
@@ -56,13 +55,12 @@ python3 lib/trajectory.py
 - SageMath is required for the `.sage` drivers.
 - The optimizer in [`lib/optimize.sage`](lib/optimize.sage) uses `numpy` and
   `scipy.optimize.linprog`.
-- [`experiments/lodestone/fsm_coarse.sage`](experiments/lodestone/fsm_coarse.sage) is the
-  legacy/exploratory entry point.
-- [`experiments/lodestone/optimize_delta.sage`](experiments/lodestone/optimize_delta.sage) and
-  [`experiments/lodestone/h1_sweep.sage`](experiments/lodestone/h1_sweep.sage) are the legacy
-  baseline drivers on the exact `uniform_x` oracle path.
-- [`experiments/lodestone/lodestone_sweep.sage`](experiments/lodestone/lodestone_sweep.sage) is
-  the current primary comparison driver for `L1`-`L3`.
+- [`experiments/lodestone/partition_sweep.sage`](experiments/lodestone/partition_sweep.sage) is
+  the primary partition-comparison driver for `L1`-`L3`.
+- [`experiments/lodestone/h1_sweep.sage`](experiments/lodestone/h1_sweep.sage) is the
+  uniform-only H1 hypothesis baseline.
+- [`experiments/lodestone/inspect_case.sage`](experiments/lodestone/inspect_case.sage) is the
+  single-case diagnostic workbench.
 - The minimax optimizer is implemented as float bisection plus LP feasibility,
   followed by dyadic snapping of the returned parameters. Treat it as a strong
   numerical solver, not a fully certified rational optimum.
