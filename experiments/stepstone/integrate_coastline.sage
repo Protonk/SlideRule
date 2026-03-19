@@ -9,15 +9,11 @@ Run:  ./sagew experiments/stepstone/integrate_coastline.sage
 """
 
 from helpers import pathing
-load(pathing('lib', 'day.sage'))
-load(pathing('lib', 'partitions.sage'))
+load(pathing('experiments', 'ripple', 'coastline.sage'))
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import numpy as np
-from math import log, log2 as math_log2
-from scipy import integrate
 
 
 # ── Configuration ────────────────────────────────────────────────────
@@ -25,32 +21,11 @@ from scipy import integrate
 DEPTHS = [2, 3, 4, 5, 6, 7]   # N = 4, 8, 16, 32, 64, 128
 
 
-# ── Math ─────────────────────────────────────────────────────────────
-
-def cell_chord_slope(a, b):
-    return (math_log2(b) - math_log2(a)) / (b - a)
-
-
-def continuous_slope(m):
-    return 1.0 / (m * log(2.0)) - 1.0
-
-
-def coastline_area(depth):
-    cells = float_cells(depth, 'uniform_x')
-    total = 0.0
-    for a, b in cells:
-        sigma_dev = cell_chord_slope(a, b) - 1.0
-        area, _ = integrate.quad(
-            lambda m: abs(continuous_slope(m) - sigma_dev), a, b)
-        total += area
-    return total
-
-
 # ── Plot ─────────────────────────────────────────────────────────────
 
 def make_plot():
     Ns = [2**d for d in DEPTHS]
-    areas = [coastline_area(d) for d in DEPTHS]
+    areas = [coastline_area(d, 'uniform_x') for d in DEPTHS]
 
     fig, ax = plt.subplots(figsize=(8, 4.5), constrained_layout=True)
 
@@ -87,7 +62,7 @@ def print_diagnostics():
     print("=" * 45)
     for d in DEPTHS:
         N = 2**d
-        area = coastline_area(d)
+        area = coastline_area(d, 'uniform_x')
         print("  N = %4d   area = %.6f" % (N, area))
     print()
 

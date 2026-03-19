@@ -14,14 +14,22 @@ CSV results live in `lodestone/results/`.
 Scripts: `lodestone_sweep`, `l1c_grid_sweep`, `l1c_stability_sweep`,
 `harmonic_diagnostic_sweep`, `h1_sweep`, `fsm_coarse`, `optimize_delta`.
 
+### `ripple/`
+
+Normalized asymptotic-behavior experiments for coastline area across
+partition families. Focuses on scaled-area convergence, wobble, and
+stability diagnostics.
+
+Scripts: `stability_heatmap`, `settlers`, `divergent`.
+
 ### `stepstone/`
 
 Chord error visualization and analysis. Explores per-cell error structure,
 slope deviation geometry, and fractal crossing-count art.
 
 Subfolders: `zoo/` (partition zoo grids), `damage/` (foreign-error ribbons),
-`hazards/` (slope deviation and stability), `fractal/` (fractal raster
-rendering and outputs).
+`hazards/` (slope deviation views), `fractal/` (fractal raster rendering and
+outputs).
 
 Fractal entry points:
 
