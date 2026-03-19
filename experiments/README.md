@@ -20,7 +20,15 @@ Chord error visualization and analysis. Explores per-cell error structure,
 slope deviation geometry, and fractal crossing-count art.
 
 Subfolders: `zoo/` (partition zoo grids), `damage/` (foreign-error ribbons),
-`hazards/` (slope deviation and stability), `art/` (fractal raster engine).
+`hazards/` (slope deviation and stability), `fractal/` (fractal raster
+rendering and outputs).
+
+Fractal entry points:
+
+- `fractal/single_fractal.sage` — one partition kind to one image
+- `fractal/grid_fractals.sage` — one preset grid or the full zoo
+
+Generated fractal PNGs live in `stepstone/fractal/results/`.
 
 ## Shared utilities
 

@@ -4,19 +4,19 @@ _slope_deviation.sage — Shared math and rendering for slope deviation panels.
 Provides build_steps(depth, kind) and render_panel(ax, kind, ...) for use
 by curated.sage and zoo.sage.
 
-Math (cell_chord_slope) imported from art/raster.sage to avoid duplication.
+Math (cell_chord_slope) imported from fractal/raster.sage to avoid duplication.
 
 Not intended to be run directly.
 """
 
 from helpers import pathing
-load(pathing('experiments', 'stepstone', 'art', 'raster.sage'))
+load(pathing('experiments', 'stepstone', 'fractal', 'raster.sage'))
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# cell_chord_slope is now provided by art/raster.sage
+# cell_chord_slope is now provided by fractal/raster.sage
 
 
 # ── Defaults ─────────────────────────────────────────────────────────

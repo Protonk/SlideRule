@@ -1,228 +1,203 @@
-# Plan: Restructure experiments/ into topical subdirectories
+# Ripple Plan
 
-## Status (2026-03-18)
+## Goal
 
-- Follow-up audit completed after the directory move/refactor.
-- Verified `./sagew tests/run_tests.sage` passes (`88` tests).
-- Regenerated the missing root stepstone PNG artifacts:
-  - `experiments/stepstone/chord_slope_crossing.png`
-  - `experiments/stepstone/integrate_coastline.png`
-  - `experiments/stepstone/many_steps_miss.png`
-- Additional smoke checks passed for moved/shared-helper scripts:
-  - `./sagew experiments/stepstone/damage/counter_factual.sage`
-  - `./sagew experiments/stepstone/zoo/radar_peaks.sage`
-  - `./sagew experiments/stepstone/hazards/crossings.sage`
-- No further refactor fixes were required in this pass beyond regenerating
-  the expected PNG artifacts and recording verification.
+Create a new home at `experiments/ripple/` for work on normalized asymptotic
+behavior: measures, diagnostics, and visualizations that study how partition
+families approach their limiting coastline-area behavior as depth increases.
 
-## Context
+This should keep `experiments/stepstone/` from accumulating another cluster of
+one-off analysis scripts while giving us a place to iterate on both the math
+and the presentation.
 
-The experiments/ directory grew organically: sweep drivers, visualization
-scripts, legacy baselines, and a deep chord_error/ tree all sit at the same
-level. The goal is a cleaner layout with:
+## Why A New Folder
 
-- Topical subdirectories (no `core/` or `helpers/`)
-- 2 shared utility files at the experiments/ root
-- A short README explaining subdirectories
-- An AGENTS.md explaining how/when to create new subdirectories
-- Two exemplar subdirectories: **lodestone/** and **stepstone/**
-- Results moved from `experiments/results/` into `experiments/lodestone/results/`
+- `stepstone/` already carries the direct geometric/error experiments.
+- This new work is about convergence behavior, normalization choices, and
+  derived stability measures across depth.
+- The likely workflow is iterative: try a measure, inspect the resulting
+  picture, adjust the measure, repeat.
+- That argues for a dedicated subarea with clean separation between:
+  computation,
+  reusable measures,
+  visualization entry points,
+  and generated outputs.
 
-## Target layout
+## Proposed Layout
 
 ```
-experiments/
-├── README.md                          NEW — short orientation
-├── AGENTS.md                          NEW — subdirectory creation protocol
-├── zoo_figure.sage                    NEW — shared zoo-grid plotting
-├── sweep_driver.sage                  NEW — shared sweep + CSV infrastructure
-├── lodestone/
-│   ├── lodestone_sweep.sage           MOVED from experiments/
-│   ├── l1c_grid_sweep.sage            MOVED
-│   ├── l1c_stability_sweep.sage       MOVED
-│   ├── harmonic_diagnostic_sweep.sage MOVED
-│   ├── h1_sweep.sage                  MOVED (legacy baseline)
-│   ├── fsm_coarse.sage                MOVED (foundational FSM diagnostics)
-│   ├── optimize_delta.sage            MOVED (shared-delta optimization)
-│   └── results/                       MOVED from experiments/results/
-│       ├── lodestone_summary.csv      from results/
-│       ├── lodestone_percell.csv      from results/
-│       ├── h1a_gap_vs_q.csv           from results/
-│       ├── h1b_depth_scaling.csv      from results/
-│       ├── h1c_layer_dependent.csv    from results/
-│       ├── harmonic_diagnostic_2026-03-12/  from results/lodestone/
-│       ├── l1c_grid_2026-03-12/             from results/lodestone/
-│       └── l1c_stability_2026-03-12/        from results/lodestone/
-├── stepstone/
-│   ├── TILT.md                        MOVED from chord_error/
-│   ├── plog_chord_argument.sage       MOVED from chord_error/
-│   ├── damage/                        MOVED from chord_error/damage/
-│   │   └── counter_factual.sage (+.png)
-│   ├── zoo/                           MOVED from chord_error/zoo/
-│   │   ├── cartesean_envelope.sage (+.png)
-│   │   ├── radar_peaks.sage (+.png)
-│   │   ├── polar_heatmap.sage (+.png)
-│   │   └── curvature_mismatch.sage (+.png)
-│   ├── chord_slope_crossing.sage      UP from chord_error/stepstones/
-│   ├── many_steps_miss.sage           UP from chord_error/stepstones/
-│   ├── integrate_coastline.sage       UP from chord_error/stepstones/
-│   ├── art/                           UP from chord_error/stepstones/art/
-│   │   ├── FRACTAL.md
-│   │   ├── RASTER-FRACTAL-PLAN.md
-│   │   ├── raster.sage
-│   │   └── multiplexer.sage
-│   └── hazards/                       UP from chord_error/stepstones/hazards/
-│       ├── _slope_deviation.sage
-│       ├── crossings.sage
-│       ├── curated.sage
-│       └── stability_heatmap.sage
+experiments/ripple/
+├── README.md
+├── coastline.sage              shared computation + measures
+├── ripple_sparklines.sage      23-panel sparkline grid
+├── stability_heatmap.sage      MOVED from stepstone/hazards/
+└── results/                    output images + cached series
 ```
 
-## Key decisions
+No nested `lib/` — helpers sit alongside the scripts they serve.
 
-### 1. fsm_coarse.sage → lodestone/
+## What moves in
 
-FSM coarse diagnostics are the foundational evaluation pipeline that all
-lodestone sweeps build on. `fsm_coarse` establishes how the Day evaluator
-and Jukna combinatorics work; the sweeps then explore parameters. Same
-story, same topic.
+### `stability_heatmap.sage` — from `stepstone/hazards/`
 
-### 2. optimize_delta.sage → lodestone/
+The existing stability heatmap computes coastline areas for all partitions
+at depths 1-10, normalizes by geometric, and renders a binary
+stable/unstable grid. It is a coarse-binary view of the same convergence
+question ripple addresses with continuous measures. Housing them together
+means they share the same `coastline_area()` implementation and stay
+consistent when the math changes.
 
-Shared-delta optimization is the core technique lodestone sweeps use.
-`optimize_delta` is the first exploration on `uniform_x`; the sweeps
-generalize across partition kinds. Same optimization pipeline, same topic.
+After the move, `stepstone/hazards/` retains `_slope_deviation.sage`,
+`curated.sage`, and their PNGs. The deleted `crossings.sage` and
+`crossings.png` are already handled by the FRACTAL-PLAN.
 
-### 3. h1_sweep.sage → lodestone/
+### `coastline.sage` — rewritten, not extracted
 
-H1a/b/c/d hypotheses are the predecessor claims that lodestone validates.
-Legacy status, but topically inseparable from the lodestone program.
+Two files currently implement `coastline_area()`:
 
-### 4. smoke_test.sage → DELETE
+- `stepstone/hazards/stability_heatmap.sage` (accepts any `kind`)
+- `stepstone/integrate_coastline.sage` (hardcodes `uniform_x`)
 
-One-line wrapper (`load(pathing('tests', 'run_tests.sage'))`). The
-canonical invocation is `./sagew tests/run_tests.sage`.
+Both use identical math: `integrate.quad(|1/(m ln 2) - sigma_j|, a, b)`
+summed over cells. The function is ~10 lines and not worth ceremonial
+extraction. We rewrite it once in `coastline.sage` alongside the measure
+definitions, and both `stability_heatmap.sage` and `ripple_sparklines.sage`
+load from there.
 
-### 5. stepstone/ internal flattening
-
-Inner `chord_error/stepstones/` level is eliminated to avoid
-`stepstone/stepstones/`. Three loose scripts promote to stepstone/ root.
-art/ and hazards/ promote one level up.
-
-### 6. Results relocation
-
-`experiments/results/` is deleted. Contents scatter:
-- `results/lodestone_summary.csv` → `lodestone/results/`
-- `results/lodestone_percell.csv` → `lodestone/results/`
-- `results/h1a_gap_vs_q.csv` → `lodestone/results/`
-- `results/h1b_depth_scaling.csv` → `lodestone/results/`
-- `results/h1c_layer_dependent.csv` → `lodestone/results/`
-- `results/lodestone/harmonic_diagnostic_2026-03-12/` → `lodestone/results/`
-- `results/lodestone/l1c_grid_2026-03-12/` → `lodestone/results/`
-- `results/lodestone/l1c_stability_2026-03-12/` → `lodestone/results/`
-- stepstone has no CSV results (PNGs colocated with scripts)
-
-## Shared utility files (2 files at experiments/ root)
-
-### `zoo_figure.sage`
-
-Extracts the repeated zoo subplot pattern found in 7 scripts:
+`coastline.sage` provides:
 
 ```sage
-def zoo_subplots(figsize_per_cell=(4.5, 3.5), **subplot_kw):
-    """Create fig + axes grid matching PARTITION_ZOO.
-    Returns (fig, axes_flat, n_rows, n_cols)."""
+def coastline_area(depth, kind):
+    """Sum of |continuous_slope - cell_chord_slope| integrated per cell."""
 
-def zoo_iter(axes_flat):
-    """Yield (name, color, kind, ax) for each zoo entry."""
+def coastline_series(kinds, depths):
+    """Return dict keyed by kind -> list of raw areas across depths."""
 
-def zoo_hide_unused(axes_flat):
-    """Hide axes beyond len(PARTITION_ZOO)."""
+def scaled_series(raw, depths):
+    """Multiply each area by 2^depth."""
 
-def zoo_label_edges(axes, ylabel='', xlabel=''):
-    """Set ylabel on left column, xlabel on bottom row."""
+# ── Measure registry ──────────────────────────────────────────────
+MEASURES = {
+    'log_ratio':     lambda B, d: log(B[d] / B[d-1]),
+    'difference':    lambda B, d: B[d] - B[d-1],
+    'rel_change':    lambda B, d: abs(B[d] - B[d-1]) / abs(B[d-1]),
+    'geo_ratio':     ...,   # needs geo series passed in
+    'geo_change':    ...,   # needs geo series passed in
+}
 ```
 
-Eliminates ~15 lines of boilerplate per zoo script.
+No cached series exist today. Whether to add CSV caching to `results/`
+is a decision for the first iteration — we may find the compute is fast
+enough at moderate depths that caching adds complexity for no benefit.
 
-### `sweep_driver.sage`
+## Core Question
 
-Extracts patterns shared by 6 sweep scripts:
+We suspect each partition may approach an asymptotic coastline-volume/area
+constant, but possibly with different convergence velocity and different
+amounts of oscillation. The first visualization should therefore emphasize:
 
-```sage
-def result_dir(topic, tag=None):
-    """Create experiments/<topic>/results/<tag>/ and return path."""
+- whether the normalized quantity appears to settle,
+- how quickly it settles,
+- whether it approaches monotonically or with sign changes,
+- whether some families are notably ragged or wobbly across depth.
 
-def append_csv(path, rows, header=None):
-    """Append dicts-as-rows to CSV, writing header if new file."""
+## First Math Pass
 
-def subset_size_str(greedy_size, exact_size):
-    """Render greedy/exact subset sizes (currently duplicated in
-    fsm_coarse.sage and optimize_delta.sage)."""
-```
+Start by computing, for every partition and every depth in a chosen range:
 
-## Implementation steps
+- raw coastline area `A_d(kind)`
+- scaled area `B_d(kind) = 2^d * A_d(kind)`
 
-### Step 1: Create shared utilities
+Then define the first candidate ripple signal from the scaled quantity:
 
-Write `experiments/zoo_figure.sage` and `experiments/sweep_driver.sage`.
+- `R_d(kind) = log(B_d(kind) / B_{d-1}(kind))`
 
-### Step 2: git mv all files
+This preserves sign and compresses scale, so wobble should remain visible even
+when absolute magnitudes vary widely.
 
-Use `git mv` to preserve history. Sequence:
+## Measures To Iterate On
 
-1. `mkdir -p experiments/lodestone/results`
-2. `mkdir -p experiments/stepstone`
-3. Move 7 lodestone scripts into `experiments/lodestone/`
-4. Move 5 root CSVs from `experiments/results/` → `experiments/lodestone/results/`
-5. Move 3 timestamped dirs from `experiments/results/lodestone/` → `experiments/lodestone/results/`
-6. `git mv experiments/chord_error/TILT.md experiments/stepstone/`
-7. `git mv experiments/chord_error/plog_chord_argument.sage experiments/stepstone/`
-8. `git mv experiments/chord_error/damage experiments/stepstone/`
-9. `git mv experiments/chord_error/zoo experiments/stepstone/`
-10. Promote stepstones/ contents up: move 3 loose scripts to `experiments/stepstone/`
-11. `git mv experiments/chord_error/stepstones/art experiments/stepstone/`
-12. `git mv experiments/chord_error/stepstones/hazards experiments/stepstone/`
-13. `git rm experiments/smoke_test.sage`
-14. Remove empty `experiments/chord_error/` and `experiments/results/` trees
+We should expect to iterate on the measure, not just the plot. Candidate
+families worth supporting from the start:
 
-### Step 3: Update internal references in moved scripts
+- signed log-ratio: `log(B_d / B_{d-1})`
+- signed difference: `B_d - B_{d-1}`
+- relative change magnitude: `|B_d - B_{d-1}| / |B_{d-1}|`
+- geometric-referenced ratio:
+  `B_d(kind) / B_d(geometric_x)`
+- geometric-referenced change:
+  `log((B_d(kind) / B_d(geo)) / (B_{d-1}(kind) / B_{d-1}(geo)))`
 
-Three files have absolute `pathing()` calls that must change:
+We do not yet know which framing is the most revealing. The design should make
+it cheap to swap these in and compare outputs.
 
-| File (new location) | Old path | New path |
-|---|---|---|
-| `stepstone/hazards/_slope_deviation.sage` | `pathing('experiments', 'chord_error', 'stepstones', 'art', 'raster.sage')` | `pathing('experiments', 'stepstone', 'art', 'raster.sage')` |
-| `stepstone/hazards/crossings.sage` | `pathing('experiments', 'chord_error', 'stepstones', 'art', 'multiplexer.sage')` | `pathing('experiments', 'stepstone', 'art', 'multiplexer.sage')` |
-| `stepstone/art/multiplexer.sage` | `pathing('experiments', 'chord_error', 'stepstones', 'art', 'raster.sage')` | `pathing('experiments', 'stepstone', 'art', 'raster.sage')` |
+## Depth Range
 
-Additionally, all lodestone sweep scripts that write CSVs via
-`pathing('experiments', 'results', ...)` must be updated to point at
-`pathing('experiments', 'lodestone', 'results', ...)`.
+Stay at depth 10 (N = 1024) for now. At 23 partitions x depths 1–10 this
+is ~47K `integrate.quad` calls — noticeable but tolerable (under 2 minutes).
+No caching layer; just recompute each run.
 
-### Step 4: Refactor scripts to use shared utilities
+If deeper depths are needed later, a closed-form antiderivative of the
+integrand can replace quad entirely. See `CLOSED-FORM-PLAN.md` for the
+sketch. That's a math task, not a plumbing task, and doesn't block anything.
 
-- Zoo scripts (7 files) → load `zoo_figure.sage`, replace boilerplate with
-  `zoo_subplots()`, `zoo_iter()`, `zoo_hide_unused()`, `zoo_label_edges()`
-- Sweep scripts → load `sweep_driver.sage`, deduplicate `subset_size_str`,
-  use `result_dir()`, use `append_csv()`
+## Visualization Direction
 
-### Step 5: Write README.md and AGENTS.md
+First deliverable:
 
-- **experiments/README.md**: ~30 lines. Subdirectory list, shared file
-  descriptions, run instructions (`./sagew experiments/<topic>/script.sage`).
-  (Existing README.md will be rewritten.)
-- **experiments/AGENTS.md**: When to create a new subdirectory vs extend
-  existing. Naming conventions. Minimum structure requirements.
+- a linear sparkline strip, one row per partition, consistent horizontal
+  depth axis, clearly indicated zero line when the measure is signed.
+  Partition selection and ordering are configurable at the top of the
+  script — may be the full 23 or a curated subset. Layout loaded from
+  `lib/partitions.sage` (PARTITION_ZOO) or `lib/partitions.json`
+  directly, not via `zoo_figure.sage`.
 
-### Step 6: Clean up artifacts
+Likely follow-ups:
 
-- Remove `.sage.py` compiled files from experiments/ tree (gitignored, so
-  `git mv` won't relocate them — they'll be stale after moves)
-- Remove `.DS_Store` files (already in `.gitignore`)
+- sorted sparkline strip by wobble/raggedness score
+- heatmap version for fast comparison (stability_heatmap is the prototype)
+- single-partition deep dives with annotations
+- summary ranking plots for "most stable", "most oscillatory", etc.
 
-### Step 7: Verify
+## Ergonomics
 
-- `./sagew tests/run_tests.sage` passes (88 tests)
-- Spot-check: run one lodestone script and one stepstone script
-- Verify PNG/CSV outputs land in correct locations
+Make this easy to iterate on:
+
+- Centralize all candidate measures in `coastline.sage` rather than burying
+  math inside plotting scripts.
+- Have one precompute path that emits reusable per-depth series for all
+  partitions so later plots do not recompute expensive integrals unnecessarily.
+- Keep plotting entry points thin: load precomputed series, choose a measure,
+  render.
+- Put all tweakable settings near the top of each script:
+  depth range, chosen measure, baseline mode, output path.
+- The measure registry in `coastline.sage` makes switching between measures
+  one-line configuration rather than code surgery.
+
+## Implementation Sequence
+
+1. Create `experiments/ripple/` with `README.md` and `results/`.
+2. Write `experiments/ripple/coastline.sage` with `coastline_area()`,
+   `coastline_series()`, `scaled_series()`, and the measure registry.
+3. `git mv experiments/stepstone/hazards/stability_heatmap.sage
+   experiments/ripple/stability_heatmap.sage` — update its load paths and
+   output path, replace its local `coastline_area()` with a load of
+   `coastline.sage`.
+4. Update `stepstone/integrate_coastline.sage` to load `coastline.sage`
+   instead of defining its own copy.
+5. Build `experiments/ripple/ripple_sparklines.sage` for the sparkline
+   strip.
+6. Generate an initial output and inspect whether the chosen measure actually
+   exposes wobble versus mere scale differences.
+7. Iterate on measure choice, baseline choice, and ordering if the first pass
+   is visually flat or misleading.
+
+## Open Decisions
+
+- Is `2^d * A_d(kind)` the right primary normalization, or is a
+  geometric-referenced quantity more revealing?
+- Should the default sparkline show signed change or magnitude-only change?
+- What depth range gives enough asymptotic signal without making the render too
+  slow?
+- Should the 23 panels be kept in canonical zoo order, or reordered by
+  stability/wobble once the metric exists?

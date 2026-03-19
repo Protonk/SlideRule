@@ -206,22 +206,3 @@ All 23 partitions in zoo order:
 | 20 | `beta_x` | beta | `#ff7f00` | E | right-dense | HiR | no |
 | 21 | `arc_length_x` | arc-length | `#a65628` | F | left-dense | HiR | yes |
 | 22 | `minimax_chord_x` | minimax-chord | `#f781bf` | F | left-dense | HiR | yes |
-
----
-
-## Grid Presets (summary)
-
-Nine preset grid layouts for comparative visualization. Full specifications
-with cell assignments and narratives are in `PLAN.md`.
-
-| Preset | Dims | Fill | Center | Theme |
-|--------|------|------|--------|-------|
-| `geo_vs_elementary` | 3x3 | full | geometric | Thesis winner vs naive alternatives |
-| `geo_vs_number_theory` | 3x3 | full | geometric | Thesis winner vs number-theoretic constructions |
-| `geo_vs_chaos` | 3x3 | full | geometric | Thesis winner vs fractal/stochastic perturbations |
-| `density_gradient` | 4x4 | full | — | Density centroid migration left-to-right |
-| `mathematical_sophistication` | 4x4 | full | — | Rows = increasing mathematical machinery |
-| `relational_triangle` | 4x4 | lower triangle | — | 4 anchor philosophies with bridging relationships |
-| `symmetry_spine` | 3x3 | lower triangle | — | Symmetric diagonal with symmetry-breaking departures |
-| `complete_atlas` | 5x5 | partial | geometric | All 23 partitions in concentric rings |
-| `four_pillars` | 4x4 | diagonal | — | 4 fundamental design philosophies |

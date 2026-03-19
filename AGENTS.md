@@ -6,6 +6,7 @@
 
 - Repo orientation -> `README.md`
 - Guiding thesis / scientific north star -> `LODESTONE.md`
+- Partition-family analysis / selection rationale -> `PARTITIONS.md`
 - Active research claims/status -> `HYPOTHESES.md`
 - Current obstruction / wall diagnostics -> `WALL.md`
 - Sweep findings and dated empirical summaries -> `SWEEP-REPORTS.md`

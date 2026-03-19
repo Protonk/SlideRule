@@ -75,6 +75,11 @@ Each partition row carries:
 - `width_x`, `width_log`
 - `kind`
 
+Companion metadata:
+
+- `partitions.json`: machine-readable partition metadata and curated preset
+  grid layouts for the stepstone fractal renderers.
+
 ### `policies.sage`
 
 Layer 1.5: named intercept policies.

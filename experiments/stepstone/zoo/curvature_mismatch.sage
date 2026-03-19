@@ -1,8 +1,8 @@
 """
-curvature_mismatch.sage — Cell width vs locally optimal width for all sixteen
-partition kinds.
+curvature_mismatch.sage — Cell width vs locally optimal width for a curated
+set of representative partition families.
 
-Sixteen panels (4x4 grid).  Each panel plots one dot per cell at
+Sixteen panels (4x4 grid). Each panel plots one dot per cell at
 (m_peak, mismatch_ratio) where mismatch_ratio = actual_width / optimal_width.
 The optimal width at position m is m * ln(2) / N (the geometric cell width).
 Points above y=1 are under-resolved; points below are over-resolved.
@@ -20,7 +20,29 @@ from math import log, log2 as math_log2
 
 # ── Configuration ────────────────────────────────────────────────────
 
-DEPTH = 9   # N = 512
+DEPTH = 10   # N = 1024
+
+CURATED_KINDS = [
+    'bitrev_geometric_x',
+    'dyadic_x',
+    'uniform_x',
+    'harmonic_x',
+    'mirror_harmonic_x',
+    'reverse_geometric_x',
+    'powerlaw_x',
+    'beta_x',
+    'chebyshev_x',
+    'sinusoidal_x',
+    'ruler_x',
+    'thuemorse_x',
+    'golden_x',
+    'stern_brocot_x',
+    'arc_length_x',
+    'minimax_chord_x',
+]
+
+_zoo_by_kind = {kind: (name, color, kind) for name, color, kind in PARTITION_ZOO}
+CURATED_ZOO = [_zoo_by_kind[kind] for kind in CURATED_KINDS]
 
 
 # ── Math ─────────────────────────────────────────────────────────────
@@ -40,9 +62,16 @@ def cell_mismatch(a, b, N):
 
 def make_plot():
     N = 2**DEPTH
-    fig, axes, _n_rows, _n_cols = zoo_subplots(sharey=False)
+    n_rows, n_cols = zoo_grid_shape(CURATED_ZOO)
+    fig, axes = plt.subplots(
+        n_rows,
+        n_cols,
+        figsize=(n_cols * 4.6, n_rows * 3.6),
+        constrained_layout=True,
+        sharey=False,
+    )
 
-    for name, color, kind, ax in zoo_iter(axes.flat):
+    for ax, (name, color, kind) in zip(axes.flat, CURATED_ZOO):
         cells = float_cells(DEPTH, kind)
         m_peaks = []
         ratios = []
@@ -52,7 +81,7 @@ def make_plot():
             m_peaks.append(m_pk)
             ratios.append(r)
 
-        ax.scatter(m_peaks, ratios, c=color, s=12, alpha=0.6,
+        ax.scatter(m_peaks, ratios, c=color, s=10, alpha=0.65,
                    edgecolors='none', zorder=3)
 
         ax.axhline(1.0, color='#999999', linewidth=0.8, linestyle='--',
@@ -63,13 +92,12 @@ def make_plot():
 
         ax.set_title(name, fontsize=9, fontweight='bold')
 
-    zoo_hide_unused(axes.flat)
     zoo_label_edges(axes, ylabel='width / optimal width',
                     xlabel='$m_{\\mathrm{peak}}$')
 
     fig.suptitle(
-        'Curvature mismatch: cell width / locally optimal width\n'
-        '$N = %d$ cells on $[1,\\, 2)$, $y = 1$ is geometric (equioscillation)' % N,
+        'Curvature mismatch for representative partition families\n'
+        '$N = %d$ cells on $[1,\\, 2)$, $y = 1$ is the geometric local optimum' % N,
         fontsize=13, fontweight='bold',
     )
 
@@ -83,10 +111,10 @@ def make_plot():
 def print_diagnostics():
     N = 2**DEPTH
     print()
-    print("Curvature mismatch diagnostics")
+    print("Curvature mismatch diagnostics (curated set)")
     print("=" * 60)
     print("  N = %d" % N)
-    for name, _, kind in PARTITION_ZOO:
+    for name, _, kind in CURATED_ZOO:
         cells = float_cells(DEPTH, kind)
         log2_ratios = []
         for a, b in cells:

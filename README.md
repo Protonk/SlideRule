@@ -18,6 +18,8 @@ against `geometric_x`.
 
 - [`LODESTONE.md`](LODESTONE.md): guiding thesis, structural motivation, and
   the primary `L1`-`L3` tests.
+- [`PARTITIONS.md`](PARTITIONS.md): analytical classification of the partition
+  family and the current selection rationale.
 - [`HYPOTHESES.md`](HYPOTHESES.md): active research claims and their status.
 - [`WALL.md`](WALL.md): the current obstruction model and its
   decomposition.
