@@ -9,16 +9,18 @@ asymptotic regime is smooth, ragged, or oscillatory.
 
 ## Files
 
-- `coastline.sage` — shared coastline-area computation (closed-form
-  antiderivative), scaling helpers, and measure registry
 - `stability_heatmap.sage` — binary stability grid for all 23 partitions
 - `settlers.sage` — sparklines for 8 partitions that converge to a finite
   constant, ordered by convergence speed
 - `divergent.sage` — sparklines for 7 partitions that diverge or never
   settle, showing exponential growth, irregular growth, and persistent
   oscillation
-- `CLOSED-FORM-PLAN.md` — derivation of the closed-form cell integral
-  (implemented)
+- `integrate_coastline.sage` — bar chart of coastline area vs depth for
+  uniform partitions (moved from `stepstone/`)
+- `area_comparison.sage` — area comparison across partition families
+
+Shared coastline math lives in `experiments/coastline_series.sage`,
+including the implemented closed-form cell integral.
 
 Generated outputs live in `results/`.
 

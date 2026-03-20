@@ -2,8 +2,8 @@
 H1 hypothesis sweep: depth scaling (H1b), q scaling (H1a), and
 layer-dependent vs layer-invariant comparison (H1c).
 
-Sweep 1 (H1b): fixed q=5, alpha=1/2, depth in {4..10}.
-Sweep 2 (H1a): fixed depth=4, alpha=1/2, q in {1,2,3,5,7,9,11,13,15}.
+Sweep 1 (H1b): fixed q=5, exponent_t=1/2, depth in {4..10}.
+Sweep 2 (H1a): fixed depth=4, exponent_t=1/2, q in {1,2,3,5,7,9,11,13,15}.
 Sweep 3 (H1c): (q=3,d=6) and (q=5,d=6), layer-invariant vs layer-dependent.
 
 All sweeps report delta-shape statistics for H1d (sparsity signal).
@@ -61,7 +61,7 @@ def run_h1_case(q, depth, p_num, q_den, layer_dependent=False):
     improve_over_available = case["improve"] / available if available > 0 else 0.0
 
     return {
-        "alpha": f"{p_num}/{q_den}",
+        "exponent": f"{p_num}/{q_den}",
         "q": q,
         "depth": depth,
         "n_params": case["n_params"],
@@ -116,7 +116,7 @@ def print_row(r):
 # ── CSV output ──────────────────────────────────────────────────────────
 
 CSV_COLUMNS = [
-    "alpha", "q", "depth", "n_params", "layer_dependent",
+    "exponent", "q", "depth", "n_params", "layer_dependent",
     "single_err", "opt_err", "free_err",
     "single_u", "opt_u", "free_u",
     "improve", "gap", "improve_over_single", "improve_over_available",
@@ -140,7 +140,7 @@ def main():
     # ── Sweep 1: H1b — depth scaling at fixed q ─────────────────────────
 
     print("=" * 100)
-    print("Sweep 1 (H1b): depth scaling at fixed q=5, alpha=1/2")
+    print("Sweep 1 (H1b): depth scaling at fixed q=5, exponent=1/2")
     print("=" * 100)
     print()
 
@@ -162,7 +162,7 @@ def main():
 
     print()
     print("=" * 100)
-    print("Sweep 2 (H1a): q scaling at fixed depth=4, alpha=1/2")
+    print("Sweep 2 (H1a): q scaling at fixed depth=4, exponent=1/2")
     print("=" * 100)
     print()
 

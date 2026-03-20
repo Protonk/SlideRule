@@ -19,7 +19,8 @@ Normalized asymptotic-behavior experiments for coastline area across
 partition families. Focuses on scaled-area convergence, wobble, and
 stability diagnostics.
 
-Scripts: `stability_heatmap`, `settlers`, `divergent`.
+Scripts: `stability_heatmap`, `settlers`, `divergent`, `integrate_coastline`,
+`area_comparison`.
 
 ### `stepstone/`
 
@@ -35,7 +36,9 @@ Fractal entry points:
 - `fractal/single_fractal.sage` — one partition kind to one image
 - `fractal/grid_fractals.sage` — one preset grid or the full zoo
 
-Generated fractal PNGs live in `stepstone/fractal/results/`.
+Generated outputs live in per-subtopic `results/` directories
+(`stepstone/results/`, `zoo/results/`, `damage/results/`, `hazards/results/`,
+`fractal/results/`).
 
 ## Shared utilities
 
@@ -43,6 +46,8 @@ Generated fractal PNGs live in `stepstone/fractal/results/`.
   `zoo_iter()`, `zoo_hide_unused()`, `zoo_label_edges()`.
 - **`sweep_driver.sage`** — CSV and result-directory helpers: `write_csv()`,
   `result_dir()`, `subset_size_str()`.
+- **`coastline_series.sage`** — Shared coastline-area computation
+  (closed-form antiderivative), scaling helpers, and measure registry.
 
 ## Generated files
 

@@ -7,9 +7,9 @@ exact Day evaluator remains easy to inspect.
 """
 
 
-def default_c0(alpha_q, x_width=1):
+def default_c0(exponent_q, x_width=1):
     """Centered baseline intercept used throughout the experiments."""
-    return QQ(x_width) * QQ(1 - QQ(alpha_q)) / 2
+    return QQ(x_width) * QQ(1 - QQ(exponent_q)) / 2
 
 
 def centered_state(r, q):
@@ -29,17 +29,17 @@ def default_step(depth, scale=16):
     return QQ(1) / QQ(max(1, scale * depth))
 
 
-def zero_policy(q, depth, alpha_q, x_width=1):
+def zero_policy(q, depth, exponent_q, x_width=1):
     """Single shared intercept, no path-dependent correction."""
     return {
         "name": "zero",
         "description": "baseline shared intercept",
-        "c0_rat": default_c0(alpha_q, x_width),
+        "c0_rat": default_c0(exponent_q, x_width),
         "delta_rat": {(r, b): QQ(0) for r in range(q) for b in (0, 1)},
     }
 
 
-def state_bit_policy(q, depth, alpha_q, step=None, x_width=1):
+def state_bit_policy(q, depth, exponent_q, step=None, x_width=1):
     """
     Layer-invariant correction that depends on current residue and bit.
     """
@@ -54,12 +54,12 @@ def state_bit_policy(q, depth, alpha_q, step=None, x_width=1):
     return {
         "name": "state_bit",
         "description": "layer-invariant residue x bit correction",
-        "c0_rat": default_c0(alpha_q, x_width),
+        "c0_rat": default_c0(exponent_q, x_width),
         "delta_rat": delta,
     }
 
 
-def terminal_bias_policy(q, depth, alpha_q, step=None, x_width=1):
+def terminal_bias_policy(q, depth, exponent_q, step=None, x_width=1):
     """
     Last-layer correction keyed by terminal residue.
     """
@@ -80,12 +80,12 @@ def terminal_bias_policy(q, depth, alpha_q, step=None, x_width=1):
     return {
         "name": "terminal_bias",
         "description": "last-layer bias by terminal residue",
-        "c0_rat": default_c0(alpha_q, x_width),
+        "c0_rat": default_c0(exponent_q, x_width),
         "delta_rat": delta,
     }
 
 
-def hand_tuned_policy(q, depth, alpha_q, x_width=1):
+def hand_tuned_policy(q, depth, exponent_q, x_width=1):
     """
     Example explicit rational table.
 
@@ -107,21 +107,21 @@ def hand_tuned_policy(q, depth, alpha_q, x_width=1):
     return {
         "name": "hand_tuned",
         "description": "explicit q=3 rational transition table",
-        "c0_rat": default_c0(alpha_q, x_width),
+        "c0_rat": default_c0(exponent_q, x_width),
         "delta_rat": delta,
     }
 
 
-def build_intercept_policy(name, q, depth, alpha_q, x_width=1, **kwargs):
+def build_intercept_policy(name, q, depth, exponent_q, x_width=1, **kwargs):
     """Dispatch by policy name."""
     if name == "zero":
-        return zero_policy(q, depth, alpha_q, x_width=x_width)
+        return zero_policy(q, depth, exponent_q, x_width=x_width)
     if name == "state_bit":
-        return state_bit_policy(q, depth, alpha_q, step=kwargs.get("step"),
+        return state_bit_policy(q, depth, exponent_q, step=kwargs.get("step"),
                                 x_width=x_width)
     if name == "terminal_bias":
-        return terminal_bias_policy(q, depth, alpha_q, step=kwargs.get("step"),
+        return terminal_bias_policy(q, depth, exponent_q, step=kwargs.get("step"),
                                     x_width=x_width)
     if name == "hand_tuned":
-        return hand_tuned_policy(q, depth, alpha_q, x_width=x_width)
+        return hand_tuned_policy(q, depth, exponent_q, x_width=x_width)
     raise ValueError(f"unknown intercept policy: {name}")

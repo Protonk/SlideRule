@@ -23,7 +23,7 @@ import numpy as np
 RUN_TAG = 'partition_2026-03-18'
 Q = 5
 DEPTH = 6
-ALPHA = '1/2'
+EXPONENT = '1/2'
 KIND = 'geometric_x'
 OUT_PATH = pathing('experiments', 'lodestone', 'results', 'intercept_displacement.png')
 
@@ -36,14 +36,14 @@ def load_percell(run_tag):
         return list(csv.DictReader(f))
 
 
-def extract_displacement(rows, kind, q, depth, alpha, layer_dependent):
+def extract_displacement(rows, kind, q, depth, exponent, layer_dependent):
     ld_str = str(layer_dependent)
     cells = [(float(r['x_mid']),
               float(r['path_intercept']) - float(r['free_cell_intercept']))
              for r in rows
              if r['partition_kind'] == kind
              and r['q'] == str(q) and r['depth'] == str(depth)
-             and r['alpha'] == alpha
+             and r['exponent'] == exponent
              and r['layer_dependent'] == ld_str
              and r['free_cell_intercept'] != '']
     cells.sort()
@@ -63,7 +63,7 @@ def make_plot(rows):
         (ax_li, False, 'Layer-invariant', '#e74c3c'),
         (ax_ld, True, 'Layer-dependent', '#3498db'),
     ]:
-        xs, disps = extract_displacement(rows, KIND, Q, DEPTH, ALPHA, ld)
+        xs, disps = extract_displacement(rows, KIND, Q, DEPTH, EXPONENT, ld)
         if not xs:
             print("  WARNING: no data for LD=%s" % ld)
             continue
@@ -94,7 +94,7 @@ def make_plot(rows):
     short = KIND.replace('_x', '')
     fig.suptitle(
         'Intercept displacement: how far does sharing push each cell?\n'
-        '%s, $q = %d$, depth $= %d$, $\\alpha = %s$' % (short, Q, DEPTH, ALPHA),
+        '%s, $q = %d$, depth $= %d$, exponent $= %s$' % (short, Q, DEPTH, EXPONENT),
         fontsize=12, fontweight='bold',
     )
 

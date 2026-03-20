@@ -34,7 +34,7 @@ Claim:
 - The free-per-cell worst-case error (`free_err`) is lower on the geometric
   partition than on the uniform partition at every tested depth.
 
-Evidence (lodestone sweep, alpha=1/2):
+Evidence (lodestone sweep, exponent_t=1/2):
 
 - In the depth sweep (q=5, d=3..6), geometric `free_err` is strictly lower at
   every depth. At d=6: geometric 0.00194 vs uniform 0.00276.
@@ -50,7 +50,7 @@ Claim:
 - Under the layer-invariant shared-delta constraint, geometric partitions
   should yield lower `opt_err` than uniform partitions.
 
-Evidence against (lodestone sweep, alpha=1/2):
+Evidence against (lodestone sweep, exponent_t=1/2):
 
 - In the depth sweep at q=5, geometric `opt_err` exceeds uniform `opt_err` at
   d>=4. At d=6: geometric 0.03799 vs uniform 0.03475.
@@ -76,7 +76,7 @@ Claim (original):
 Claim (revised after reciprocal controls):
 
 - Under layer-dependent sharing, both geometric_x and harmonic_x beat
-  uniform_x at the tested alpha=1/2 grid points, but the actual opposite-end
+  uniform_x at the tested exponent_t=1/2 grid points, but the actual opposite-end
   control mirror_harmonic_x does not.
 - The advantage is therefore not unique to the log coordinate, but it is also
   not “any redistribution helps.” Direction matters.
@@ -91,17 +91,17 @@ Evidence (lodestone follow-up sweeps, 2026-03-11 to 2026-03-12):
   - (q=5, d=4): geo 0.01025 vs uni 0.01207
   - (q=5, d=6): geo 0.01013 vs uni 0.01213
   - (q=3, d=8): geo 0.02184 vs uni 0.02454
-- At q=3 with alpha=1/2, the layer-dependent bands are now filled in across
+- At q=3 with exponent_t=1/2, the layer-dependent bands are now filled in across
   d=4, 5, 6, 7, 8:
   - geometric: 0.021838, 0.021864, 0.021915, 0.021844, 0.021838
   - uniform:   0.024510, 0.024520, 0.024520, 0.024630, 0.024538
-- Initial alpha=1/3 robustness checks also preserve geo < uni:
+- Initial exponent_t=1/3 robustness checks also preserve geo < uni:
   - (q=3, d=4): geo 0.01238 vs uni 0.01457
   - (q=5, d=6): geo 0.00582 vs uni 0.00744
 
 Reciprocal-control evidence (2026-03-12):
 
-- Layer-dependent rankings at alpha=1/2:
+- Layer-dependent rankings at exponent_t=1/2:
   - (q=3, d=4): har 0.01922 < geo 0.02184 < uni 0.02451 — harmonic wins
   - (q=5, d=4): geo 0.01025 < har 0.01091 < uni 0.01207 — geometric wins
   - (q=5, d=6): geo 0.01013 < har 0.01103 < uni 0.01213 — geometric wins
@@ -132,8 +132,8 @@ Next test:
 - investigate why layer-dependent sharing prefers the x=1-heavy families while
   layer-invariant sharing can favor mirror_harmonic_x at deeper points
 - check whether the q-dependence of the harmonic_x vs geometric_x ranking
-  persists at other alpha values
-- add non-`1/2` alpha checks for mirror_harmonic_x, not just geo vs uniform
+  persists at other target exponent values
+- add non-`1/2` target exponent checks for mirror_harmonic_x, not just geo vs uniform
 
 ### L2. Log-organized schemes behave more naturally across depth than x-organized schemes
 
@@ -151,7 +151,7 @@ Why this matters:
   or a real scaling law about how the difficulty of the problem replicates with
   depth.
 
-First evidence (lodestone sweep, alpha=1/2):
+First evidence (lodestone sweep, exponent_t=1/2):
 
 - `free_err` decays faster on geometric (lower at every tested depth),
   confirming the cell-level advantage from L1a.
@@ -183,7 +183,7 @@ Why this matters:
   about the FSM parameterization or partly an artifact of working on a
   partition already matched to scaling.
 
-First evidence (lodestone sweep, alpha=1/2, q=3, d=6):
+First evidence (lodestone sweep, exponent_t=1/2, q=3, d=6):
 
 - Layer-dependent deltas reduce the gap by ~40% (uniform) and ~50% (geometric),
   confirming that layer sharing is the dominant wall source for both partition
@@ -231,7 +231,7 @@ Key evidence:
 Immediate next tests:
 
 - extend H1c only as needed to support `L3`
-- run multi-`alpha` robustness checks
+- run multi-exponent robustness checks
 - turn the baseline observations into a scaling law in the
   parameter-to-cell ratio
 
@@ -291,7 +291,7 @@ Evidence:
 Next test:
 
 - extend the layer-dependent comparison to a wider grid in `(q, depth)` and to
-  more than one `alpha`
+  more than one target exponent
 - reuse those same benchmark points when running the `L3` uniform-grid
   comparison
 

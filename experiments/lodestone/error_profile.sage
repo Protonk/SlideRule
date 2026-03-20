@@ -1,7 +1,7 @@
 """
 error_profile.sage — Per-cell error profile across cell position.
 
-For a single benchmark case (q, depth, alpha), plots cell_worst_err vs x_mid
+For a single benchmark case (q, depth, exponent), plots cell_worst_err vs x_mid
 for geometric_x and uniform_x under both layer-invariant and layer-dependent
 sharing. Shows where the wall concentrates spatially.
 
@@ -23,21 +23,21 @@ import numpy as np
 
 Q = 3
 DEPTH = 6
-ALPHA = '1/2'
-RUN_TAG = 'lodestone_2026-03-11'
+EXPONENT = '1/2'
+RUN_TAG = 'wall_surface_2026-03-18'
 PERCELL_CSV = pathing('experiments', 'lodestone', 'results', RUN_TAG, 'percell.csv')
 OUT_PATH = pathing('experiments', 'lodestone', 'results', 'error_profile.png')
 
 
 # ── Load and filter ──────────────────────────────────────────────────
 
-def load_percell(filepath, q, depth, alpha):
+def load_percell(filepath, q, depth, exponent):
     """Load percell CSV and filter to the target case."""
     with open(filepath, 'r', newline='') as f:
         reader = csv.DictReader(f)
         rows = [r for r in reader
                 if r['q'] == str(q) and r['depth'] == str(depth)
-                and r['alpha'] == alpha]
+                and r['exponent'] == exponent]
     return rows
 
 
@@ -90,8 +90,8 @@ def make_plot(rows):
 
     fig.suptitle(
         'Per-cell error profile: where does the wall concentrate?\n'
-        '$q = %d$, depth $= %d$, $\\alpha = %s$, $N = %d$ cells'
-        % (Q, DEPTH, ALPHA, 2**DEPTH),
+        '$q = %d$, depth $= %d$, exponent $= %s$, $N = %d$ cells'
+        % (Q, DEPTH, EXPONENT, 2**DEPTH),
         fontsize=12, fontweight='bold',
     )
 
@@ -102,8 +102,8 @@ def make_plot(rows):
 # ── Main ─────────────────────────────────────────────────────────────
 
 print()
-print("Loading percell data for q=%d, depth=%d, alpha=%s..." % (Q, DEPTH, ALPHA))
-rows = load_percell(PERCELL_CSV, Q, DEPTH, ALPHA)
+print("Loading percell data for q=%d, depth=%d, exponent=%s..." % (Q, DEPTH, EXPONENT))
+rows = load_percell(PERCELL_CSV, Q, DEPTH, EXPONENT)
 print("  %d rows loaded" % len(rows))
 make_plot(rows)
 print("Done.")

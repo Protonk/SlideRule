@@ -1,7 +1,7 @@
 """
 partition_sweep.sage — General-purpose partition comparison sweep.
 
-Iterates the cartesian product of KINDS x GRID x ALPHAS x LAYER_MODES,
+Iterates the cartesian product of KINDS x GRID x EXPONENTS x LAYER_MODES,
 runs compute_case for each, and writes summary + percell CSVs.
 
 Run:  ./sagew experiments/lodestone/partition_sweep.sage
@@ -18,7 +18,7 @@ load(pathing('experiments', 'lodestone', 'lodestone_runner.sage'))
 
 KINDS = ['uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x']
 GRID = [(3, 4), (5, 4), (5, 6), (3, 8)]
-ALPHAS = [(1, 2)]
+EXPONENTS = [(1, 2)]
 LAYER_MODES = [False, True]
 RUN_TAG = 'partition_2026-03-18'
 
@@ -34,7 +34,7 @@ def main():
     percell_rows = []
 
     cases = [(q, d, p, qd, kind, ld)
-             for p, qd in ALPHAS
+             for p, qd in EXPONENTS
              for q, d in GRID
              for ld in LAYER_MODES
              for kind in KINDS]
@@ -44,13 +44,13 @@ def main():
     print(f"Partition sweep: {total} cases")
     print(f"  kinds: {KINDS}")
     print(f"  grid: {GRID}")
-    print(f"  alphas: {ALPHAS}")
+    print(f"  exponents: {EXPONENTS}")
     print(f"  layer modes: {LAYER_MODES}")
     print(f"  output: {run_dir}")
     print("=" * 80)
     print()
 
-    print(f"  {'#':>3}  {'kind':>18}  {'LD':>3}  {'alpha':>5}  {'q':>3}  {'d':>2}  "
+    print(f"  {'#':>3}  {'kind':>18}  {'LD':>3}  {'exp':>5}  {'q':>3}  {'d':>2}  "
           f"{'opt_err':>10}  {'free_err':>10}  {'gap':>10}  {'time':>6}")
     print("  " + "-" * 92)
 

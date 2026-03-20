@@ -132,7 +132,7 @@ def make_plot():
         fontsize=12, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/chord_slope_crossing.png'
+    out_path = 'experiments/stepstone/results/chord_slope_crossing.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

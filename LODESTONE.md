@@ -82,8 +82,8 @@ the sharing penalty on geometric cells erases the cell-level advantage.
 
 **L1c** (layer-dependent): under layer-dependent parameterization, the
 geometric advantage from L1a propagates to lower `opt_err`. *Supported* across
-the tested alpha=1/2 grid (2026-03-12), with initial positive checks at
-alpha=1/3, but now refined by reciprocal controls: geometric is not unique
+the tested exponent_t=1/2 grid (2026-03-12), with initial positive checks at
+exponent_t=1/3, but now refined by reciprocal controls: geometric is not unique
 inside the tested x=1-heavy family, while the actual opposite-end control
 `mirror_harmonic_x` loses to `uniform_x` at every tested LD point. At q=3, the
 layer-dependent `opt_err` now appears nearly depth-flat across d=4..8.

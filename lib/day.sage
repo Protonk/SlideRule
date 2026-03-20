@@ -7,17 +7,17 @@ trajectory_experiment.py (see lib/trajectory.py for the original).
 
 Within one octave [1,2), plog(x) = x - 1 is smooth.  The only
 breakpoints in the error factor come from the output pseudolog
-u = c - alpha * plog(x) crossing an integer (Day's H-grid).
+u = c - exponent_q * plog(x) crossing an integer (Day's H-grid).
 Between consecutive breakpoints, the unique interior extremum is
 Day's D-candidate (stationary point).  V-grid crossings (octave
 boundaries) do not appear inside a single octave.
 
 Error factor:
-    z(x) = pexp(c - alpha * plog(x)) * x^alpha
-    log2(z) = floor(u) + log2(1 + frac(u)) + alpha * log2(x)
+    z(x) = pexp(c - exponent_q * plog(x)) * x^exponent_q
+    log2(z) = floor(u) + log2(1 + frac(u)) + exponent_q * log2(x)
 
 D-candidate on a segment where floor(u) = k:
-    x_plog_D = (c - k) / (1 + alpha)
+    x_plog_D = (c - k) / (1 + exponent_q)
 """
 
 import math
@@ -121,16 +121,16 @@ def path_intercept(bits, c0, delta, q):
 
 # ── Sampled evaluator (kept for validation) ─────────────────────────────
 
-def cell_logerr_sampled(bits, alpha, c, nsamp=256):
+def cell_logerr_sampled(bits, exponent, c, nsamp=256):
     """Sampled worst-case |log2(z)| on a dyadic cell."""
     lo, hi = dyadic_cell_bounds(bits)
-    alpha = HiR(alpha)
+    exponent_hi = HiR(exponent)
     c = HiR(c)
     worst = HiR(0)
     for k in range(nsamp + 1):
         x = lo + (hi - lo) * HiR(k) / nsamp
-        target = x**(-alpha)
-        approx = pexp(c - alpha * plog(x))
+        target = x**(-exponent_hi)
+        approx = pexp(c - exponent_hi * plog(x))
         if approx <= 0:
             return HiR(999)
         err = abs(log(abs(target / approx), 2))
@@ -148,20 +148,20 @@ def cell_breakpoints(bits, p_num, q_den, c_rat):
 
     Returns sorted list of QQ values in [plog_lo, plog_hi].
     """
-    alpha = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     plog_lo, plog_hi = dyadic_cell_plog(bits)
     c = QQ(c_rat)
 
     points = [plog_lo, plog_hi]
 
-    if alpha == 0:
+    if exponent_q == 0:
         return points
 
-    u_at_lo = c - alpha * plog_lo
-    u_at_hi = c - alpha * plog_hi
+    u_at_lo = c - exponent_q * plog_lo
+    u_at_hi = c - exponent_q * plog_hi
 
     for k in range(floor(u_at_hi), ceil(u_at_lo) + 1):
-        xp = (c - QQ(k)) / alpha
+        xp = (c - QQ(k)) / exponent_q
         if plog_lo < xp < plog_hi:
             points.append(xp)
 
@@ -170,8 +170,8 @@ def cell_breakpoints(bits, p_num, q_den, c_rat):
 
 def breakpoint_label(x_plog, plog_lo, plog_hi, p_num, q_den, c_rat):
     """Label a breakpoint as a boundary or Day H-candidate."""
-    alpha_q = QQ(p_num) / QQ(q_den)
-    u = QQ(c_rat) - alpha_q * QQ(x_plog)
+    exponent_q = QQ(p_num) / QQ(q_den)
+    u = QQ(c_rat) - exponent_q * QQ(x_plog)
     if x_plog == plog_lo:
         return ('B', 'L', Integer(floor(u)))
     if x_plog == plog_hi:
@@ -191,20 +191,20 @@ def log2_z_at(x_plog, p_num, q_den, c_rat, x_start=1):
     Uses exact QQ for breakpoint structure, HiR for the
     transcendental part (log2(1 + f) and log2(x)).
     """
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
-    u = c - alpha_q * x_plog
+    u = c - exponent_q * x_plog
 
     s = floor(u)
     f = u - s
 
     x_hi = HiR(x_start) + HiR(x_plog)
-    alpha_hi = HiR(alpha_q)
+    exponent_hi = HiR(exponent_q)
 
     log2_pexp = HiR(s) + (HiR(1) + HiR(f)).log() / LN2
     log2_x = x_hi.log() / LN2
 
-    return log2_pexp + alpha_hi * log2_x
+    return log2_pexp + exponent_hi * log2_x
 
 
 def cell_exact_logerr(bits, p_num, q_den, c_rat):
@@ -215,7 +215,7 @@ def cell_exact_logerr(bits, p_num, q_den, c_rat):
     Returns (log2_zmin, log2_zmax, worst_abs, log2_ratio)
     where log2_ratio = log2(zmax/zmin).
     """
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
 
     breakpoints = cell_breakpoints(bits, p_num, q_den, c_rat)
@@ -226,10 +226,10 @@ def cell_exact_logerr(bits, p_num, q_den, c_rat):
         seg_hi = breakpoints[i + 1]
 
         seg_mid = (seg_lo + seg_hi) / 2
-        u_mid = c - alpha_q * seg_mid
+        u_mid = c - exponent_q * seg_mid
         k = floor(u_mid)
 
-        xp_D = (c - QQ(k)) / (1 + alpha_q)
+        xp_D = (c - QQ(k)) / (1 + exponent_q)
         if seg_lo < xp_D < seg_hi:
             candidates.append(xp_D)
 
@@ -254,9 +254,9 @@ def _d_candidate_valid(xp_D_plog, k, p_num, q_den, c_rat):
     This is the mandatory second check from the plan: the stationary
     formula and the floor(u)=k verification must agree.
     """
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
-    u = c - alpha_q * QQ(xp_D_plog)
+    u = c - exponent_q * QQ(xp_D_plog)
     return Integer(floor(u)) == Integer(k)
 
 
@@ -281,7 +281,7 @@ def cell_breakpoints_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
     Returns a sorted list of plog values.  Cell endpoints are HiR;
     interior H-candidates are QQ (exact).  All comparisons use HiR.
     """
-    alpha = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
 
     lo = HiR(plog_lo)
@@ -289,14 +289,14 @@ def cell_breakpoints_arb(plog_lo, plog_hi, p_num, q_den, c_rat):
 
     points = [lo, hi]
 
-    if alpha == 0:
+    if exponent_q == 0:
         return points
 
-    u_at_lo = HiR(c) - HiR(alpha) * lo
-    u_at_hi = HiR(c) - HiR(alpha) * hi
+    u_at_lo = HiR(c) - HiR(exponent_q) * lo
+    u_at_hi = HiR(c) - HiR(exponent_q) * hi
 
     for k in range(floor(u_at_hi), ceil(u_at_lo) + 1):
-        xp = (c - QQ(k)) / alpha          # exact QQ
+        xp = (c - QQ(k)) / exponent_q          # exact QQ
         if lo < HiR(xp) < hi:
             points.append(xp)
 
@@ -311,14 +311,14 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat, x_start=1):
     Parameters
     ----------
     plog_lo, plog_hi : plog-domain cell bounds (QQ or HiR)
-    p_num, q_den     : alpha = p_num / q_den
+    p_num, q_den     : exponent = p_num / q_den
     c_rat            : QQ intercept
     x_start          : domain left endpoint (default 1)
 
     Returns (log2_zmin, log2_zmax, worst_abs, log2_ratio, meta)
     where meta carries candidate metadata.
     """
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
     xs = QQ(x_start)
 
@@ -339,12 +339,12 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat, x_start=1):
         seg_hi = breakpoints[i + 1]
 
         seg_mid_hi = (HiR(seg_lo) + HiR(seg_hi)) / 2
-        u_mid = HiR(c) - HiR(alpha_q) * seg_mid_hi
+        u_mid = HiR(c) - HiR(exponent_q) * seg_mid_hi
         k = Integer(floor(u_mid))
 
         # D-candidate: stationary point of log2(z) on segment with floor(u)=k.
         # Derived from d/dx_plog[log2(z)] = 0 with x = x_start + x_plog.
-        xp_D = (1 - xs + c - QQ(k)) / (1 + alpha_q)    # exact QQ
+        xp_D = (1 - xs + c - QQ(k)) / (1 + exponent_q)    # exact QQ
 
         # Check 1: strictly inside segment
         if not (HiR(seg_lo) < HiR(xp_D) < HiR(seg_hi)):
@@ -363,8 +363,8 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat, x_start=1):
         _assert_z_positive(val, plog_val)
         evaluated.append((plog_val, val, ctype))
 
-    # Concavity consistency check (alpha > 0)
-    if alpha_q > 0:
+    # Concavity consistency check (target exponent > 0)
+    if exponent_q > 0:
         for i in range(n_bp - 1):
             _segment_concavity_check(i, breakpoints, evaluated)
 
@@ -389,7 +389,7 @@ def cell_logerr_arb(plog_lo, plog_hi, p_num, q_den, c_rat, x_start=1):
 
 def _segment_concavity_check(seg_idx, breakpoints, evaluated):
     """
-    On a fixed-k segment with alpha > 0, f = log2(z) is strictly concave.
+    On a fixed-k segment with target exponent > 0, f = log2(z) is strictly concave.
     A valid D point must be the segment maximizer; the minimum must be
     at a boundary.  Raises AssertionError on violation.
     """
@@ -474,7 +474,7 @@ def cell_active_pattern(bits, p_num, q_den, c_rat):
       * indexed breakpoint labels
       * indexed segment min/max active-candidate pairs
     """
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
     plog_lo, plog_hi = dyadic_cell_plog(bits)
     breakpoints = cell_breakpoints(bits, p_num, q_den, c_rat)
@@ -501,9 +501,9 @@ def cell_active_pattern(bits, p_num, q_den, c_rat):
             (right_label, float(log2_z_at(seg_hi, p_num, q_den, c_rat))),
         ]
 
-        u_mid = c - alpha_q * seg_mid
+        u_mid = c - exponent_q * seg_mid
         k = floor(u_mid)
-        xp_D = (c - QQ(k)) / (1 + alpha_q)
+        xp_D = (c - QQ(k)) / (1 + exponent_q)
         if seg_lo < xp_D < seg_hi:
             d_label = ('D', Integer(k))
             values.append((d_label, float(log2_z_at(xp_D, p_num, q_den, c_rat))))
@@ -748,9 +748,9 @@ def best_single_intercept(paths, p_num, q_den, c_init=None, span=2.0,
     When partition_kind is specified, uses the arbitrary-cell evaluator
     with the given partition geometry.
     """
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     if c_init is None:
-        c_init = float(default_c0(alpha_q, x_width))
+        c_init = float(default_c0(exponent_q, x_width))
 
     if partition_kind is not None:
         if depth is None:

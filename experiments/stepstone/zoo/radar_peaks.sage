@@ -114,7 +114,7 @@ def make_plot():
         fontsize=13, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/zoo/radar_peaks.png'
+    out_path = 'experiments/stepstone/zoo/results/radar_peaks.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

@@ -12,7 +12,7 @@ Explanations belong in [`LODESTONE.md`](LODESTONE.md) and
 - Legacy `uniform_x` baseline sweeps (2026-03-09).
 - First direct `L1`–`L3` partition-comparison sweep (2026-03-11).
 - L1c grid sweep: layer-dependent comparison across (q, depth) (2026-03-12).
-- L1c stability sweep: q=3 depth fill and initial alpha=1/3 robustness
+- L1c stability sweep: q=3 depth fill and initial exponent_t=1/3 robustness
   (2026-03-12).
 - Harmonic diagnostic sweep: reciprocal and mirrored-reciprocal controls
   (2026-03-12).
@@ -29,7 +29,7 @@ Driver:
 
 Scope:
 
-- `alpha = 1/2`
+- `exponent = 1/2`
 - layer-invariant shared-delta model
 - 10 cases covering `q in {1, 2, 3, 5}` and depths `4, 6, 8` plus the extra
   `(q, d) = (5, 4)` and `(5, 6)` detail lines
@@ -72,7 +72,7 @@ Question:
 
 Parameters:
 
-- `alpha = 1/2`
+- `exponent = 1/2`
 - `q = 5`
 - `depth = 4..10`
 
@@ -99,7 +99,7 @@ Question:
 
 Parameters:
 
-- `alpha = 1/2`
+- `exponent = 1/2`
 - `depth = 4`
 - `q = 1, 2, 3, 5, 7, 9, 11, 13, 15`
 
@@ -130,7 +130,7 @@ Question:
 
 Parameters:
 
-- `alpha = 1/2`
+- `exponent = 1/2`
 - benchmark cases `(q, d) = (3, 6)` and `(5, 6)`
 - both layer-invariant and layer-dependent runs
 
@@ -179,7 +179,7 @@ Role in current program:
   `geometric_x` partitions under the same optimizer, FSM parameterization, and
   objective.
 
-### Sweep 1 — Depth scaling at fixed q=5, alpha=1/2
+### Sweep 1 — Depth scaling at fixed q=5, exponent_t=1/2
 
 | kind | d | opt_err | free_err | gap | improve |
 |------|---|---------|----------|-----|---------|
@@ -198,7 +198,7 @@ Direct observations:
 - Geometric `opt_err` exceeds uniform at d>=4 (L1b against).
 - The gap grows faster on geometric, indicating a larger sharing penalty.
 
-### Sweep 2 — q scaling at fixed depth=4, alpha=1/2
+### Sweep 2 — q scaling at fixed depth=4, exponent_t=1/2
 
 | kind | q | opt_err | free_err | gap |
 |------|---|---------|----------|-----|
@@ -245,7 +245,7 @@ Direct observations:
 
 Direct observations:
 
-- Results are qualitatively similar to alpha=1/2 at this point: geometric has
+- Results are qualitatively similar to exponent_t=1/2 at this point: geometric has
   lower `free_err` but higher `gap`.
 
 ## 2026-03-12 — L1c grid sweep
@@ -267,7 +267,7 @@ Role in current program:
 - This is the follow-up test of L1c, checking whether the geometric advantage
   under layer-dependent sharing holds beyond the single (q=3, d=6) benchmark.
 
-### Stage 1 — (q=3, d=4), (q=5, d=4), (q=5, d=6), alpha=1/2
+### Stage 1 — (q=3, d=4), (q=5, d=4), (q=5, d=6), exponent_t=1/2
 
 | kind | q | d | mode | opt_err | free_err | gap | gap reduction |
 |------|---|---|------|---------|----------|-----|---------------|
@@ -292,7 +292,7 @@ Direct observations:
   three Stage 1 points, but not at (q=5, d=4).
 - At (q=5, d=4), the layer-dependent gap nearly closes on both partition kinds.
 
-### Stage 2 — (q=3, d=8), alpha=1/2
+### Stage 2 — (q=3, d=8), exponent_t=1/2
 
 | kind | q | d | mode | opt_err | free_err | gap | gap reduction |
 |------|---|---|------|---------|----------|-----|---------------|
@@ -328,9 +328,9 @@ Artifacts:
 Role in current program:
 
 - This is the follow-up to the L1c grid sweep. It fills in the missing q=3
-  intermediate depths and adds the first small alpha=1/3 robustness checks.
+  intermediate depths and adds the first small exponent_t=1/3 robustness checks.
 
-### Stage 1 — q=3 depth fill at alpha=1/2
+### Stage 1 — q=3 depth fill at exponent_t=1/2
 
 | d | uniform_x LD opt_err | geometric_x LD opt_err |
 |---|----------------------|------------------------|
@@ -350,7 +350,7 @@ Direct observations:
 - This is stronger evidence for a q=3 layer-dependent floor, though still only
   empirical evidence.
 
-### Stage 2 — alpha=1/3 robustness
+### Stage 2 — exponent_t=1/3 robustness
 
 | q | d | uniform_x LD opt_err | geometric_x LD opt_err |
 |---|---|----------------------|------------------------|
@@ -359,7 +359,7 @@ Direct observations:
 
 Direct observations:
 
-- L1c survives both tested alpha=1/3 points.
+- L1c survives both tested exponent_t=1/3 points.
 - At both points, geometric also gets the larger gap reduction from introducing
   layer dependence.
 
@@ -388,7 +388,7 @@ Role in current program:
   - any x=1-heavy redistribution helps under layer dependence
   - any redistribution at all helps under layer dependence
 
-### Layer-invariant results, alpha=1/2
+### Layer-invariant results, exponent_t=1/2
 
 | kind | q | d | opt_err | free_err | gap |
 |------|---|---|---------|----------|-----|
@@ -419,7 +419,7 @@ Direct observations:
   “any redistribution helps” story: the x=2-heavy partition can outperform
   both x=1-heavy partitions and uniform at deeper points.
 
-### Layer-dependent results, alpha=1/2
+### Layer-dependent results, exponent_t=1/2
 
 | kind | q | d | opt_err | free_err | gap |
 |------|---|---|---------|----------|-----|

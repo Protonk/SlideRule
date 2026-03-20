@@ -1,7 +1,7 @@
 """
 inspect_case.sage — Single-case diagnostic workbench.
 
-Runs one (q, depth, alpha, kind) case and prints everything worth knowing:
+Runs one (q, depth, exponent, kind) case and prints everything worth knowing:
 three-metric computation, induced pattern family, delta table, cell-level
 breakpoint analysis, and exact-vs-sampled validation.
 
@@ -33,7 +33,7 @@ VALIDATION_MAX_CELLS = 16
 
 def cell_active_pattern_arb(plog_lo, plog_hi, p_num, q_den, c_rat, x_start=1):
     """Partition-aware active-pattern signature for one cell."""
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     c = QQ(c_rat)
     xs = QQ(x_start)
     breakpoints = cell_breakpoints_arb(plog_lo, plog_hi, p_num, q_den, c_rat)
@@ -60,9 +60,9 @@ def cell_active_pattern_arb(plog_lo, plog_hi, p_num, q_den, c_rat, x_start=1):
             (right_label, float(log2_z_at(seg_hi, p_num, q_den, c_rat, x_start=x_start))),
         ]
 
-        u_mid = HiR(c) - HiR(alpha_q) * seg_mid_hi
+        u_mid = HiR(c) - HiR(exponent_q) * seg_mid_hi
         k = Integer(floor(u_mid))
-        xp_D = (QQ(1) - xs + c - QQ(k)) / (1 + alpha_q)
+        xp_D = (QQ(1) - xs + c - QQ(k)) / (1 + exponent_q)
         if (HiR(seg_lo) < HiR(xp_D) < HiR(seg_hi)
                 and _d_candidate_valid(xp_D, k, p_num, q_den, c_rat)):
             d_label = ('D', Integer(k))
@@ -272,7 +272,7 @@ def cell_report(case, bits):
     q = case["q"]
     p_num = case["p_num"]
     q_den = case["q_den"]
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     row = case["row_map"][bits]
     c_rat = path_intercept(bits, case["opt_pol"]["c0_rat"],
                            case["opt_pol"]["delta_rat"], q)
@@ -281,16 +281,16 @@ def cell_report(case, bits):
 
     print(f"  cell bits={bits}  x=[{float(row['x_lo']):.6f}, {float(row['x_hi']):.6f})  "
           f"plog=[{float(row['plog_lo']):.6f}, {float(row['plog_hi']):.6f})")
-    print(f"  c={float(c_rat):.6f}  alpha={float(alpha_q):.6f}")
+    print(f"  c={float(c_rat):.6f}  exponent={float(exponent_q):.6f}")
     print(f"  breakpoints ({len(bps)}): {[float(HiR(x)) for x in bps]}")
 
     for i in range(len(bps) - 1):
         seg_lo = bps[i]
         seg_hi = bps[i + 1]
         seg_mid_hi = (HiR(seg_lo) + HiR(seg_hi)) / 2
-        u_mid = HiR(c) - HiR(alpha_q) * seg_mid_hi
+        u_mid = HiR(c) - HiR(exponent_q) * seg_mid_hi
         k = Integer(floor(u_mid))
-        xp_D = (c - QQ(k)) / (1 + alpha_q)
+        xp_D = (c - QQ(k)) / (1 + exponent_q)
         has_D = (HiR(seg_lo) < HiR(xp_D) < HiR(seg_hi)
                  and _d_candidate_valid(xp_D, k, p_num, q_den, c_rat))
 
@@ -345,7 +345,7 @@ def print_delta_table(case):
 
 def main():
     print("=" * 80)
-    print(f"Inspect case: q={Q}, depth={DEPTH}, alpha={P_NUM}/{Q_DEN}, "
+    print(f"Inspect case: q={Q}, depth={DEPTH}, exponent={P_NUM}/{Q_DEN}, "
           f"kind={KIND}, LD={LAYER_DEPENDENT}")
     print("=" * 80)
 

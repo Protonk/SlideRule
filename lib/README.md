@@ -86,7 +86,7 @@ Layer 1.5: named intercept policies.
 
 Primary entry points:
 
-- `build_intercept_policy(name, q, depth, alpha_q, **kwargs)`
+- `build_intercept_policy(name, q, depth, exponent_q, **kwargs)`
 - `zero_policy(...)`
 - `state_bit_policy(...)`
 - `terminal_bias_policy(...)`

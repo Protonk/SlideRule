@@ -31,7 +31,7 @@ RUN_TAGS = ['wall_surface_2026-03-18', 'partition_2026-03-18']
 Q = 3
 DEPTHS = [3, 4, 5, 6, 7, 8]
 KINDS = ['uniform_x', 'geometric_x', 'mirror_harmonic_x']
-ALPHA = '1/2'
+EXPONENT = '1/2'
 OUT_PATH = pathing('experiments', 'lodestone', 'results', 'wall_decomposition.png')
 
 SHORT_NAME = {
@@ -51,17 +51,18 @@ def load_summary(run_tags):
         with open(path, 'r', newline='') as f:
             for r in csv.DictReader(f):
                 key = (r['partition_kind'], r['q'], r['depth'],
-                       r['alpha'], r['layer_dependent'])
+                       r['exponent'], r['layer_dependent'])
                 if key not in seen:
                     seen.add(key)
                     all_rows.append(r)
     return all_rows
 
 
-def find_row(rows, kind, q, depth, alpha, ld):
+def find_row(rows, kind, q, depth, exponent, ld):
     for r in rows:
         if (r['partition_kind'] == kind and r['q'] == str(q)
-                and r['depth'] == str(depth) and r['alpha'] == alpha
+                and r['depth'] == str(depth)
+                and r['exponent'] == exponent
                 and r['layer_dependent'] == str(ld)):
             return r
     return None
@@ -85,7 +86,7 @@ def make_plot(rows):
     y_max = 0
     for kind in KINDS:
         for depth in DEPTHS:
-            r = find_row(rows, kind, Q, depth, ALPHA, False)
+            r = find_row(rows, kind, Q, depth, EXPONENT, False)
             if r:
                 y_max = max(y_max, float(r['single_err']))
     y_max *= 1.08
@@ -98,7 +99,7 @@ def make_plot(rows):
                 (False, 'LI', -bar_width / 2 - 0.02),
                 (True, 'LD', bar_width / 2 + 0.02),
             ]):
-                r = find_row(rows, kind, Q, depth, ALPHA, ld)
+                r = find_row(rows, kind, Q, depth, EXPONENT, ld)
                 if r is None:
                     continue
 
@@ -139,7 +140,7 @@ def make_plot(rows):
 
     fig.suptitle(
         'Wall decomposition across depth and partition geometry\n'
-        '$q = %d$, $\\alpha = %s$' % (Q, ALPHA),
+        '$q = %d$, exponent $= %s$' % (Q, EXPONENT),
         fontsize=12, fontweight='bold',
     )
 

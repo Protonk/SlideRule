@@ -157,7 +157,7 @@ def plot_ribbons(all_data):
              ha='center', fontsize=9, color='#666666')
     fig.tight_layout(rect=[0, 0, 1, 0.955])
 
-    out_path = 'experiments/stepstone/damage/counter_factual.png'
+    out_path = 'experiments/stepstone/damage/results/counter_factual.png'
     fig.savefig(out_path, dpi=180)
     print("Saved: %s" % out_path)
 

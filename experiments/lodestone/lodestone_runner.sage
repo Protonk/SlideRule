@@ -98,7 +98,7 @@ def compute_case(q, depth, p_num, q_den, partition_kind='uniform_x',
 
 SUMMARY_COLUMNS = [
     "source_run",
-    "partition_kind", "alpha", "q", "depth", "layer_dependent",
+    "partition_kind", "exponent", "q", "depth", "layer_dependent",
     "single_err", "opt_err", "free_err",
     "improve", "gap",
     "worst_cell_index", "worst_cell_bits",
@@ -108,7 +108,7 @@ SUMMARY_COLUMNS = [
 
 PERCELL_COLUMNS = [
     "source_run",
-    "partition_kind", "alpha", "q", "depth", "layer_dependent",
+    "partition_kind", "exponent", "q", "depth", "layer_dependent",
     "cell_index", "bits",
     "x_lo", "x_hi", "plog_lo", "plog_hi",
     "x_mid", "plog_mid",
@@ -125,7 +125,7 @@ def build_summary_row(case, source_run):
     return {
         "source_run": source_run,
         "partition_kind": case["partition_kind"],
-        "alpha": f"{case['p_num']}/{case['q_den']}",
+        "exponent": f"{case['p_num']}/{case['q_den']}",
         "q": case["q"],
         "depth": case["depth"],
         "layer_dependent": case["layer_dependent"],
@@ -148,7 +148,7 @@ def build_percell_rows(case, source_run):
     row_map = case["row_map"]
     free_metrics = case["free_metrics"]
     q = case["q"]
-    alpha_str = f"{case['p_num']}/{case['q_den']}"
+    exponent_str = f"{case['p_num']}/{case['q_den']}"
 
     c0_rat = opt["c0_rat"]
     delta_rat = opt["delta_rat"]
@@ -176,7 +176,7 @@ def build_percell_rows(case, source_run):
         rows.append({
             "source_run": source_run,
             "partition_kind": case["partition_kind"],
-            "alpha": alpha_str,
+            "exponent": exponent_str,
             "q": case["q"],
             "depth": case["depth"],
             "layer_dependent": case["layer_dependent"],

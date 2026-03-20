@@ -439,8 +439,8 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
 
     Returns a policy dict compatible with optimize_shared_delta output.
     """
-    alpha_q = QQ(p_num) / QQ(q_den)
-    c_init = float(default_c0(alpha_q, x_width))
+    exponent_q = QQ(p_num) / QQ(q_den)
+    c_init = float(default_c0(exponent_q, x_width))
     use_arb = (partition_kind is not None)
 
     _, paths, _ = residue_paths(q, depth)
@@ -474,7 +474,7 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
     else:
         tau_lo = max(f for _, _, f in cell_optima)
 
-    zero_c0 = default_c0(alpha_q, x_width)
+    zero_c0 = default_c0(exponent_q, x_width)
     if layer_dependent:
         zero_delta = {(t, r, b): QQ(0) for t in range(depth) for r in range(q) for b in (0, 1)}
     else:
@@ -557,7 +557,7 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
             x_continuous, q, dyadic_bits, depth=depth, layer_dependent=layer_dependent)
     else:
         fallback_used = True
-        c0_opt = default_c0(alpha_q, x_width)
+        c0_opt = default_c0(exponent_q, x_width)
         if layer_dependent:
             delta_opt = {(t, r, b): QQ(0) for t in range(depth) for r in range(q) for b in (0, 1)}
         else:
@@ -690,9 +690,9 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
         raise ValueError("partition_kind requires method='minimax'")
     if layer_dependent:
         raise ValueError("layer_dependent=True requires method='minimax'")
-    alpha_q = QQ(p_num) / QQ(q_den)
+    exponent_q = QQ(p_num) / QQ(q_den)
     if c0_init is None:
-        c0_init = float(QQ(1 - alpha_q) / 2)
+        c0_init = float(QQ(1 - exponent_q) / 2)
 
     _, paths, _ = residue_paths(q, depth)
     n_params = 1 + 2 * q

@@ -96,7 +96,7 @@ residue-state basis itself.
 ### First partition-dependent evidence (2026-03-11)
 
 The first lodestone partition-comparison sweep tests the wall on both
-`uniform_x` and `geometric_x`. Key observations at (q=3, d=6), alpha=1/2:
+`uniform_x` and `geometric_x`. Key observations at (q=3, d=6), target exponent 1/2:
 
 - Layer-invariant gap: uniform 0.03601, geometric 0.03976.
 - Layer-dependent gap: uniform 0.02176, geometric 0.01998.
@@ -127,7 +127,7 @@ This is a case-based decomposition, not yet a theorem.
 
 - Does the residual automaton-coupling wall shrink predictably with larger `q`
   in the layer-dependent model?
-- Do the same decompositions hold away from `alpha = 1/2`?
+- Do the same decompositions hold away from `exponent = 1/2`?
 - Do the same decompositions survive on `uniform_x`, or does
   cell-difficulty imbalance become dominant there?
 - Is there a clean scaling law in the parameter-to-cell ratio that captures both

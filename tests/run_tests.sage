@@ -35,8 +35,8 @@ def test_residue_paths():
 
 def test_global_metrics_and_best_single():
     _, paths, _ = residue_paths(1, 3)
-    alpha_q = QQ(1) / QQ(2)
-    zero = zero_policy(1, 3, alpha_q)
+    exponent_q = QQ(1) / QQ(2)
+    zero = zero_policy(1, 3, exponent_q)
     metrics = global_exact_metrics(paths, 1, 2, zero["c0_rat"], zero["delta_rat"], 1)
     best = best_single_intercept(paths, 1, 2)
 
@@ -52,8 +52,8 @@ def test_global_metrics_and_best_single():
 
 def test_active_pattern_family():
     _, paths, _ = residue_paths(1, 3)
-    alpha_q = QQ(1) / QQ(2)
-    zero = zero_policy(1, 3, alpha_q)
+    exponent_q = QQ(1) / QQ(2)
+    zero = zero_policy(1, 3, exponent_q)
     family = build_active_pattern_family(paths, 1, 2, zero["c0_rat"], zero["delta_rat"], 1)
 
     assert_true(len(family["coordinate_keys"]) > 0, "pattern family should expose coordinates")
@@ -300,7 +300,7 @@ def test_uniform_x_matches_dyadic():
 
 def test_arb_evaluator_oracle_d3():
     """Arbitrary-cell evaluator matches exact evaluator on uniform_x depth=3."""
-    c_rat = QQ(1) / QQ(4)  # alpha=1/2 => c = (1-1/2)/2 = 1/4
+    c_rat = QQ(1) / QQ(4)  # exponent=1/2 => c = (1-1/2)/2 = 1/4
     max_disc, n_cells, _ = validate_arb_against_exact(3, 1, 2, c_rat, tol=1e-12, hard_tol=1e-8)
     assert_true(n_cells == 8, f"expected 8 cells, got {n_cells}")
     assert_true(
@@ -334,7 +334,7 @@ def test_arb_evaluator_oracle_varied_c():
 
 def test_d_candidate_validity():
     """D-candidates that pass containment also pass floor(u)=k."""
-    alpha_q = QQ(1) / QQ(2)
+    exponent_q = QQ(1) / QQ(2)
     c = QQ(1) / QQ(4)
     depth = 4
     partition = build_partition(depth, kind='uniform_x')
@@ -345,9 +345,9 @@ def test_d_candidate_validity():
             seg_lo = breakpoints[i]
             seg_hi = breakpoints[i + 1]
             seg_mid_hi = (HiR(seg_lo) + HiR(seg_hi)) / 2
-            u_mid = HiR(c) - HiR(alpha_q) * seg_mid_hi
+            u_mid = HiR(c) - HiR(exponent_q) * seg_mid_hi
             k = Integer(floor(u_mid))
-            xp_D = (c - QQ(k)) / (1 + alpha_q)
+            xp_D = (c - QQ(k)) / (1 + exponent_q)
             if HiR(seg_lo) < HiR(xp_D) < HiR(seg_hi):
                 assert_true(
                     _d_candidate_valid(xp_D, k, 1, 2, c),
@@ -1056,8 +1056,8 @@ def test_nondefault_domain_evaluator():
     depth = 3
     xs, xw = 2, 2
     p_num, q_den = 1, 2
-    alpha_q = QQ(p_num) / QQ(q_den)
-    c0 = default_c0(alpha_q, xw)
+    exponent_q = QQ(p_num) / QQ(q_den)
+    c0 = default_c0(exponent_q, xw)
 
     part = build_partition(depth, kind='uniform_x', x_start=xs, x_width=xw)
     for row in part:

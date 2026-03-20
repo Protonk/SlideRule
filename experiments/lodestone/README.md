@@ -8,7 +8,7 @@ alternatives under the FSM sharing constraint.
 
 ### `partition_sweep.sage`
 
-The main driver. Edit KINDS, GRID, ALPHAS, LAYER_MODES at the top, then
+The main driver. Edit KINDS, GRID, EXPONENTS, LAYER_MODES at the top, then
 run. The pipeline is fully kind-agnostic — any partition kind from
 `lib/partitions.sage` works.
 
@@ -48,8 +48,9 @@ Edit RUN_TAG at the top to point at the desired run.
 
 ## Shared machinery
 
-`lodestone_runner.sage` provides `compute_case()` and the canonical CSV
-column definitions. All scripts load it.
+`lodestone_runner.sage` provides `compute_case()` plus the canonical
+partition-sweep `summary.csv` / `percell.csv` column definitions.
+`h1_sweep.sage` reuses `compute_case()` but defines its own H1 CSV schema.
 
 ## Results layout
 

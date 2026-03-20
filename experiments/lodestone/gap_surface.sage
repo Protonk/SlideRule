@@ -22,7 +22,7 @@ import numpy as np
 # ── Configuration ────────────────────────────────────────────────────
 
 RUN_TAG = 'wall_surface_2026-03-18'
-ALPHA = '1/2'
+EXPONENT = '1/2'
 KINDS = ['uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x']
 OUT_PATH = pathing('experiments', 'lodestone', 'results', 'gap_surface.png')
 
@@ -38,10 +38,10 @@ def load_summary(run_tag):
 # ── Plot ─────────────────────────────────────────────────────────────
 
 def make_plot(rows):
-    alpha_rows = [r for r in rows if r['alpha'] == ALPHA]
+    exponent_rows = [r for r in rows if r['exponent'] == EXPONENT]
 
-    qs = sorted(set(int(r['q']) for r in alpha_rows))
-    depths = sorted(set(int(r['depth']) for r in alpha_rows))
+    qs = sorted(set(int(r['q']) for r in exponent_rows))
+    depths = sorted(set(int(r['depth']) for r in exponent_rows))
 
     short_name = {
         'uniform_x': 'uniform',
@@ -65,7 +65,7 @@ def make_plot(rows):
 
     # Compute global color scale
     all_gaps = []
-    for r in alpha_rows:
+    for r in exponent_rows:
         all_gaps.append(float(r['gap']))
     vmin = 0.0
     vmax = max(all_gaps) if all_gaps else 0.05
@@ -75,7 +75,7 @@ def make_plot(rows):
         ax = axes[row_idx, col_idx]
 
         grid = np.full((len(depths), len(qs)), np.nan)
-        for r in alpha_rows:
+        for r in exponent_rows:
             if r['partition_kind'] != kind or r['layer_dependent'] != ld_str:
                 continue
             qi = qs.index(int(r['q']))
@@ -118,7 +118,7 @@ def make_plot(rows):
 
     fig.suptitle(
         'Gap scaling surface: wall size across (q, depth)\n'
-        '$\\alpha = %s$' % ALPHA,
+        'exponent $= %s$' % EXPONENT,
         fontsize=13, fontweight='bold',
     )
 

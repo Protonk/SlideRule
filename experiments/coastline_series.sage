@@ -1,5 +1,6 @@
 """
-coastline.sage — Shared coastline-area computations and normalization measures.
+coastline_series.sage — Shared coastline-area computations and normalization
+measures.
 
 Not intended to be run directly. Loaded by ripple and stepstone scripts that
 study how the slope-deviation coastline behaves across depth.

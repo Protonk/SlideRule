@@ -1,4 +1,4 @@
-source_run,partition_kind,alpha,q,depth,layer_dependent,cell_index,bits,x_lo,x_hi,plog_lo,plog_hi,x_mid,plog_mid,cell_worst_err,cell_log2_ratio,path_intercept,free_cell_intercept,worst_candidate_type,worst_candidate_x,worst_candidate_plog,n_candidates
+source_run,partition_kind,exponent,q,depth,layer_dependent,cell_index,bits,x_lo,x_hi,plog_lo,plog_hi,x_mid,plog_mid,cell_worst_err,cell_log2_ratio,path_intercept,free_cell_intercept,worst_candidate_type,worst_candidate_x,worst_candidate_plog,n_candidates
 partition_2026-03-18,uniform_x,1/2,3,4,False,0,"(0, 0, 0, 0)",1.0,1.0625,0.0,0.0625,1.03125,0.03125,0.03187323864373392,0.020499698946776224,-0.043701171875,-0.01439666748046875,endpoint,1.0,0.0,2
 partition_2026-03-18,uniform_x,1/2,3,4,False,1,"(0, 0, 0, 1)",1.0625,1.125,0.0625,0.125,1.09375,0.09375,0.02497703409366612,0.01739357313344691,-0.061767578125,-0.040305137634277344,endpoint,1.0625,0.0625,2
 partition_2026-03-18,uniform_x,1/2,3,4,False,2,"(0, 0, 1, 0)",1.125,1.1875,0.125,0.1875,1.15625,0.15625,0.012473957307290956,0.014680257898353694,-0.068115234375,-0.061507225036621094,endpoint,1.125,0.125,2

@@ -89,7 +89,7 @@ def make_plot():
         fontsize=13, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/zoo/cartesean_envelope.png'
+    out_path = 'experiments/stepstone/zoo/results/cartesean_envelope.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

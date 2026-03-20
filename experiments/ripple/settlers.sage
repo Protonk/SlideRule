@@ -10,7 +10,7 @@ Run:  ./sagew experiments/ripple/settlers.sage
 """
 
 from helpers import pathing
-load(pathing('experiments', 'ripple', 'coastline.sage'))
+load(pathing('experiments', 'coastline_series.sage'))
 
 import matplotlib
 matplotlib.use('Agg')

@@ -5,11 +5,11 @@ uniform step function at increasing N.
 Bar chart: x-axis labeled by N = 4, 8, 16, 32, 64, 128; y-axis is the
 integral of |1/(m ln 2) - 1 - step(m)| over [1, 2].
 
-Run:  ./sagew experiments/stepstone/integrate_coastline.sage
+Run:  ./sagew experiments/ripple/integrate_coastline.sage
 """
 
 from helpers import pathing
-load(pathing('experiments', 'ripple', 'coastline.sage'))
+load(pathing('experiments', 'coastline_series.sage'))
 
 import matplotlib
 matplotlib.use('Agg')
@@ -49,7 +49,7 @@ def make_plot():
         fontsize=12, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/integrate_coastline.png'
+    out_path = 'experiments/ripple/results/integrate_coastline.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

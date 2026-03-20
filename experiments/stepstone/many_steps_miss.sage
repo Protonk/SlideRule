@@ -97,7 +97,7 @@ def make_plot():
         fontsize=12, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/many_steps_miss.png'
+    out_path = 'experiments/stepstone/results/many_steps_miss.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 
