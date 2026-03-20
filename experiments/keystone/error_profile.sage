@@ -5,7 +5,7 @@ For a single benchmark case (q, depth, exponent), plots cell_worst_err vs x_mid
 for geometric_x and uniform_x under both layer-invariant and layer-dependent
 sharing. Shows where the wall concentrates spatially.
 
-Run:  ./sagew experiments/lodestone/error_profile.sage
+Run:  ./sagew experiments/keystone/error_profile.sage
 """
 
 import os
@@ -25,8 +25,8 @@ Q = 3
 DEPTH = 6
 EXPONENT = '1/2'
 RUN_TAG = 'wall_surface_2026-03-18'
-PERCELL_CSV = pathing('experiments', 'lodestone', 'results', RUN_TAG, 'percell.csv')
-OUT_PATH = pathing('experiments', 'lodestone', 'results', 'error_profile.png')
+PERCELL_CSV = pathing('experiments', 'keystone', 'results', RUN_TAG, 'percell.csv')
+OUT_PATH = pathing('experiments', 'keystone', 'results', 'error_profile.png')
 
 
 # ── Load and filter ──────────────────────────────────────────────────

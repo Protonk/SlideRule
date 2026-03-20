@@ -7,11 +7,11 @@ breakpoint analysis, and exact-vs-sampled validation.
 
 Edit the configuration block below, then run.
 
-Run:  ./sagew experiments/lodestone/inspect_case.sage
+Run:  ./sagew experiments/keystone/inspect_case.sage
 """
 
 from helpers import pathing
-load(pathing('experiments', 'lodestone', 'lodestone_runner.sage'))
+load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
 
 from collections import defaultdict
 

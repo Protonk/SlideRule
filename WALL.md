@@ -9,7 +9,7 @@ Not for: the repo-level thesis, run logs, or full sweep tables
 Most baseline evidence in this file comes from the legacy exact `uniform_x`
 path. The wall is not the repo's main claim. It is the diagnostic model for
 understanding how the baseline fails, and it becomes directly load-bearing when
-`L3` asks whether the same decomposition survives across partition geometries.
+`K3` asks whether the same decomposition survives across partition geometries.
 
 ## Definition
 
@@ -95,7 +95,7 @@ residue-state basis itself.
 
 ### First partition-dependent evidence (2026-03-11)
 
-The first lodestone partition-comparison sweep tests the wall on both
+The first keystone partition-comparison sweep tests the wall on both
 `uniform_x` and `geometric_x`. Key observations at (q=3, d=6), target exponent 1/2:
 
 - Layer-invariant gap: uniform 0.03601, geometric 0.03976.
@@ -108,10 +108,11 @@ layer-dependent residual, suggesting that the sharing penalty interacts
 differently with the two cell geometries.
 
 The gap is also consistently larger on geometric across the full depth sweep
-(q=5, d=3..6) in the layer-invariant model, which is why L1b is not generally
-supported. See [`HYPOTHESES.md`](HYPOTHESES.md) for the L1a/L1b/L1c
-subdivision and [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md) for the dated sweep
-summary.
+(q=5, d=3..6) in the layer-invariant model, which is why K1b is not generally
+supported. See [`HYPOTHESES.md`](HYPOTHESES.md) for the K1a/K1b/K1c
+subdivision and the run-level reports inside
+[`experiments/keystone/results/`](experiments/keystone/results/) for the dated
+sweep data.
 
 ## Working interpretation
 
@@ -136,7 +137,8 @@ This is a case-based decomposition, not yet a theorem.
 ## Reading outward
 
 - For the repo-level thesis and why partition choice matters, read
-  [`LODESTONE.md`](LODESTONE.md).
+  [`KEYSTONE.md`](KEYSTONE.md).
 - For status labels and next tests, read [`HYPOTHESES.md`](HYPOTHESES.md).
-- For the sweep tables and dated observations behind this decomposition, read
-  [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md).
+- For the sweep tables and dated observations behind this decomposition, see
+  the run-level reports inside
+  [`experiments/keystone/results/`](experiments/keystone/results/).

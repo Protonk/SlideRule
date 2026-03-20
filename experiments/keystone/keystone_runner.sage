@@ -1,5 +1,5 @@
 """
-lodestone_runner.sage — Shared per-case computation and CSV row builders.
+keystone_runner.sage — Shared per-case computation and CSV row builders.
 
 Provides compute_case() for running one (q, depth, partition_kind) case
 through the three-metric pipeline (single, opt, free), plus row builders

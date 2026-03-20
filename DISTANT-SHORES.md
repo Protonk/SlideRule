@@ -4,7 +4,7 @@ Purpose: sketch a transformation from the triangle inequality to a computable
 measure of computational cost of departure from a log-linear surrogate.
 This is a roadmap, not a proof. Six steps, two gnomes.
 
-Reading inward: depends on [`LODESTONE.md`](LODESTONE.md) for the
+Reading inward: depends on [`KEYSTONE.md`](KEYSTONE.md) for the
 scale-symmetry thesis and [`WALL.md`](WALL.md) for the wall decomposition.
 
 ---
@@ -112,7 +112,7 @@ This is gnomes because:
 What would resolve this step: either a theorem relating subspace codimension
 to minimax projection distance for the specific subspace structure the FSM
 generates, or enough empirical data across (q, d, alpha, partition) to fit
-a stable curve. The L1–L3 experiments are partial evidence but not yet
+a stable curve. The K1–K3 experiments are partial evidence but not yet
 sufficient.
 
 ## Step 6. [GNOMES] The cost measure is a property of the problem, not the architecture

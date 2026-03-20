@@ -5,11 +5,11 @@ run from project root via `./sagew experiments/<topic>/<script>.sage`.
 
 ## Subdirectories
 
-### `lodestone/`
+### `keystone/`
 
-Partition-comparison sweeps for the lodestone program. Tests whether
+Partition-comparison sweeps for the keystone program. Tests whether
 geometric partitions beat uniform under shared-delta optimization.
-CSV results live in `lodestone/results/`.
+CSV results live in `keystone/results/`.
 
 Scripts: `partition_sweep`, `h1_sweep`, `inspect_case`, `error_profile`.
 

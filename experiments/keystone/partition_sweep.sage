@@ -4,14 +4,14 @@ partition_sweep.sage — General-purpose partition comparison sweep.
 Iterates the cartesian product of KINDS x GRID x EXPONENTS x LAYER_MODES,
 runs compute_case for each, and writes summary + percell CSVs.
 
-Run:  ./sagew experiments/lodestone/partition_sweep.sage
+Run:  ./sagew experiments/keystone/partition_sweep.sage
 """
 
 import os
 import sys
 
 from helpers import pathing
-load(pathing('experiments', 'lodestone', 'lodestone_runner.sage'))
+load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
 
 
 # ── Configuration ────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ RUN_TAG = 'partition_2026-03-18'
 # ── Main ─────────────────────────────────────────────────────────────
 
 def main():
-    run_dir = pathing('experiments', 'lodestone', 'results', RUN_TAG)
+    run_dir = pathing('experiments', 'keystone', 'results', RUN_TAG)
     if not os.path.exists(run_dir):
         os.makedirs(run_dir)
 

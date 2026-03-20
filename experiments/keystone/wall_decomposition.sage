@@ -12,7 +12,7 @@ Each cell has two side-by-side bars (LI and LD), each decomposed into:
 Read horizontally: watch the wall grow with depth for one partition.
 Read vertically: compare wall shape across geometries at one depth.
 
-Run:  ./sagew experiments/lodestone/wall_decomposition.sage
+Run:  ./sagew experiments/keystone/wall_decomposition.sage
 """
 
 import csv
@@ -32,7 +32,7 @@ Q = 3
 DEPTHS = [3, 4, 5, 6, 7, 8]
 KINDS = ['uniform_x', 'geometric_x', 'mirror_harmonic_x']
 EXPONENT = '1/2'
-OUT_PATH = pathing('experiments', 'lodestone', 'results', 'wall_decomposition.png')
+OUT_PATH = pathing('experiments', 'keystone', 'results', 'wall_decomposition.png')
 
 SHORT_NAME = {
     'uniform_x': 'uniform',
@@ -47,7 +47,7 @@ def load_summary(run_tags):
     all_rows = []
     seen = set()
     for tag in run_tags:
-        path = pathing('experiments', 'lodestone', 'results', tag, 'summary.csv')
+        path = pathing('experiments', 'keystone', 'results', tag, 'summary.csv')
         with open(path, 'r', newline='') as f:
             for r in csv.DictReader(f):
                 key = (r['partition_kind'], r['q'], r['depth'],

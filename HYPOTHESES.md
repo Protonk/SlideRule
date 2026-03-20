@@ -7,25 +7,25 @@ Not for: script usage, run logs, or implementation details
 ## Current headline
 
 The main live claim is the scale-equivariance thesis in
-[`LODESTONE.md`](LODESTONE.md). The first lodestone partition-comparison run
-exists (2026-03-11). L1 has been subdivided: the cell-level advantage of
+[`KEYSTONE.md`](KEYSTONE.md). The first keystone partition-comparison run
+exists (2026-03-11). K1has been subdivided: the cell-level advantage of
 geometric partitions is clear, but the shared-delta advantage depends on the
 parameterization regime. The corrected reciprocal-control diagnostic
-(2026-03-12) sharpens L1c: under layer-dependent sharing, x=1-heavy
+(2026-03-12) sharpens K1c: under layer-dependent sharing, x=1-heavy
 redistributions beat `uniform_x`, but the actual opposite-end control does
 not. The wall and H1 results remain important as legacy baseline evidence.
 
-## Primary lodestone hypotheses
+## Primary keystone hypotheses (K1–K3)
 
-### L1. Geometric partitions outperform uniform partitions for power-law targets
+### K1. Geometric partitions outperform uniform partitions for power-law targets
 
-Status: subdivided (2026-03-11) — see L1a, L1b, L1c below
+Status: subdivided (2026-03-11) — see K1a, K1b, K1c below
 
-The first lodestone partition-comparison sweep (2026-03-11) shows that the
-original L1 claim is true at the cell level but not under the shared-delta
+The first keystone partition-comparison sweep (2026-03-11) shows that the
+original K1claim is true at the cell level but not under the shared-delta
 constraint in general. The distinction motivates three sub-hypotheses.
 
-### L1a. Geometric cells have lower optimal per-cell error
+### K1a. Geometric cells have lower optimal per-cell error
 
 Status: supported
 
@@ -34,14 +34,14 @@ Claim:
 - The free-per-cell worst-case error (`free_err`) is lower on the geometric
   partition than on the uniform partition at every tested depth.
 
-Evidence (lodestone sweep, exponent_t=1/2):
+Evidence (keystone sweep, exponent_t=1/2):
 
 - In the depth sweep (q=5, d=3..6), geometric `free_err` is strictly lower at
   every depth. At d=6: geometric 0.00194 vs uniform 0.00276.
 - The mechanism is clear: equal-log-width cells match the curvature of
   `log2(z)` for power-law targets, distributing error more evenly across cells.
 
-### L1b. Geometric partitions yield lower minimax error under layer-invariant FSM sharing
+### K1b. Geometric partitions yield lower minimax error under layer-invariant FSM sharing
 
 Status: not generally supported
 
@@ -50,7 +50,7 @@ Claim:
 - Under the layer-invariant shared-delta constraint, geometric partitions
   should yield lower `opt_err` than uniform partitions.
 
-Evidence against (lodestone sweep, exponent_t=1/2):
+Evidence against (keystone sweep, exponent_t=1/2):
 
 - In the depth sweep at q=5, geometric `opt_err` exceeds uniform `opt_err` at
   d>=4. At d=6: geometric 0.03799 vs uniform 0.03475.
@@ -63,14 +63,14 @@ Key insight: the FSM sharing constraint is bitwise/additive in structure, which
 may align better with uniform-x cell boundaries. Geometric cells win at the
 cell level but the sharing penalty can erase that advantage.
 
-### L1c. Under layer-dependent parameterization, x=1-heavy non-uniform partitions outperform uniform
+### K1c. Under layer-dependent parameterization, x=1-heavy non-uniform partitions outperform uniform
 
 Status: refined by reciprocal controls (2026-03-12)
 
 Claim (original):
 
 - When the parameterization is loosened to layer-dependent deltas, the
-  geometric free-per-cell advantage from L1a propagates through to lower
+  geometric free-per-cell advantage from K1a propagates through to lower
   `opt_err`.
 
 Claim (revised after reciprocal controls):
@@ -83,7 +83,7 @@ Claim (revised after reciprocal controls):
 - Within the x=1-heavy family, the ranking is still q-dependent: harmonic_x
   beats geometric_x at q=3, while geometric_x beats harmonic_x at q=5.
 
-Evidence (lodestone follow-up sweeps, 2026-03-11 to 2026-03-12):
+Evidence (keystone follow-up sweeps, 2026-03-11 to 2026-03-12):
 
 - Geometric layer-dependent `opt_err` < uniform layer-dependent `opt_err` at
   all 4 tested grid points (pre-harmonic):
@@ -120,7 +120,7 @@ Interpretation:
 
 - Under layer-dependent sharing, direction matters. The tested x=1-heavy
   redistributions beat uniform, while the x=2-heavy control does not.
-- Geometric is not unique among x=1-heavy partitions, so L1a is not the whole
+- Geometric is not unique among x=1-heavy partitions, so K1a is not the whole
   story under sharing. The shared-delta mechanism still cares about how cell
   resolution is distributed inside that broad family.
 - Under layer-invariant sharing, the opposite-end control becoming competitive
@@ -135,9 +135,9 @@ Next test:
   persists at other target exponent values
 - add non-`1/2` target exponent checks for mirror_harmonic_x, not just geo vs uniform
 
-### L2. Log-organized schemes behave more naturally across depth than x-organized schemes
+### K2. Log-organized schemes behave more naturally across depth than x-organized schemes
 
-Status: mixed, requires subdivision similar to L1 (2026-03-11)
+Status: mixed, requires subdivision similar to K1(2026-03-11)
 
 Claim (unchanged):
 
@@ -147,26 +147,26 @@ Claim (unchanged):
 
 Why this matters:
 
-- This asks whether the lodestone story is only a static partition preference
+- This asks whether the keystone story is only a static partition preference
   or a real scaling law about how the difficulty of the problem replicates with
   depth.
 
-First evidence (lodestone sweep, exponent_t=1/2):
+First evidence (keystone sweep, exponent_t=1/2):
 
 - `free_err` decays faster on geometric (lower at every tested depth),
-  confirming the cell-level advantage from L1a.
+  confirming the cell-level advantage from K1a.
 - However, `opt_err` grows faster on geometric at higher depths under
-  layer-invariant sharing, mirroring L1b.
+  layer-invariant sharing, mirroring K1b.
 - The relative improvement `improve / single_err` is not straightforwardly
   better on geometric across depth.
 
 Next test:
 
-- repeat the depth sweep with layer-dependent parameterization to see if L1c
+- repeat the depth sweep with layer-dependent parameterization to see if K1c
   extends to depth scaling
-- subdivide L2 along the same L1a/L1b/L1c lines if the pattern persists
+- subdivide K2along the same K1a/K1b/K1c lines if the pattern persists
 
-### L3. The wall decomposition is partition-dependent
+### K3. The wall decomposition is partition-dependent
 
 Status: first evidence (2026-03-11)
 
@@ -183,7 +183,7 @@ Why this matters:
   about the FSM parameterization or partly an artifact of working on a
   partition already matched to scaling.
 
-First evidence (lodestone sweep, exponent_t=1/2, q=3, d=6):
+First evidence (keystone sweep, exponent_t=1/2, q=3, d=6):
 
 - Layer-dependent deltas reduce the gap by ~40% (uniform) and ~50% (geometric),
   confirming that layer sharing is the dominant wall source for both partition
@@ -209,7 +209,7 @@ Role in the current program:
 
 - `H1` is no longer the repo's main thesis. It establishes that shared
   structure does nontrivial work on the legacy `uniform_x` baseline, so the
-  lodestone partition tests compare against a meaningful baseline rather than a
+  keystone partition tests compare against a meaningful baseline rather than a
   degenerate model.
 
 Current claim:
@@ -230,7 +230,7 @@ Key evidence:
 
 Immediate next tests:
 
-- extend H1c only as needed to support `L3`
+- extend H1c only as needed to support `K3`
 - run multi-exponent robustness checks
 - turn the baseline observations into a scaling law in the
   parameter-to-cell ratio
@@ -272,7 +272,7 @@ Evidence:
 Next test:
 
 - repeat the depth sweep for several fixed `q` values to estimate the decay law
-- use the same parameter choices as the first uniform-grid comparison for `L2`
+- use the same parameter choices as the first uniform-grid comparison for `K2`
 
 ### H1c. Most of the baseline wall in the tested cases is caused by layer sharing
 
@@ -292,7 +292,7 @@ Next test:
 
 - extend the layer-dependent comparison to a wider grid in `(q, depth)` and to
   more than one target exponent
-- reuse those same benchmark points when running the `L3` uniform-grid
+- reuse those same benchmark points when running the `K3` uniform-grid
   comparison
 
 ### H1d. Delta-shape depends strongly on parameterization
@@ -348,9 +348,10 @@ Current read:
 
 ## Reading outward
 
-- For the repo-level thesis and motivation, read [`LODESTONE.md`](LODESTONE.md).
+- For the repo-level thesis and motivation, read [`KEYSTONE.md`](KEYSTONE.md).
 - For the current obstruction model, read [`WALL.md`](WALL.md).
-- For dated numeric evidence, read [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md).
-- For how to run the scripts behind those claims and the planned lodestone
+- For dated numeric evidence, see the run-level reports inside
+  [`experiments/keystone/results/`](experiments/keystone/results/).
+- For how to run the scripts behind those claims and the planned keystone
   comparisons, read
   [`experiments/README.md`](experiments/README.md).

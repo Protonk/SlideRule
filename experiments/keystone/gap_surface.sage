@@ -6,7 +6,7 @@ one panel per (kind, layer_mode). Shows whether the wall has a ridge,
 whether it's monotone, and whether geometric's wall surface differs from
 uniform's.
 
-Run:  ./sagew experiments/lodestone/gap_surface.sage
+Run:  ./sagew experiments/keystone/gap_surface.sage
 """
 
 import csv
@@ -24,13 +24,13 @@ import numpy as np
 RUN_TAG = 'wall_surface_2026-03-18'
 EXPONENT = '1/2'
 KINDS = ['uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x']
-OUT_PATH = pathing('experiments', 'lodestone', 'results', 'gap_surface.png')
+OUT_PATH = pathing('experiments', 'keystone', 'results', 'gap_surface.png')
 
 
 # ── Load ─────────────────────────────────────────────────────────────
 
 def load_summary(run_tag):
-    path = pathing('experiments', 'lodestone', 'results', run_tag, 'summary.csv')
+    path = pathing('experiments', 'keystone', 'results', run_tag, 'summary.csv')
     with open(path, 'r', newline='') as f:
         return list(csv.DictReader(f))
 

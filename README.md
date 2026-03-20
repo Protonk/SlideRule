@@ -5,7 +5,7 @@ FSM-parameterised coarse-stage approximations meet scale-equivariant geometry.
 Day's FRSR analysis gives an exact finite candidate set for the extrema of
 piecewise-linear coarse approximations to `x^(p/q)`. This repo studies finite-
 state intercept policies for those coarse approximations. The main guiding push
-is now the thesis in [`LODESTONE.md`](LODESTONE.md): on `R_{>0}`, approximation
+is now the thesis in [`KEYSTONE.md`](KEYSTONE.md): on `R_{>0}`, approximation
 problems governed by scaling should be organized in log coordinates,
 approximated by the affine pseudo-log, and discretized on geometric grids.
 
@@ -16,16 +16,15 @@ against `geometric_x`.
 
 ## Documentation
 
-- [`LODESTONE.md`](LODESTONE.md): guiding thesis, structural motivation, and
-  the primary `L1`-`L3` tests.
+- [`KEYSTONE.md`](KEYSTONE.md): guiding thesis, structural motivation, and
+  the primary `K1`-`K3` tests.
 - [`PARTITIONS.md`](PARTITIONS.md): analytical classification of the partition
   family and the current selection rationale.
 - [`HYPOTHESES.md`](HYPOTHESES.md): active research claims and their status.
 - [`WALL.md`](WALL.md): the current obstruction model and its
   decomposition.
-- [`SWEEP-REPORTS.md`](SWEEP-REPORTS.md): dated sweep summaries and artifact links.
 - [`experiments/README.md`](experiments/README.md): experiment drivers, output
-  columns, and which scripts support the lodestone program.
+  columns, and which scripts support the keystone program.
 - [`lib/README.md`](lib/README.md): module graph, data contracts, and numerical caveats.
 
 ## Terminology
@@ -42,9 +41,9 @@ against `geometric_x`.
 All commands below are run from project root.
 
 ```sh
-./sagew experiments/lodestone/partition_sweep.sage
-./sagew experiments/lodestone/h1_sweep.sage
-./sagew experiments/lodestone/inspect_case.sage
+./sagew experiments/keystone/partition_sweep.sage
+./sagew experiments/keystone/h1_sweep.sage
+./sagew experiments/keystone/inspect_case.sage
 python3 lib/trajectory.py
 ./sagew tests/run_tests.sage
 ./sagew
@@ -55,11 +54,11 @@ python3 lib/trajectory.py
 - SageMath is required for the `.sage` drivers.
 - The optimizer in [`lib/optimize.sage`](lib/optimize.sage) uses `numpy` and
   `scipy.optimize.linprog`.
-- [`experiments/lodestone/partition_sweep.sage`](experiments/lodestone/partition_sweep.sage) is
-  the primary partition-comparison driver for `L1`-`L3`.
-- [`experiments/lodestone/h1_sweep.sage`](experiments/lodestone/h1_sweep.sage) is the
+- [`experiments/keystone/partition_sweep.sage`](experiments/keystone/partition_sweep.sage) is
+  the primary partition-comparison driver for `K1`-`K3`.
+- [`experiments/keystone/h1_sweep.sage`](experiments/keystone/h1_sweep.sage) is the
   uniform-only H1 hypothesis baseline.
-- [`experiments/lodestone/inspect_case.sage`](experiments/lodestone/inspect_case.sage) is the
+- [`experiments/keystone/inspect_case.sage`](experiments/keystone/inspect_case.sage) is the
   single-case diagnostic workbench.
 - The minimax optimizer is implemented as float bisection plus LP feasibility,
   followed by dyadic snapping of the returned parameters. Treat it as a strong

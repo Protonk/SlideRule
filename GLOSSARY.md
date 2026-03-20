@@ -179,7 +179,7 @@ validation target.
 The **arbitrary-cell regime** computes the same style of error metrics from
 general cell bounds, typically supplied as `plog_lo` / `plog_hi` from a
 partition row. This is the regime used for current cross-partition
-lodestone comparisons.
+keystone comparisons.
 
 The relationship between them is important: on `uniform_x`, the
 arbitrary-cell regime is checked against the reference exact `uniform_x`
@@ -240,10 +240,10 @@ Synonym for the wall when expressed as a number: `gap = opt_err − free_err`.
 The partition with equal log-width cells: cell j spans
 `[x_start · r^j, x_start · r^(j+1))` where `r = (x_width / x_start + 1)^(1/N)`.
 It is the unique partition invariant under multiplication by the grid
-ratio. In the lodestone program it is the preferred scale-equivariant
+ratio. In the keystone program it is the preferred scale-equivariant
 curve-agnostic geometry. In current repo terminology it is a geometry
 name, distinct from the cell's binary address. See
-[`LODESTONE.md`](LODESTONE.md) and [`HYPOTHESES.md`](HYPOTHESES.md) for
+[`KEYSTONE.md`](KEYSTONE.md) and [`HYPOTHESES.md`](HYPOTHESES.md) for
 the status of the partition-comparison claims.
 
 ## candidate families (H, V, D)
@@ -258,12 +258,12 @@ The minimum z comes from whichever of H or V has the smaller index
 (`α_Day = min(a,b)`); the maximum z always comes from D. All three families
 are expressed through the zeta function `ζ(r, k, c)`.
 
-## hypotheses H1–H4, L1–L3
+## hypotheses H1–H4, K1–K3
 
 The project maintains two hypothesis families. **H1–H4** concern the
-shared-delta / FSM story. **L1–L3** concern the lodestone
+shared-delta / FSM story. **K1–K3** concern the keystone
 scale-symmetry thesis and partition comparisons. See
-[`HYPOTHESES.md`](HYPOTHESES.md) and [`LODESTONE.md`](LODESTONE.md).
+[`HYPOTHESES.md`](HYPOTHESES.md) and [`KEYSTONE.md`](KEYSTONE.md).
 
 ## index
 
@@ -309,13 +309,13 @@ The second of three wall sources. The layer-invariant model forces one
 correction law to serve all depth levels, conflating coarse and fine
 positional effects.
 
-## LODESTONE
+## KEYSTONE
 
-The project document (`LODESTONE.md`) that states the overarching
+The project document (`KEYSTONE.md`) that states the overarching
 scale-symmetry thesis: the logarithm is the canonical coordinate for
 approximation on R_{>0} under scaling, the affine pseudo-log is its
 coarse surrogate, and geometric grids are the natural compatible
-discretization. Contains the L1–L3 hypothesis statements and the
+discretization. Contains the K1–K3 hypothesis statements and the
 Hamming/Knuth/Coonen lineage.
 
 ## minimax objective
@@ -386,7 +386,7 @@ Its inverse is `L⁻¹(X) = 2^(floor(X)) · (1 + X − floor(X))`. The
 pseudo-log is the mathematical abstraction of the IEEE 754 bit-pattern
 reinterpretation. Within each binade, it is affine in x with slope
 `2^(−E_x)`. The gap `log₂(m) − (m − 1)` is the error function ε(m).
-The LODESTONE thesis identifies the pseudo-log as a coarse affine
+The KEYSTONE thesis identifies the pseudo-log as a coarse affine
 surrogate for the logarithmic coordinate that linearises scaling on R_{>0}.
 
 ## plog_lo, plog_hi
@@ -427,7 +427,7 @@ Sage's preparsing step before execution as Python.
 The governing symmetry of the problem: `x → λx` for λ > 0. The
 logarithm is (up to affine transformation) the unique coordinate that
 turns this multiplicative symmetry into additive translation. The
-LODESTONE thesis argues that approximation schemes for power-law targets
+KEYSTONE thesis argues that approximation schemes for power-law targets
 should be organised in this coordinate, and that the pseudo-log and
 geometric grids are the coarse implementations of that principle.
 

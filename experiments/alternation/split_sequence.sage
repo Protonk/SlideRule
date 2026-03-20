@@ -11,7 +11,7 @@ Run:  ./sagew experiments/alternation/split_sequence.sage
 import time
 
 from helpers import pathing
-load(pathing('experiments', 'lodestone', 'lodestone_runner.sage'))
+load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
 load(pathing('experiments', 'alternation', 'sign_sequences.sage'))
 
 

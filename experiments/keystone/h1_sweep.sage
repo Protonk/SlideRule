@@ -8,14 +8,14 @@ Sweep 3 (H1c): (q=3,d=6) and (q=5,d=6), layer-invariant vs layer-dependent.
 
 All sweeps report delta-shape statistics for H1d (sparsity signal).
 
-Run from project root:  ./sagew experiments/lodestone/h1_sweep.sage
+Run from project root:  ./sagew experiments/keystone/h1_sweep.sage
 """
 
 import os
 import math
 
 from helpers import pathing
-load(pathing('experiments', 'lodestone', 'lodestone_runner.sage'))
+load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
 
 
 # ── Delta-shape statistics (H1d) ────────────────────────────────────────
@@ -135,7 +135,7 @@ def write_h1_csv(rows, filepath):
 
 def main():
     p_num, q_den = 1, 2
-    results_dir = pathing('experiments', 'lodestone', 'results')
+    results_dir = pathing('experiments', 'keystone', 'results')
 
     # ── Sweep 1: H1b — depth scaling at fixed q ─────────────────────────
 

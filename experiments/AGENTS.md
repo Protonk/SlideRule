@@ -12,7 +12,7 @@ Otherwise, add scripts to an existing subdirectory.
 
 ## Naming conventions
 
-- Directory names are short, singular nouns (e.g. `lodestone`, `stepstone`).
+- Directory names are short, singular nouns (e.g. `keystone`, `stepstone`).
 - Script names use `snake_case` with a descriptive suffix
   (`_sweep`, `_diagnostic`, `_heatmap`).
 - Results go in `<topic>/results/`, never at the `experiments/` root.
@@ -33,6 +33,22 @@ A new subdirectory should contain at least:
 
 - One runnable `.sage` script.
 - A clear `Run:` docstring in each script showing the `./sagew` invocation.
+
+## Sweep reports and run provenance
+
+Dated box-score tables and observations live inside `results/` alongside the
+artifacts they describe — not in a central file. To find sweep evidence for a
+hypothesis:
+
+1. Look for a `README.md` inside dated run directories
+   (e.g. `keystone/results/keystone_2026-03-11/README.md`).
+2. Look for topic-level report files in `results/`
+   (e.g. `keystone/results/h1_report.md`).
+3. For runs whose artifacts exist only in git history, check
+   `results/historical.md`.
+
+New sweep runs should follow the same pattern: write a `README.md` in the
+run's output directory recording the driver, scope, and direct observations.
 
 ## Shared utilities
 

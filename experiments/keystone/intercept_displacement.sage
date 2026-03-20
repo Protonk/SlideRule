@@ -5,7 +5,7 @@ Plots (path_intercept - free_cell_intercept) vs cell position x_mid for a
 single partition kind, comparing layer-invariant (broad swings) against
 layer-dependent (tight oscillation).
 
-Run:  ./sagew experiments/lodestone/intercept_displacement.sage
+Run:  ./sagew experiments/keystone/intercept_displacement.sage
 """
 
 import csv
@@ -25,13 +25,13 @@ Q = 5
 DEPTH = 6
 EXPONENT = '1/2'
 KIND = 'geometric_x'
-OUT_PATH = pathing('experiments', 'lodestone', 'results', 'intercept_displacement.png')
+OUT_PATH = pathing('experiments', 'keystone', 'results', 'intercept_displacement.png')
 
 
 # ── Load ─────────────────────────────────────────────────────────────
 
 def load_percell(run_tag):
-    path = pathing('experiments', 'lodestone', 'results', run_tag, 'percell.csv')
+    path = pathing('experiments', 'keystone', 'results', run_tag, 'percell.csv')
     with open(path, 'r', newline='') as f:
         return list(csv.DictReader(f))
 

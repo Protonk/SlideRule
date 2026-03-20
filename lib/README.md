@@ -179,7 +179,7 @@ families, and is useful for quick exploratory work without Sage.
 - The arbitrary-cell evaluator uses the same endpoint / `H` / `D` candidate
   logic on arbitrary cell bounds and is validated against the exact oracle on
   `uniform_x`.
-- The lodestone partition comparisons should use the arbitrary-cell path for
+- The keystone partition comparisons should use the arbitrary-cell path for
   every partition kind, keeping the exact `uniform_x` path only as a
   regression oracle.
 - The shared-delta minimax path in `optimize.sage` is not a fully symbolic

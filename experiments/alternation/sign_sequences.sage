@@ -19,7 +19,7 @@ EPS_SIGN = 1e-12
 
 # Data source
 WALL_SURFACE_TAG = 'wall_surface_2026-03-18'
-PERCELL_PATH = pathing('experiments', 'lodestone', 'results',
+PERCELL_PATH = pathing('experiments', 'keystone', 'results',
                        WALL_SURFACE_TAG, 'percell.csv')
 
 
