@@ -1,15 +1,19 @@
 """
-counter_factual.sage — Damage ribbon across sixteen partition geometries.
+amplification.sage — Chord amplification ribbons across partition geometries.
 
-For each cell in a partition of [1, 2], the ribbon spans from -incoming
-(bottom) to exported (top).  A flat ribbon hugging zero means balanced
-damage exchange; asymmetry reveals which cells are net exporters or
-importers of chord error.
+For each cell k, the amplification factor R[j,k] = E[j,k] / E[k,k] measures
+by what factor the error on cell k is multiplied when forced to use cell j's
+chord instead of its own.  The ribbon spans from -incoming to +exported,
+where both quantities are median excess amplification (R - 1), so a flat
+ribbon at zero means no sharing penalty.
 
-This is a gestural comparison — the shape and symmetry of the ribbon
-matter more than any single value.
+The prediction: on geometric partitions, the ribbon should be roughly flat
+(all cells equally vulnerable).  On uniform partitions, the ribbon should
+flare near x=1, where cells have tiny native errors and are proportionally
+most sensitive to chord displacement — the reverse of the absolute-error
+ribbon in counter_factual.sage.
 
-Run:  ./sagew experiments/stepstone/damage/counter_factual.sage
+Run:  ./sagew experiments/stepstone/damage/amplification.sage
 """
 
 from helpers import pathing
@@ -28,38 +32,56 @@ import numpy as np
 DEPTH = 7   # N = 128
 
 
-def exported_damage(E):
+# ── Amplification matrix ────────────────────────────────────────────
+
+def build_amplification_matrix(E):
+    """R[j][k] = E[j][k] / E[k][k].  Diagonal is 1."""
     N = len(E)
+    diag = [E[k][k] for k in range(N)]
+    R = [[0.0] * N for _ in range(N)]
+
+    for j in range(N):
+        for k in range(N):
+            R[j][k] = E[j][k] / diag[k] if diag[k] > 0 else 1.0
+
+    return R
+
+
+def exported_amp(R):
+    """Median excess amplification (R - 1) that j's chord inflicts on others."""
+    N = len(R)
     result = []
     for j in range(N):
-        row = sorted(E[j][k] for k in range(N) if k != j)
+        row = sorted(R[j][k] - 1.0 for k in range(N) if k != j)
         result.append(_lower_median(row))
     return result
 
 
-def incoming_damage(E):
-    N = len(E)
+def incoming_amp(R):
+    """Median excess amplification (R - 1) that cell k absorbs from others."""
+    N = len(R)
     result = []
     for k in range(N):
-        col = sorted(E[j][k] for j in range(N) if j != k)
+        col = sorted(R[j][k] - 1.0 for j in range(N) if j != k)
         result.append(_lower_median(col))
     return result
 
 
-# ── Compute ribbon arrays ────────────────────────────────────────────
+# ── Compute ribbon arrays ───────────────────────────────────────────
 
 def compute_ribbon(cells):
     N = len(cells)
     x_pos = [(a + b) / 2.0 for a, b in cells]
 
     E = build_error_matrix(cells)
-    exp = exported_damage(E)
-    inc = incoming_damage(E)
+    R = build_amplification_matrix(E)
+    exp = exported_amp(R)
+    inc = incoming_amp(R)
 
     return np.array(x_pos), np.array(exp), np.array(inc)
 
 
-# ── Plotting ─────────────────────────────────────────────────────────
+# ── Plotting ────────────────────────────────────────────────────────
 
 def plot_ribbons(all_data):
     N = 2**DEPTH
@@ -80,7 +102,6 @@ def plot_ribbons(all_data):
         ax.set_xlim(0.98, 2.02)
         ax.set_title(name, fontsize=9, fontweight='bold')
 
-        # Gestural: hide numeric ticks, just show zero line
         ax.set_yticks([0])
         ax.set_yticklabels(['0'], fontsize=6, color='#666666')
         ax.tick_params(axis='y', length=0)
@@ -91,7 +112,6 @@ def plot_ribbons(all_data):
 
     zoo_hide_unused(axes.flat)
 
-    # Left-side labels: top half = exported, bottom half = incoming
     for ax in axes[:, 0]:
         ax.annotate('exp', xy=(0, 1), xycoords='axes fraction',
                     xytext=(-4, -6), textcoords='offset points',
@@ -101,21 +121,21 @@ def plot_ribbons(all_data):
                     fontsize=6, color='#999999', ha='right', va='bottom')
 
     fig.suptitle(
-        'Counterfactual damage ribbons across partition geometries',
+        'Chord amplification ribbons across partition geometries',
         fontsize=13, fontweight='bold', y=0.99,
     )
     fig.text(0.5, 0.965,
-             'ribbon width = damage asymmetry per cell  |  '
-             'flat at zero = balanced exchange  |  N=%d' % N,
+             'ribbon height = median sharing multiplier $-$ 1  |  '
+             'flat at zero = no sharing penalty  |  N=%d' % N,
              ha='center', fontsize=9, color='#666666')
     fig.tight_layout(rect=[0, 0, 1, 0.955])
 
-    out_path = 'experiments/stepstone/damage/results/counter_factual.png'
+    out_path = 'experiments/stepstone/damage/results/amplification.png'
     fig.savefig(out_path, dpi=180)
     print("Saved: %s" % out_path)
 
 
-# ── Precompute ────────────────────────────────────────────────────────
+# ── Precompute ──────────────────────────────────────────────────────
 
 def precompute_all():
     import sys
@@ -136,31 +156,31 @@ def precompute_all():
     return all_data
 
 
-# ── Diagnostics ──────────────────────────────────────────────────────
+# ── Diagnostics ─────────────────────────────────────────────────────
 
 def print_diagnostics(all_data):
     N = 2**DEPTH
     print()
-    print("Counterfactual diagnostics  (N=%d)" % N)
+    print("Amplification diagnostics  (N=%d)" % N)
     print("=" * 70)
-    print("  %-20s  max(exp)  max(inc)  exporters" % "partition")
+    print("  %-20s  max(exp)  max(inc)  net exporters" % "partition")
     print("  " + "-" * 60)
 
     for name, color, kind in PARTITION_ZOO:
         x_pos, exp, inc = all_data[kind]
         n = len(x_pos)
         exporters = sum(1 for j in range(n) if exp[j] > inc[j] + 1e-14)
-        print("  %-20s  %8.6f  %8.6f  %4d/%d" %
-              (name, exp.max(), inc.max(), exporters, n))
+        print("  %-20s  %7.1fx  %7.1fx  %4d/%d" %
+              (name, 1.0 + exp.max(), 1.0 + inc.max(), exporters, n))
 
     print()
 
 
-# ── Main ─────────────────────────────────────────────────────────────
+# ── Main ────────────────────────────────────────────────────────────
 
 N = 2**DEPTH
 print()
-print("Counterfactual damage ribbons  (N=%d)" % N)
+print("Chord amplification ribbons  (N=%d)" % N)
 print("=" * 60)
 print()
 

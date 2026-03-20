@@ -3,16 +3,17 @@ split_sequence.sage — Compute the refinement split count sequence for one
 partition kind across increasing depth.
 
 Prints the number of parent cells where children disagree in sign at each
-depth transition d -> d+1.
+depth transition d -> d+1. Uses compute_signs for efficient computation
+with disk caching.
 
-Run:  ./sagew experiments/alternation/split_sequence.sage
+Run:  ./sagew experiments/alternation/refinement/split_sequence.sage
 """
 
+import sys
 import time
 
 from helpers import pathing
-load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
-load(pathing('experiments', 'alternation', 'sign_sequences.sage'))
+load(pathing('experiments', 'alternation', 'refinement', 'compute_signs.sage'))
 
 
 # ── Configuration ────────────────────────────────────────────────────
@@ -24,34 +25,12 @@ Q_DEN = 2
 LAYER_DEPENDENT = False
 MIN_DEPTH = 3
 MAX_DEPTH = 13   # need depths 3..13 for 10 transitions
-
-
-# ── Compute ──────────────────────────────────────────────────────────
-
-def signs_from_case(case):
-    """Extract sign list from a compute_case result."""
-    percell_rows = build_percell_rows(case, 'split_seq')
-    entries = []
-    for r in percell_rows:
-        fc = r['free_cell_intercept']
-        if fc == '':
-            continue
-        delta = float(r['path_intercept']) - float(fc)
-        if delta > EPS_SIGN:
-            s = 1
-        elif delta < -EPS_SIGN:
-            s = -1
-        else:
-            s = 0
-        entries.append((float(r['x_lo']), float(r['x_hi']),
-                        float(r['x_mid']), s))
-    entries.sort()
-    return [e[3] for e in entries]
+TOL = 1e-10
+DYADIC_BITS = 20
+USE_CACHE = True
 
 
 # ── Main ─────────────────────────────────────────────────────────────
-
-import sys
 
 ld_tag = 'LD' if LAYER_DEPENDENT else 'LI'
 print()
@@ -59,6 +38,8 @@ print("Split sequence: %s, q=%d, exponent=%d/%d, %s"
       % (KIND, Q, P_NUM, Q_DEN, ld_tag))
 print("  Depths %d to %d (%d transitions)"
       % (MIN_DEPTH, MAX_DEPTH, MAX_DEPTH - MIN_DEPTH))
+if USE_CACHE:
+    print("  Cache: enabled (tol=%.0e, dyadic_bits=%d)" % (TOL, DYADIC_BITS))
 print()
 sys.stdout.flush()
 
@@ -68,16 +49,15 @@ split_counts = []
 t_total = time.time()
 
 for d in range(MIN_DEPTH, MAX_DEPTH + 1):
-    t0 = time.time()
-    case = compute_case(Q, d, P_NUM, Q_DEN,
-                        partition_kind=KIND,
-                        layer_dependent=LAYER_DEPENDENT)
-    signs = signs_from_case(case)
+    result = compute_signs(Q, d, P_NUM, Q_DEN, kind=KIND,
+                           layer_dependent=LAYER_DEPENDENT,
+                           tol=TOL, dyadic_bits=DYADIC_BITS,
+                           use_cache=USE_CACHE)
+    signs = result['signs']
     sign_cache[d] = signs
-    elapsed = time.time() - t0
 
-    rle = sign_rle(signs)
-    print("  d=%2d  N=%5d  %2d runs  %.1fs" % (d, 2**d, len(rle), elapsed))
+    tag = '(cached)' if result['cached'] else '%.1fs' % result['elapsed']
+    print("  d=%2d  N=%5d  %2d runs  %s" % (d, 2**d, result['n_runs'], tag))
 
     if d > MIN_DEPTH:
         prev_signs = sign_cache[d - 1]

@@ -1,5 +1,5 @@
 """
-refinement_split_map.sage — Where does refinement introduce new sign boundaries?
+split_map.sage — Where does refinement introduce new sign boundaries?
 
 Single-partition focus. For each adjacent depth pair d -> d+1, draws a wide
 horizontal strip over [1, 2] divided into 2^d parent cells. Dark cells =
@@ -8,7 +8,7 @@ children disagree in sign (new boundary born). Pale cells = children agree.
 Each row has side-by-side LI and LD strips. Depth transitions increase
 downward.
 
-Run:  ./sagew experiments/alternation/refinement_split_map.sage
+Run:  ./sagew experiments/alternation/refinement/split_map.sage
 """
 
 from math import log
@@ -28,7 +28,7 @@ KIND = 'uniform_x'
 Q = 3
 DEPTH_PAIRS = [(3, 4), (4, 5), (5, 6), (6, 7)]
 EXPONENT = '1/2'
-OUT_PATH = pathing('experiments', 'alternation', 'results', 'refinement_split_map.png')
+OUT_PATH = pathing('experiments', 'alternation', 'refinement', 'results', 'split_map.png')
 
 SHORT_NAME = {
     'uniform_x': 'uniform',

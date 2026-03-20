@@ -611,6 +611,15 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
     n_unique = len(intercepts)
     max_delta_abs = _delta_linf_from_policy(delta_opt, q)
 
+    # Build bits -> free-cell intercept map from the per-cell optima
+    # computed in Step 1.  Keyed by bits tuple for direct lookup.
+    cell_free_intercepts = {}
+    for i, P in enumerate(paths):
+        if use_arb:
+            cell_free_intercepts[P["bits"]] = cell_optima_arb[i][2]  # c_star
+        else:
+            cell_free_intercepts[P["bits"]] = cell_optima[i][1]      # c_star
+
     result = {
         "name": "optimized",
         "description": (f"numerical minimax bisection+LP (q={q}, d={depth}, "
@@ -642,6 +651,7 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
         "layer_dependent": layer_dependent,
         "partition_kind": partition_kind,
         "metrics": metrics,
+        "cell_free_intercepts": cell_free_intercepts,
     }
     result.update(_worst_cell_metadata(metrics, row_map))
     return result
