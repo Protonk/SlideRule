@@ -91,7 +91,6 @@ nudges = {
     'powerlaw_x':          (-0.120,  0.015),
     'golden_x':            (-0.100, -0.022),
     'cantor_x':            (-0.080, -0.025),
-    'minkowski_x':         ( 0.025,  0.020),
     'farey_rank_x':        ( 0.025, -0.022),
     'radical_inverse_x':   (-0.150, -0.015),
     'sturmian_x':          (-0.110, -0.020),

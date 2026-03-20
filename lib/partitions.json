@@ -143,7 +143,7 @@
       "symmetry": "asymmetric",
       "density": "rational_dense",
       "params": {},
-      "equivalences": ["minkowski_x"]
+      "equivalences": []
     },
     {
       "kind": "reverse_geometric_x",
@@ -228,20 +228,6 @@
       "density": "fractal_scattered",
       "params": {"cantor_levels": 3},
       "equivalences": []
-    },
-    {
-      "kind": "minkowski_x",
-      "display_name": "minkowski",
-      "zoo_index": 16,
-      "color": "#e41a1c",
-      "category": "number_theory",
-      "description": "Dyadic-to-Stern-Brocot conjugacy (Minkowski ? function)",
-      "arithmetic": "QQ",
-      "curve_aware": false,
-      "symmetry": "asymmetric",
-      "density": "rational_dense",
-      "params": {},
-      "equivalences": ["stern_brocot_x"]
     },
     {
       "kind": "farey_rank_x",
@@ -338,7 +324,6 @@
     "null_model": {"label": "Null Model", "group": "G"}
   },
   "equivalences": [
-    {"pair": ["minkowski_x", "stern_brocot_x"], "condition": null},
     {"pair": ["radical_inverse_x", "uniform_x"], "condition": "vdc_base=2"}
   ],
   "presets": {
@@ -361,18 +346,7 @@
       "cells": [
         [0, 0, "stern_brocot_x"], [0, 1, "farey_rank_x"], [0, 2, "radical_inverse_x"],
         [1, 0, "golden_x"], [1, 1, "geometric_x"], [1, 2, "sturmian_x"],
-        [2, 0, "minkowski_x"], [2, 1, "dyadic_x"], [2, 2, "ruler_x"]
-      ]
-    },
-    "geo_vs_chaos": {
-      "dimensions": [3, 3],
-      "center": [1, 1],
-      "fill": "full",
-      "narrative": "Thesis winner surrounded by fractal, stochastic, and parametric perturbations. Top = internal complexity (Thue-Morse, Cantor, bit-reversal). Middle = parametric modulation. Bottom = baselines.",
-      "cells": [
-        [0, 0, "thuemorse_x"], [0, 1, "cantor_x"], [0, 2, "bitrev_geometric_x"],
-        [1, 0, "sinusoidal_x"], [1, 1, "geometric_x"], [1, 2, "beta_x"],
-        [2, 0, "random_x"], [2, 1, "dyadic_x"], [2, 2, "ruler_x"]
+        [2, 0, "cantor_x"], [2, 1, "dyadic_x"], [2, 2, "ruler_x"]
       ]
     },
     "density_gradient": {
@@ -387,64 +361,16 @@
         [3, 0, "beta_x"], [3, 1, "reverse_geometric_x"], [3, 2, "mirror_harmonic_x"], [3, 3, "random_x"]
       ]
     },
-    "mathematical_sophistication": {
-      "dimensions": [4, 4],
-      "center": null,
-      "fill": "full",
-      "narrative": "Rows = increasing mathematical machinery. R0 = Calculus I (equal, equal-log, reciprocal, mirror). R1 = Approximation theory. R2 = Combinatorics & Dynamics. R3 = Deep structure & optimization.",
-      "cells": [
-        [0, 0, "uniform_x"], [0, 1, "geometric_x"], [0, 2, "harmonic_x"], [0, 3, "mirror_harmonic_x"],
-        [1, 0, "chebyshev_x"], [1, 1, "sinusoidal_x"], [1, 2, "powerlaw_x"], [1, 3, "beta_x"],
-        [2, 0, "ruler_x"], [2, 1, "thuemorse_x"], [2, 2, "golden_x"], [2, 3, "sturmian_x"],
-        [3, 0, "stern_brocot_x"], [3, 1, "minkowski_x"], [3, 2, "arc_length_x"], [3, 3, "minimax_chord_x"]
-      ]
-    },
-    "relational_triangle": {
-      "dimensions": [4, 4],
-      "center": null,
-      "fill": "lower_triangle",
-      "narrative": "Diagonal = 4 anchor philosophies (uniform, geometric, chebyshev, arc_length). Below-diagonal entries show connecting relationships between anchors.",
-      "cells": [
-        [0, 0, "uniform_x"],
-        [1, 0, "harmonic_x"], [1, 1, "geometric_x"],
-        [2, 0, "reverse_geometric_x"], [2, 1, "stern_brocot_x"], [2, 2, "chebyshev_x"],
-        [3, 0, "random_x"], [3, 1, "ruler_x"], [3, 2, "minimax_chord_x"], [3, 3, "arc_length_x"]
-      ]
-    },
-    "symmetry_spine": {
-      "dimensions": [3, 3],
-      "center": null,
-      "fill": "lower_triangle",
-      "narrative": "Diagonal = symmetric partitions (uniform, geometric, chebyshev). Below-diagonal = symmetry-breaking departures (harmonic, powerlaw, mirror_harmonic).",
-      "cells": [
-        [0, 0, "uniform_x"],
-        [1, 0, "harmonic_x"], [1, 1, "geometric_x"],
-        [2, 0, "powerlaw_x"], [2, 1, "mirror_harmonic_x"], [2, 2, "chebyshev_x"]
-      ]
-    },
     "complete_atlas": {
-      "dimensions": [5, 5],
-      "center": [2, 2],
-      "fill": "partial",
-      "narrative": "All 23 partitions in concentric rings around geometric. Inner ring = 8 nearest relatives. Outer ring = fractal, number-theoretic, parametric, curve-aware. Blanks at opposite corners [0,4] and [4,0], framing the atlas along the anti-diagonal through center.",
+      "dimensions": [4, 5],
+      "center": [1, 2],
+      "fill": "full",
+      "narrative": "All 20 most distinctive partitions in a 4x5 grid. R0 = left-dense and curve-aware. R1 = geometric core and nearest relatives. R2 = number-theoretic and sequence-based. R3 = parametric, fractal, and controls.",
       "cells": [
-        [0, 0, "cantor_x"], [0, 1, "thuemorse_x"], [0, 2, "stern_brocot_x"], [0, 3, "farey_rank_x"],
-        [1, 0, "ruler_x"], [1, 1, "harmonic_x"], [1, 2, "uniform_x"], [1, 3, "radical_inverse_x"], [1, 4, "dyadic_x"],
-        [2, 0, "bitrev_geometric_x"], [2, 1, "reverse_geometric_x"], [2, 2, "geometric_x"], [2, 3, "mirror_harmonic_x"], [2, 4, "sinusoidal_x"],
-        [3, 0, "sturmian_x"], [3, 1, "golden_x"], [3, 2, "chebyshev_x"], [3, 3, "minkowski_x"], [3, 4, "beta_x"],
-        [4, 1, "minimax_chord_x"], [4, 2, "powerlaw_x"], [4, 3, "arc_length_x"], [4, 4, "random_x"]
-      ]
-    },
-    "four_pillars": {
-      "dimensions": [4, 4],
-      "center": null,
-      "fill": "diagonal",
-      "narrative": "Four fundamental partition design philosophies on the diagonal: (0) Agnostic simplicity (uniform). (1) Scale equivariance (geometric, thesis winner). (2) Classical approximation theory (chebyshev). (3) Curve-specific optimization (minimax_chord). The thesis claim: geometric achieves nearly the performance of minimax_chord while remaining curve-agnostic.",
-      "cells": [
-        [0, 0, "uniform_x"],
-        [1, 1, "geometric_x"],
-        [2, 2, "chebyshev_x"],
-        [3, 3, "minimax_chord_x"]
+        [0, 0, "harmonic_x"], [0, 1, "powerlaw_x"], [0, 2, "arc_length_x"], [0, 3, "minimax_chord_x"], [0, 4, "chebyshev_x"],
+        [1, 0, "reverse_geometric_x"], [1, 1, "mirror_harmonic_x"], [1, 2, "geometric_x"], [1, 3, "uniform_x"], [1, 4, "dyadic_x"],
+        [2, 0, "stern_brocot_x"], [2, 1, "farey_rank_x"], [2, 2, "radical_inverse_x"], [2, 3, "golden_x"], [2, 4, "sturmian_x"],
+        [3, 0, "ruler_x"], [3, 1, "thuemorse_x"], [3, 2, "sinusoidal_x"], [3, 3, "beta_x"], [3, 4, "cantor_x"]
       ]
     }
   }

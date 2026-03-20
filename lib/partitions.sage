@@ -18,7 +18,6 @@ Twenty-three partition kinds:
     powerlaw_x           — density ~ m^{-p}, aggressive left-packing
     golden_x             — golden-ratio Kronecker sequence breakpoints
     cantor_x             — Cantor dust: cells in surviving middle-third intervals
-    minkowski_x          — dyadic-to-Stern-Brocot conjugacy (Minkowski ? function)
     farey_rank_x         — Farey sequence rank-subsampled boundaries
     radical_inverse_x    — van der Corput low-discrepancy sequence
     sturmian_x           — Sturmian word (irrational rotation) widths
@@ -40,7 +39,7 @@ PARTITION_KINDS = ('uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x'
                    'ruler_x', 'sinusoidal_x', 'chebyshev_x', 'thuemorse_x',
                    'bitrev_geometric_x', 'stern_brocot_x', 'reverse_geometric_x',
                    'random_x', 'dyadic_x', 'powerlaw_x', 'golden_x', 'cantor_x',
-                   'minkowski_x', 'farey_rank_x', 'radical_inverse_x',
+                   'farey_rank_x', 'radical_inverse_x',
                    'sturmian_x', 'beta_x', 'arc_length_x', 'minimax_chord_x')
 PARTITION_KIND_ALIASES = {
     'reciprocal_x': 'harmonic_x',
@@ -312,38 +311,6 @@ def _cantor_boundaries(N, a_hir, w_hir, cantor_levels):
             bdry.append(HiR(a_f + w_f * t))
     # Force exact endpoint.
     bdry[-1] = a_hir + w_hir
-    return bdry
-
-
-def _minkowski_boundaries(depth, a_qq, w_qq):
-    """Compute 2^depth+1 boundary points via dyadic-to-Stern-Brocot conjugacy (QQ).
-
-    The inverse Minkowski question-mark function maps j/2^depth to
-    Stern-Brocot mediants.  For each j we descend the Stern-Brocot tree
-    using the binary digits of j (after stripping trailing zeros) to
-    navigate left/right, collecting mediants in QQ.
-    """
-    N = int(2**depth)
-    bdry = [a_qq]
-    for j in range(1, N):
-        # Strip trailing zeros: effective depth and odd core.
-        v = Integer(j).valuation(2)
-        d_eff = depth - v
-        j_stripped = j >> v
-        # Descend Stern-Brocot tree for d_eff levels.
-        pL, qL = Integer(0), Integer(1)
-        pR, qR = Integer(1), Integer(1)
-        med = QQ(0)
-        for bit_pos in range(d_eff - 1, -1, -1):
-            bit = (j_stripped >> bit_pos) & 1
-            med = QQ(pL + pR) / QQ(qL + qR)
-            if bit == 0:
-                pR, qR = pL + pR, qL + qR
-            else:
-                pL, qL = pL + pR, qL + qR
-        val = med
-        bdry.append(a_qq + w_qq * val)
-    bdry.append(a_qq + w_qq)
     return bdry
 
 
@@ -622,8 +589,6 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
     elif kind == 'cantor_x':
         cantor_levels = _coerce_finite_int("cantor_levels", kwargs.get('cantor_levels', 3))
         bdry = _cantor_boundaries(N, a, w, cantor_levels)
-    elif kind == 'minkowski_x':
-        bdry = _minkowski_boundaries(depth, QQ(x_start), QQ(x_width))
     elif kind == 'farey_rank_x':
         farey_order = kwargs.get('farey_order', None)
         if farey_order is not None:
@@ -701,9 +666,6 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
             x_lo = bdry[j]
             x_hi = bdry[j + 1]
         elif kind == 'stern_brocot_x':
-            x_lo = HiR(bdry[j])
-            x_hi = HiR(bdry[j + 1])
-        elif kind == 'minkowski_x':
             x_lo = HiR(bdry[j])
             x_hi = HiR(bdry[j + 1])
         elif kind == 'farey_rank_x':
@@ -791,7 +753,6 @@ PARTITION_ZOO = [
     ('power-law',         '#ff9896', 'powerlaw_x'),
     ('golden',            '#c5b0d5', 'golden_x'),
     ('cantor',            '#c49c94', 'cantor_x'),
-    ('minkowski',         '#e41a1c', 'minkowski_x'),
     ('farey-rank',        '#377eb8', 'farey_rank_x'),
     ('radical-inverse',   '#4daf4a', 'radical_inverse_x'),
     ('sturmian',          '#984ea3', 'sturmian_x'),

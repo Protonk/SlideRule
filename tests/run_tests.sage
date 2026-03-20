@@ -23,6 +23,53 @@ def assert_close(lhs, rhs, tol, message):
         raise AssertionError(f"{message}: lhs={lhs}, rhs={rhs}, tol={tol}")
 
 
+def _sign_sequence_from_opt(opt, q, depth, partition_kind='uniform_x'):
+    """Compute the sorted sign sequence implied by one minimax result."""
+    partition = build_partition(depth, kind=partition_kind)
+    row_map = partition_row_map(partition)
+    _, paths, _ = residue_paths(q, depth)
+
+    signs = []
+    for P in paths:
+        bits = P["bits"]
+        shared_c = float(path_intercept(bits, opt["c0_rat"], opt["delta_rat"], q))
+        free_c = opt["cell_free_intercepts"][bits]
+        disp = shared_c - free_c
+        if disp > 1e-12:
+            sign = 1
+        elif disp < -1e-12:
+            sign = -1
+        else:
+            sign = 0
+        signs.append((float(row_map[bits]["x_lo"]), sign))
+
+    signs.sort()
+    return [sign for _, sign in signs]
+
+
+def _sample_feasible_block_arb(plog_lo, plog_hi, p_num, q_den, tau, c_star, lo, hi):
+    """Empirically check that sampled feasible points form one block."""
+    span = max(float(c_star) - lo, hi - float(c_star)) + 0.02
+    left = float(c_star) - span
+    right = float(c_star) + span
+    flags = []
+    for j in range(17):
+        c_val = left + (right - left) * j / 16.0
+        _, _, worst, _, _ = cell_logerr_arb(
+            plog_lo, plog_hi, p_num, q_den, QQ(c_val)
+        )
+        flags.append(worst <= tau + 1e-10)
+
+    true_idx = [i for i, flag in enumerate(flags) if flag]
+    assert_true(true_idx, "sampled interval should contain at least one feasible point")
+    lo_idx = min(true_idx)
+    hi_idx = max(true_idx)
+    assert_true(
+        all(flags[i] for i in range(lo_idx, hi_idx + 1)),
+        "sampled feasible points should form one contiguous block",
+    )
+
+
 def test_residue_paths():
     edges, paths, edge_index = residue_paths(2, 3)
     assert_true(len(edges) == 12, "unexpected edge count")
@@ -1098,6 +1145,83 @@ def test_nondefault_domain_minimax():
     )
 
 
+def test_arb_feasible_intervals_nested_in_tau():
+    """Cold arb intervals should be nested in tau at depth 3."""
+    q, depth = 3, 3
+    p_num, q_den = 1, 2
+    exponent_q = QQ(p_num) / QQ(q_den)
+    c_init = float(default_c0(exponent_q, 1))
+    partition = build_partition(depth, kind='uniform_x')
+    row_map = partition_row_map(partition)
+    _, paths, _ = residue_paths(q, depth)
+
+    for P in paths:
+        row = row_map[P["bits"]]
+        c_star, f_star = optimal_cell_intercept_arb(
+            row['plog_lo'], row['plog_hi'], p_num, q_den,
+            c_init=c_init, x_start=1)
+        c_star_f = float(c_star)
+
+        prev_lo = None
+        prev_hi = None
+        for tau in [float(f_star), float(f_star + 1e-4),
+                    float(f_star + 1e-3), float(f_star + 1e-2)]:
+            lo, hi = _cell_feasible_interval_arb(
+                row['plog_lo'], row['plog_hi'], p_num, q_den,
+                c_star_f, f_star, tau, x_start=1)
+
+            assert_true(lo <= c_star_f + 1e-12, "left boundary should not cross c_star")
+            assert_true(hi >= c_star_f - 1e-12, "right boundary should not cross c_star")
+
+            if prev_lo is not None:
+                assert_true(
+                    lo <= prev_lo + 1e-9,
+                    f"lo(tau) should be nonincreasing as tau grows on cell {row['index']}",
+                )
+                assert_true(
+                    hi >= prev_hi - 1e-9,
+                    f"hi(tau) should be nondecreasing as tau grows on cell {row['index']}",
+                )
+
+            _sample_feasible_block_arb(
+                row['plog_lo'], row['plog_hi'], p_num, q_den,
+                tau, c_star_f, lo, hi)
+
+            prev_lo = lo
+            prev_hi = hi
+
+
+def test_minimax_warm_intervals_match_cold():
+    """Warm-start interval reuse should match the cold minimax policy."""
+    q, depth = 3, 3
+    cold = optimize_minimax(
+        q, depth, 1, 2,
+        partition_kind='uniform_x',
+        interval_warm_start=False,
+    )
+    warm = optimize_minimax(
+        q, depth, 1, 2,
+        partition_kind='uniform_x',
+        interval_warm_start=True,
+    )
+
+    assert_true(cold['c0_rat'] == warm['c0_rat'], "warm c0 should match cold c0")
+    assert_true(cold['delta_rat'] == warm['delta_rat'], "warm deltas should match cold deltas")
+    assert_true(
+        _sign_sequence_from_opt(cold, q, depth, 'uniform_x')
+        == _sign_sequence_from_opt(warm, q, depth, 'uniform_x'),
+        "warm sign sequence should match cold sign sequence",
+    )
+    assert_true(
+        cold['interval_stats']['warm_state_uses'] == 0,
+        "cold run should not report warm-state uses",
+    )
+    assert_true(
+        warm['interval_stats']['warm_state_uses'] > 0,
+        "warm run should report warm-state uses",
+    )
+
+
 def test_float_cells():
     """float_cells returns correct float tuples matching build_partition."""
     depth = 4
@@ -1130,22 +1254,22 @@ def test_depth_for_N():
 
 
 def test_partition_zoo():
-    """PARTITION_ZOO has 23 entries, all valid kinds, all unique colors."""
-    assert_true(len(PARTITION_ZOO) == 23, "PARTITION_ZOO should have 23 entries")
+    """PARTITION_ZOO has 22 entries, all valid kinds, all unique colors."""
+    assert_true(len(PARTITION_ZOO) == 22, "PARTITION_ZOO should have 22 entries")
     kinds = [kind for _, _, kind in PARTITION_ZOO]
     colors = [color for _, color, _ in PARTITION_ZOO]
     for kind in kinds:
         assert_true(kind in PARTITION_KINDS,
                     "PARTITION_ZOO kind %s not in PARTITION_KINDS" % kind)
-    assert_true(len(set(kinds)) == 23, "PARTITION_ZOO has duplicate kinds")
-    assert_true(len(set(colors)) == 23, "PARTITION_ZOO has duplicate colors")
+    assert_true(len(set(kinds)) == 22, "PARTITION_ZOO has duplicate kinds")
+    assert_true(len(set(colors)) == 22, "PARTITION_ZOO has duplicate colors")
 
 
 # ── Layer 1: Universal contract harness ──────────────────────────────
 
 EXACT_KINDS = frozenset({
     'ruler_x', 'thuemorse_x', 'stern_brocot_x',
-    'minkowski_x', 'farey_rank_x', 'sturmian_x',
+    'farey_rank_x', 'sturmian_x',
 })
 
 CURVE_AWARE_KINDS = frozenset({'arc_length_x', 'minimax_chord_x'})
@@ -1153,7 +1277,7 @@ CURVE_AWARE_KINDS = frozenset({'arc_length_x', 'minimax_chord_x'})
 AFFINE_EQUIVARIANT_KINDS = frozenset({
     'uniform_x', 'ruler_x', 'chebyshev_x', 'thuemorse_x', 'stern_brocot_x',
     'random_x', 'golden_x', 'cantor_x', 'farey_rank_x', 'radical_inverse_x',
-    'sturmian_x', 'beta_x', 'minkowski_x',
+    'sturmian_x', 'beta_x',
 })
 
 
@@ -1371,34 +1495,6 @@ def test_layer4_invalid_inputs():
 
 # ── Phase 2: Layer 3 collapses, equivalences, parameter relations ────
 
-
-def test_minkowski_equals_stern_brocot():
-    """Minkowski and Stern-Brocot produce identical QQ boundaries (depths 1-5)."""
-    for depth in range(1, 6):
-        mk = build_partition(depth, kind='minkowski_x')
-        sb = build_partition(depth, kind='stern_brocot_x')
-        N = 2**depth
-        for j in range(N):
-            assert_true(
-                mk[j]['x_lo'] == sb[j]['x_lo'],
-                f"depth={depth} cell {j}: minkowski x_lo != stern_brocot x_lo "
-                f"({float(mk[j]['x_lo'])} vs {float(sb[j]['x_lo'])})",
-            )
-            assert_true(
-                mk[j]['x_hi'] == sb[j]['x_hi'],
-                f"depth={depth} cell {j}: minkowski x_hi != stern_brocot x_hi "
-                f"({float(mk[j]['x_hi'])} vs {float(sb[j]['x_hi'])})",
-            )
-    # Also verify on a non-default domain.
-    for depth in range(1, 4):
-        mk = build_partition(depth, kind='minkowski_x', x_start=2, x_width=5)
-        sb = build_partition(depth, kind='stern_brocot_x', x_start=2, x_width=5)
-        N = 2**depth
-        for j in range(N):
-            assert_true(
-                mk[j]['x_lo'] == sb[j]['x_lo'],
-                f"depth={depth} [2,7) cell {j}: minkowski x_lo != stern_brocot x_lo",
-            )
 
 
 def test_radical_inverse_base2_equals_uniform():
@@ -2271,6 +2367,8 @@ def main():
         ("nondefault_domain_partition", test_nondefault_domain_partition),
         ("nondefault_domain_evaluator", test_nondefault_domain_evaluator),
         ("nondefault_domain_minimax", test_nondefault_domain_minimax),
+        ("arb_feasible_intervals_nested_in_tau", test_arb_feasible_intervals_nested_in_tau),
+        ("minimax_warm_intervals_match_cold", test_minimax_warm_intervals_match_cold),
         ("float_cells", test_float_cells),
         ("depth_for_N", test_depth_for_N),
         ("partition_zoo", test_partition_zoo),
@@ -2278,7 +2376,6 @@ def main():
         ("layer1_all_kinds_nondefault_domain", test_layer1_all_kinds_nondefault_domain),
         ("layer1_affine_equivariance", test_layer1_affine_equivariance),
         ("layer4_invalid_inputs", test_layer4_invalid_inputs),
-        ("layer3_minkowski_equals_stern_brocot", test_minkowski_equals_stern_brocot),
         ("layer3_radical_inverse_base2_equals_uniform", test_radical_inverse_base2_equals_uniform),
         ("layer3_sturmian_ratio1_equals_uniform", test_sturmian_ratio1_equals_uniform),
         ("layer3_beta_uniform_collapse", test_beta_uniform_collapse),

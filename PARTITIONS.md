@@ -36,14 +36,11 @@ Partitions arising from rational approximation and p-adic structure.
 | Kind | Density | Symmetry | Arithmetic | Description |
 |------|---------|----------|------------|-------------|
 | `stern_brocot_x` | rational-dense | asymmetric | QQ | Iterated mediant insertion |
-| `minkowski_x` | rational-dense | asymmetric | QQ | Dyadic-to-Stern-Brocot conjugacy (? function) |
 | `farey_rank_x` | rational-dense | asymmetric | QQ | Farey sequence rank-subsampled |
 | `radical_inverse_x` | quasi-uniform | asymmetric | HiR | Van der Corput low-discrepancy (default base 2) |
 
 **stern_brocot** inserts mediants between adjacent boundaries at each depth.
-**minkowski** applies the inverse Minkowski question-mark function to map
-dyadic rationals to Stern-Brocot mediants — producing identical boundaries
-after affine scaling to the target domain (see Equivalences). **farey_rank** subsamples the Farey sequence F_Q at
+**farey_rank** subsamples the Farey sequence F_Q at
 equally-spaced ranks. **radical_inverse** generates the van der Corput
 sequence, giving low-discrepancy quasi-uniform spacing.
 
@@ -166,20 +163,16 @@ Parameters:
 
 ## Equivalences
 
-Two known boundary-array identities:
+One known boundary-array identity:
 
-1. **`minkowski_x` = `stern_brocot_x`** (unconditional) — The inverse
-   Minkowski question-mark function maps dyadic rationals to Stern-Brocot
-   mediants, producing identical boundary arrays at every depth.
-
-2. **`radical_inverse_x(base=2)` = `uniform_x`** — The van der Corput
+1. **`radical_inverse_x(base=2)` = `uniform_x`** — The van der Corput
    sequence in base 2, when sorted, produces equally-spaced points.
 
 ---
 
 ## Quick Reference
 
-All 23 partitions in zoo order:
+All 22 partitions in zoo order:
 
 | # | Kind | Display | Color | Group | Density | Arith | Curve-aware |
 |---|------|---------|-------|-------|---------|-------|-------------|
@@ -199,10 +192,9 @@ All 23 partitions in zoo order:
 | 13 | `powerlaw_x` | power-law | `#ff9896` | E | left-dense | HiR | no |
 | 14 | `golden_x` | golden | `#c5b0d5` | D | quasi-uniform | HiR | no |
 | 15 | `cantor_x` | cantor | `#c49c94` | C | fractal | HiR | no |
-| 16 | `minkowski_x` | minkowski | `#e41a1c` | B | rational-dense | QQ | no |
-| 17 | `farey_rank_x` | farey-rank | `#377eb8` | B | rational-dense | QQ | no |
-| 18 | `radical_inverse_x` | radical-inverse | `#4daf4a` | B | quasi-uniform | HiR | no |
-| 19 | `sturmian_x` | sturmian | `#984ea3` | D | quasi-uniform | QQ | no |
-| 20 | `beta_x` | beta | `#ff7f00` | E | right-dense | HiR | no |
-| 21 | `arc_length_x` | arc-length | `#a65628` | F | left-dense | HiR | yes |
-| 22 | `minimax_chord_x` | minimax-chord | `#f781bf` | F | left-dense | HiR | yes |
+| 16 | `farey_rank_x` | farey-rank | `#377eb8` | B | rational-dense | QQ | no |
+| 17 | `radical_inverse_x` | radical-inverse | `#4daf4a` | B | quasi-uniform | HiR | no |
+| 18 | `sturmian_x` | sturmian | `#984ea3` | D | quasi-uniform | QQ | no |
+| 19 | `beta_x` | beta | `#ff7f00` | E | right-dense | HiR | no |
+| 20 | `arc_length_x` | arc-length | `#a65628` | F | left-dense | HiR | yes |
+| 21 | `minimax_chord_x` | minimax-chord | `#f781bf` | F | left-dense | HiR | yes |

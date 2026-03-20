@@ -197,7 +197,8 @@ def build_intercept_matrix(paths, q, depth=None, layer_dependent=False):
     return A
 
 
-def _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau, tol=1e-13):
+def _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau, tol=1e-13,
+                            interval_state=None, stats=None, return_state=False):
     """
     Find the interval [lo, hi] where cell error f(c) <= tau.
 
@@ -205,19 +206,28 @@ def _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau, tol=1e-13):
     Returns (lo, hi) or None if tau < f_star (infeasible).
     """
     if tau < f_star - tol:
+        if return_state:
+            return None, None
         return None
 
     def f(c_val):
         _, _, worst, _ = cell_exact_logerr(bits, p_num, q_den, QQ(c_val))
         return worst
 
-    return _bisect_feasible_interval(f, float(c_star), tau, tol)
+    return _bisect_feasible_interval(
+        f, float(c_star), tau, tol,
+        interval_state=interval_state, stats=stats,
+        return_state=return_state)
 
 
 def _cell_feasible_interval_arb(plog_lo, plog_hi, p_num, q_den,
-                                c_star, f_star, tau, tol=1e-13, x_start=1):
+                                c_star, f_star, tau, tol=1e-13, x_start=1,
+                                interval_state=None, stats=None,
+                                return_state=False):
     """Like _cell_feasible_interval but using the arb evaluator."""
     if tau < f_star - tol:
+        if return_state:
+            return None, None
         return None
 
     def f(c_val):
@@ -225,52 +235,227 @@ def _cell_feasible_interval_arb(plog_lo, plog_hi, p_num, q_den,
                                              x_start=x_start)
         return worst
 
-    return _bisect_feasible_interval(f, float(c_star), tau, tol)
+    return _bisect_feasible_interval(
+        f, float(c_star), tau, tol,
+        interval_state=interval_state, stats=stats,
+        return_state=return_state)
+
+def _new_interval_stats():
+    """Counters for interval-construction work inside the minimax solver."""
+    return {
+        "objective_evals": 0,
+        "cold_searches": 0,
+        "warm_state_uses": 0,
+        "warm_boundary_reuses": 0,
+        "warm_expansions": 0,
+        "warm_fallbacks": 0,
+    }
 
 
-def _bisect_feasible_interval(f, c_star_f, tau, tol=1e-13):
-    """Shared bisection logic for feasible interval computation."""
-    # Find left boundary
+def _bump_interval_stat(stats, key, amount=1):
+    """Increment one interval-search counter when stats collection is active."""
+    if stats is not None:
+        stats[key] = stats.get(key, 0) + amount
+
+
+def _eval_interval_objective(f, c_val, stats=None):
+    """Evaluate the interval objective and count the call."""
+    _bump_interval_stat(stats, "objective_evals")
+    return f(c_val)
+
+
+def _cold_left_search(f, c_star_f, tau, stats=None):
+    """Cold search for an infeasible point left of the feasible interval."""
+    _bump_interval_stat(stats, "cold_searches")
     step = 0.01
     search_lo = c_star_f - step
     for _ in range(50):
-        if f(search_lo) > tau:
+        if _eval_interval_objective(f, search_lo, stats) > tau:
             break
         step *= 2
         search_lo = c_star_f - step
+    return search_lo
 
-    a, b = search_lo, c_star_f
-    for _ in range(80):
-        if b - a < tol:
-            break
-        mid = (a + b) / 2.0
-        if f(mid) > tau:
-            a = mid
-        else:
-            b = mid
-    lo_boundary = b
 
-    # Find right boundary
+def _cold_right_search(f, c_star_f, tau, stats=None):
+    """Cold search for an infeasible point right of the feasible interval."""
+    _bump_interval_stat(stats, "cold_searches")
     step = 0.01
     search_hi = c_star_f + step
     for _ in range(50):
-        if f(search_hi) > tau:
+        if _eval_interval_objective(f, search_hi, stats) > tau:
             break
         step *= 2
         search_hi = c_star_f + step
+    return search_hi
 
-    a, b = c_star_f, search_hi
+
+def _bisect_left_boundary(f, tau, outside, inside, tol=1e-13, stats=None):
+    """Bisect a left boundary bracket with outside < inside."""
+    a, b = outside, inside
     for _ in range(80):
         if b - a < tol:
             break
         mid = (a + b) / 2.0
-        if f(mid) > tau:
+        if _eval_interval_objective(f, mid, stats) > tau:
+            a = mid
+        else:
+            b = mid
+    return b
+
+
+def _bisect_right_boundary(f, tau, inside, outside, tol=1e-13, stats=None):
+    """Bisect a right boundary bracket with inside < outside."""
+    a, b = inside, outside
+    for _ in range(80):
+        if b - a < tol:
+            break
+        mid = (a + b) / 2.0
+        if _eval_interval_objective(f, mid, stats) > tau:
             b = mid
         else:
             a = mid
-    hi_boundary = a
+    return a
 
-    return (lo_boundary, hi_boundary)
+
+def _warm_left_bracket(f, c_star_f, tau, tol, interval_state, stats=None):
+    """Attempt a warm-start bracket for the left boundary."""
+    if interval_state is None:
+        return None
+
+    prev_tau = interval_state.get("tau")
+    prev_lo = interval_state.get("lo")
+    prev_search_lo = interval_state.get("search_lo")
+    if prev_tau is None or prev_lo is None or prev_search_lo is None:
+        return None
+
+    _bump_interval_stat(stats, "warm_state_uses")
+
+    if tau <= prev_tau + tol:
+        lo_val = _eval_interval_objective(f, prev_lo, stats)
+        if lo_val <= tau:
+            _bump_interval_stat(stats, "warm_boundary_reuses")
+            return {"boundary": prev_lo, "search_lo": prev_search_lo}
+        return {"outside": prev_lo, "inside": c_star_f, "search_lo": prev_lo}
+
+    inside_val = _eval_interval_objective(f, prev_lo, stats)
+    if inside_val > tau:
+        return None
+
+    outside_val = _eval_interval_objective(f, prev_search_lo, stats)
+    if outside_val > tau:
+        return {"outside": prev_search_lo, "inside": prev_lo,
+                "search_lo": prev_search_lo}
+
+    step = max(prev_lo - prev_search_lo, 0.01)
+    if step <= 0:
+        return None
+
+    search_lo = prev_search_lo
+    for _ in range(50):
+        candidate = search_lo - step
+        if _eval_interval_objective(f, candidate, stats) > tau:
+            _bump_interval_stat(stats, "warm_expansions")
+            return {"outside": candidate, "inside": prev_lo,
+                    "search_lo": candidate}
+        search_lo = candidate
+        step *= 2
+
+    return None
+
+
+def _warm_right_bracket(f, c_star_f, tau, tol, interval_state, stats=None):
+    """Attempt a warm-start bracket for the right boundary."""
+    if interval_state is None:
+        return None
+
+    prev_tau = interval_state.get("tau")
+    prev_hi = interval_state.get("hi")
+    prev_search_hi = interval_state.get("search_hi")
+    if prev_tau is None or prev_hi is None or prev_search_hi is None:
+        return None
+
+    _bump_interval_stat(stats, "warm_state_uses")
+
+    if tau <= prev_tau + tol:
+        hi_val = _eval_interval_objective(f, prev_hi, stats)
+        if hi_val <= tau:
+            _bump_interval_stat(stats, "warm_boundary_reuses")
+            return {"boundary": prev_hi, "search_hi": prev_search_hi}
+        return {"inside": c_star_f, "outside": prev_hi, "search_hi": prev_hi}
+
+    inside_val = _eval_interval_objective(f, prev_hi, stats)
+    if inside_val > tau:
+        return None
+
+    outside_val = _eval_interval_objective(f, prev_search_hi, stats)
+    if outside_val > tau:
+        return {"inside": prev_hi, "outside": prev_search_hi,
+                "search_hi": prev_search_hi}
+
+    step = max(prev_search_hi - prev_hi, 0.01)
+    if step <= 0:
+        return None
+
+    search_hi = prev_search_hi
+    for _ in range(50):
+        candidate = search_hi + step
+        if _eval_interval_objective(f, candidate, stats) > tau:
+            _bump_interval_stat(stats, "warm_expansions")
+            return {"inside": prev_hi, "outside": candidate,
+                    "search_hi": candidate}
+        search_hi = candidate
+        step *= 2
+
+    return None
+
+
+def _bisect_feasible_interval(f, c_star_f, tau, tol=1e-13,
+                              interval_state=None, stats=None,
+                              return_state=False):
+    """Shared bisection logic for feasible interval computation."""
+    left = _warm_left_bracket(f, c_star_f, tau, tol, interval_state, stats=stats)
+    if left is None:
+        if interval_state is not None:
+            _bump_interval_stat(stats, "warm_fallbacks")
+        search_lo = _cold_left_search(f, c_star_f, tau, stats=stats)
+        lo_boundary = _bisect_left_boundary(
+            f, tau, search_lo, c_star_f, tol=tol, stats=stats)
+    elif "boundary" in left:
+        search_lo = left["search_lo"]
+        lo_boundary = left["boundary"]
+    else:
+        search_lo = left["search_lo"]
+        lo_boundary = _bisect_left_boundary(
+            f, tau, left["outside"], left["inside"], tol=tol, stats=stats)
+
+    right = _warm_right_bracket(f, c_star_f, tau, tol, interval_state, stats=stats)
+    if right is None:
+        if interval_state is not None:
+            _bump_interval_stat(stats, "warm_fallbacks")
+        search_hi = _cold_right_search(f, c_star_f, tau, stats=stats)
+        hi_boundary = _bisect_right_boundary(
+            f, tau, c_star_f, search_hi, tol=tol, stats=stats)
+    elif "boundary" in right:
+        search_hi = right["search_hi"]
+        hi_boundary = right["boundary"]
+    else:
+        search_hi = right["search_hi"]
+        hi_boundary = _bisect_right_boundary(
+            f, tau, right["inside"], right["outside"], tol=tol, stats=stats)
+
+    interval = (lo_boundary, hi_boundary)
+    next_state = {
+        "tau": float(tau),
+        "lo": lo_boundary,
+        "hi": hi_boundary,
+        "search_lo": search_lo,
+        "search_hi": search_hi,
+    }
+    if return_state:
+        return interval, next_state
+
+    return interval
 
 
 def _lp_feasibility(A, lo_bounds, hi_bounds):
@@ -335,35 +520,60 @@ def _lp_minimize_max_delta(A, lo_bounds, hi_bounds):
     return False, None, None
 
 
-def _build_feasible_intervals(cell_optima, p_num, q_den, tau):
+def _build_feasible_intervals(cell_optima, p_num, q_den, tau,
+                              interval_state=None, stats=None,
+                              return_state=False):
     """Build per-cell feasible intercept intervals at a fixed target tau."""
     lo_bounds = []
     hi_bounds = []
-    for bits, c_star, f_star in cell_optima:
-        interval = _cell_feasible_interval(bits, p_num, q_den, c_star, f_star, tau)
+    next_cells = []
+    prev_cells = interval_state.get("cells") if interval_state is not None else None
+    for i, (bits, c_star, f_star) in enumerate(cell_optima):
+        prev_cell = prev_cells[i] if prev_cells is not None and i < len(prev_cells) else None
+        interval, next_cell = _cell_feasible_interval(
+            bits, p_num, q_den, c_star, f_star, tau,
+            interval_state=prev_cell, stats=stats, return_state=True)
         if interval is None:
+            if return_state:
+                return None, None
             return None
         lo_bounds.append(interval[0])
         hi_bounds.append(interval[1])
-    return lo_bounds, hi_bounds
+        next_cells.append(next_cell)
+    result = (lo_bounds, hi_bounds)
+    if return_state:
+        return result, {"tau": float(tau), "cells": next_cells}
+    return result
 
 
-def _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau, x_start=1):
+def _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau, x_start=1,
+                                  interval_state=None, stats=None,
+                                  return_state=False):
     """Build per-cell feasible intervals using the arb evaluator.
 
     cell_optima_arb entries: (plog_lo, plog_hi, c_star, f_star).
     """
     lo_bounds = []
     hi_bounds = []
-    for plog_lo, plog_hi, c_star, f_star in cell_optima_arb:
-        interval = _cell_feasible_interval_arb(
+    next_cells = []
+    prev_cells = interval_state.get("cells") if interval_state is not None else None
+    for i, (plog_lo, plog_hi, c_star, f_star) in enumerate(cell_optima_arb):
+        prev_cell = prev_cells[i] if prev_cells is not None and i < len(prev_cells) else None
+        interval, next_cell = _cell_feasible_interval_arb(
             plog_lo, plog_hi, p_num, q_den, c_star, f_star, tau,
-            x_start=x_start)
+            x_start=x_start, interval_state=prev_cell, stats=stats,
+            return_state=True)
         if interval is None:
+            if return_state:
+                return None, None
             return None
         lo_bounds.append(interval[0])
         hi_bounds.append(interval[1])
-    return lo_bounds, hi_bounds
+        next_cells.append(next_cell)
+    result = (lo_bounds, hi_bounds)
+    if return_state:
+        return result, {"tau": float(tau), "cells": next_cells}
+    return result
 
 
 def _snap_policy_vector(x_solution, q, dyadic_bits, depth=None, layer_dependent=False):
@@ -423,7 +633,7 @@ def _worst_cell_metadata(metrics, row_map):
 
 def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
                      layer_dependent=False, partition_kind=None,
-                     x_start=1, x_width=1):
+                     x_start=1, x_width=1, interval_warm_start=True):
     """
     Numerical minimax solver via bisection on target error + LP feasibility.
 
@@ -436,6 +646,10 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
 
     When partition_kind is specified, uses the arbitrary-cell evaluator
     with the given partition geometry.
+
+    interval_warm_start reuses previously computed per-cell interval
+    boundaries across bisection steps. Disable it to compare against the
+    original cold interval builder.
 
     Returns a policy dict compatible with optimize_shared_delta output.
     """
@@ -498,12 +712,27 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
     repair_used = False
     repair_succeeded = False
     snap_tol = max(1e-8, 10.0 * tol)
+    interval_state = None
+    interval_stats = _new_interval_stats()
 
     def _build_intervals(tau_val):
+        nonlocal interval_state
+        warm_state = interval_state if interval_warm_start else None
         if use_arb:
-            return _build_feasible_intervals_arb(cell_optima_arb, p_num, q_den, tau_val,
-                                                  x_start=x_start)
-        return _build_feasible_intervals(cell_optima, p_num, q_den, tau_val)
+            intervals, next_state = _build_feasible_intervals_arb(
+                cell_optima_arb, p_num, q_den, tau_val,
+                x_start=x_start, interval_state=warm_state,
+                stats=interval_stats, return_state=True)
+        else:
+            intervals, next_state = _build_feasible_intervals(
+                cell_optima, p_num, q_den, tau_val,
+                interval_state=warm_state, stats=interval_stats,
+                return_state=True)
+        if interval_warm_start and intervals is not None:
+            interval_state = next_state
+        else:
+            interval_state = None
+        return intervals
 
     def _eval_metrics(c0, delta):
         if use_arb:
@@ -652,6 +881,8 @@ def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
         "partition_kind": partition_kind,
         "metrics": metrics,
         "cell_free_intercepts": cell_free_intercepts,
+        "interval_warm_start": bool(interval_warm_start),
+        "interval_stats": dict(interval_stats),
     }
     result.update(_worst_cell_metadata(metrics, row_map))
     return result
@@ -679,7 +910,8 @@ def _shared_objective(params, paths, p_num, q_den, q, dyadic_bits):
 def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
                           maxiter=5000, n_restarts=3, seed=42,
                           dyadic_bits=12, method='minimax', layer_dependent=False,
-                          partition_kind=None, x_start=1, x_width=1):
+                          partition_kind=None, x_start=1, x_width=1,
+                          interval_warm_start=True):
     """
     Optimize c0 and delta to minimize worst-case error over all leaf cells.
 
@@ -695,7 +927,8 @@ def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
         return optimize_minimax(q, depth, p_num, q_den, dyadic_bits=dyadic_bits,
                                 layer_dependent=layer_dependent,
                                 partition_kind=partition_kind,
-                                x_start=x_start, x_width=x_width)
+                                x_start=x_start, x_width=x_width,
+                                interval_warm_start=interval_warm_start)
     if partition_kind is not None:
         raise ValueError("partition_kind requires method='minimax'")
     if layer_dependent:

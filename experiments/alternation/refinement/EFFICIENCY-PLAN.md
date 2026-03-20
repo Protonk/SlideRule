@@ -14,6 +14,24 @@ sign sequence at depth d and d+1. The sign sequence at depth d requires:
 
 The sign of cell j is `sgn(path_intercept_j - free_cell_intercept_j)`.
 
+## Invariants and baseline
+
+The authoritative configuration for this project is:
+
+- `tol=1e-10`
+- `dyadic_bits=20`
+- `compute_signs` calling `optimize_minimax` directly
+
+The optimization target is the per-depth sign list at those fixed solver
+parameters. The split sequence is derived from the sign lists via
+`refinement_splits`, so preserving the signs preserves the digits.
+
+In practice, correctness means preserving the canonical snapped policy
+produced by `optimize_minimax`, not merely landing on a policy with similar
+error. Different bisection/bracketing mechanics are acceptable only if the
+final snapped policy is identical, because sensitive cells can flip sign when
+the snap lands differently.
+
 ### Where the time goes
 
 `optimize_minimax` (in `lib/optimize.sage:424`) runs ~32 bisection steps at
@@ -28,9 +46,9 @@ previous digits combined.
 
 ---
 
-## What we did (Strategies 1 and 2)
+## What we did
 
-### Strategy 1: Dedicated compute_signs with reused cell optima
+### Dedicated compute_signs with reused cell optima
 
 **What:** Wrote `compute_signs.sage`, a function that calls `optimize_minimax`
 directly and extracts signs without any redundant work.
@@ -66,7 +84,7 @@ increases with depth because the eliminated passes are O(2^d) while the
 bisection loop (which we did not change) is also O(2^d) — so eliminating
 the passes saves a constant fraction of total work.
 
-### Strategy 2: Disk caching
+### Disk caching
 
 **What:** After computing signs at depth d, write the full result (signs,
 solver metadata, policy) to a JSON file. Before computing, check if the cache
@@ -91,28 +109,37 @@ pays only the cost of depths 11 and 12.
 
 ## Measured results
 
-All times: uniform_x, q=3, LI, exponent=1/2. "Before" is the original path
-through `compute_case` + `build_percell_rows` (via `optimize_shared_delta`
-with dyadic_bits=12). "After" is `compute_signs` calling `optimize_minimax`
-directly (dyadic_bits=20).
+All times below are for `uniform_x`, `q=3`, LI, exponent `1/2`.
 
-| depth | N     | before   | after    | speedup | cumul before | cumul after |
-|-------|-------|----------|----------|---------|--------------|-------------|
-| 3     | 8     | 5s       | 5s       | 1.0x    | 5s           | 5s          |
-| 4     | 16    | 10s      | 10s      | 1.0x    | 15s          | 15s         |
-| 5     | 32    | 20s      | 19s      | 1.1x    | 35s          | 34s         |
-| 6     | 64    | 40s      | 39s      | 1.0x    | 75s          | 73s         |
-| 7     | 128   | 80s      | 78s      | 1.0x    | 155s         | 151s        |
-| 8     | 256   | 160s     | 159s     | 1.0x    | 315s         | 310s        |
-| 9     | 512   | 324s     | 321s     | 1.0x    | 639s         | 631s        |
-| 10    | 1024  | 642s     | 547s     | 1.17x   | 1281s        | 1178s       |
-| 11    | 2048  | 1277s    | 783s     | 1.63x   | 2558s        | 1961s       |
-| 12    | 4096  | 2572s    | 1577s    | 1.63x   | 5130s        | 3538s       |
-| 13    | 8192  | 5457s    | 3208s    | 1.70x   | 10587s       | 6746s       |
+The authoritative baseline to optimize against is the fresh per-depth cost of
+the current `compute_signs` path at `tol=1e-10`, `dyadic_bits=20`.
 
-**Fresh 10-digit total:** 10587s → 6595s (1.6x overall, 1.7x at depth 13).
+The historical "before" column is included only as context for the Strategy 1
+win. It came from the older path through `compute_case` +
+`build_percell_rows` (via `optimize_shared_delta`, default `dyadic_bits=12`)
+and should not be treated as the current semantic baseline.
 
-**Cached re-run:** <1 second for any previously computed depth range.
+| depth | N     | before   | after    | speedup |
+|-------|-------|----------|----------|---------|
+| 3     | 8     | 5s       | 5s       | 1.0x    |
+| 4     | 16    | 10s      | 10s      | 1.0x    |
+| 5     | 32    | 20s      | 19s      | 1.1x    |
+| 6     | 64    | 40s      | 39s      | 1.0x    |
+| 7     | 128   | 80s      | 78s      | 1.0x    |
+| 8     | 256   | 160s     | 159s     | 1.0x    |
+| 9     | 512   | 324s     | 321s     | 1.0x    |
+| 10    | 1024  | 642s     | 547s     | 1.17x   |
+| 11    | 2048  | 1277s    | 783s     | 1.63x   |
+| 12    | 4096  | 2572s    | 1577s    | 1.63x   |
+| 13    | 8192  | 5457s    | 3208s    | 1.70x   |
+
+**Fresh per-depth total (d=3..13):** `10587s → 6746s` (~1.57x overall).
+
+**Mixed cached/fresh run:** `6595s` in a run where depths 3-7 were cache hits.
+This is not a comparable full-fresh total and should not be used as the
+baseline for the next optimization pass.
+
+**Cached re-run:** `<1 second` for any previously computed depth range.
 
 ### Where the speedup came from
 
@@ -142,78 +169,95 @@ not the bisection loop.
 
 ---
 
-## Remaining attack surface
+## New Strategy: Warm-start interval construction inside `optimize_minimax`
 
-These are strategies we identified but did not implement. They are ordered
-by expected value (payoff × feasibility).
+This is the next attempt.
 
-### Interval-bound reuse across bisection steps
+The objective is to speed up `_build_feasible_intervals_arb` and
+`_bisect_feasible_interval` without changing the solver contract:
 
-The profiled hot path is `_build_feasible_intervals_arb`, which rebuilds
-every cell's feasible intercept interval from scratch at each bisection step.
-`_bisect_feasible_interval` restarts its boundary search from a fixed
-`step=0.01` every time.
+- same bisection over `tau`
+- same LP feasibility test
+- same stage-2 regularization
+- same dyadic snap and repair
+- same final snapped policy
 
-The feasible interval for each cell is monotone in τ: as τ increases, the
-interval expands; as τ decreases, it contracts. Previously computed interval
-endpoints are valid warm starts for nearby τ values during bisection.
+The current implementation recomputes each cell's feasible interval from
+scratch at every bisection step and each boundary search restarts from
+`c_star ± 0.01`. That throws away structure the solver already learned on the
+previous step.
 
-**Expected gain:** Potentially large — directly attacks the profiled hot path
-rather than reducing the number of times it is invoked.
+The working hypothesis is that, for a fixed cell, the feasible set in
+intercept-space is a nested interval around `c_star`: as `tau` increases the
+interval expands, and as `tau` decreases it contracts. If that holds on the
+actual arb path, previously computed boundaries are valid warm starts for
+nearby `tau` values.
 
-**Key files:** `lib/optimize.sage`, functions `_build_feasible_intervals_arb`
-and `_bisect_feasible_interval`.
+This should not be treated as an unverified theorem of the implementation.
+Before building on it, verify empirically at `d=3` using the actual
+`_cell_feasible_interval_arb` / `_bisect_feasible_interval` path that:
 
-### Reduce bisection tolerance
+- `lo(tau)` is nonincreasing as `tau` grows
+- `hi(tau)` is nondecreasing as `tau` grows
+- the cold-path feasible set behaves like a single interval around `c_star`
 
-Default tol=1e-10 produces ~32 bisection steps. At tol=1e-6, observed ~19
-steps at q=3, d=3 — a ~1.7x reduction in iterations.
+The post-bisection snap/repair logic in `optimize_minimax` is downstream of
+interval construction and does not affect these per-cell interval checks, but
+the candidate structure inside `cell_logerr_arb` still makes the empirical
+gate worthwhile.
 
-The sign sequence only needs `sgn(displacement)`. Most displacements are
-much larger than the tolerance gap, so a coarser tolerance often produces
-the same sign sequence.
+**Expected implementation:**
 
-**Risk:** Different tolerance → different τ target → different stage-2 LP
-→ different snap → potentially different signs. The correct validation is
-to compare sign sequences directly across tolerance levels, not to compare
-displacement magnitudes to tol (dimensionally wrong — tol is in error space,
-not intercept space).
+1. Keep interval state inside `optimize_minimax` for previously evaluated
+   `tau` values.
+2. Verify the nesting/monotonicity assumptions empirically at `d=3` before
+   enabling warm starts.
+3. Extend `_build_feasible_intervals_arb` to accept optional warm-start
+   boundary state.
+4. Extend `_bisect_feasible_interval` to reuse a prior bracket instead of
+   always restarting from `c_star ± 0.01`.
+5. When `tau` decreases, shrink from the previously known feasible interval.
+6. When `tau` increases, expand outward from the prior boundary rather than
+   from `c_star`.
+7. Preserve a cold-path fallback whenever a warm bracket fails a validity
+   check.
+8. Add lightweight counters or timing hooks so the reduction in scalar
+   boundary evaluations can be measured directly.
 
-**Expected gain:** ~1.7x reduction in bisection steps. Actual wall-clock gain
-depends on how much of per-step cost is interval-building vs LP. Needs
-empirical profiling at high depth.
+**Why this:** It attacks the profiled hot path directly, preserves
+the solver semantics we now consider load-bearing, and compounds with any
+later parallelism.
 
-### Safe bracket reuse from previous depth
+**Validation standard:** Compare old vs new serialized snapped policy and sign
+lists before trusting any timing result. Matching error summaries alone are
+not enough. The `d=3` interval-nesting check is a gate before implementing
+warm-start logic.
 
-The depth-d and depth-(d+1) problems have different optima, but the depth-d
-solution provides information. Two safe options:
+**Iteration budget:** Use cheap and moderate depths to iterate.
 
-1. Evaluate the depth-d policy at depth d+1 to get a valid tau_hi candidate.
-2. Test LP feasibility at τ = τ*_d to determine which side of the bracket
-   it belongs to.
+- Exactness first on small depths, then one moderate depth.
+- First confirm the interval-nesting assumption empirically at `d=3`.
+- Timing first at `d=7`, then `d=8` if the result is clean.
+- Use `d=9` as a confirmation point only if `d=7/8` already show a real win.
+- Avoid spending depth-13 budget until the implementation already looks
+  credible.
 
-Using τ*_d directly as tau_lo is **not safe** — the depth-(d+1) optimum can
-be above or below τ*_d.
-
-**Expected gain:** Modest — saves a few bisection steps per depth.
+## Other future options
 
 ### Within-depth parallelism
 
 Per-cell work (computing cell optima, building feasible intervals) is
 embarrassingly parallel. At depth 13, there are 8192 independent cells.
 
-Across-depth parallelism is limited: depth 13 alone is 3208s out of 6595s
-total (49%), so even with unlimited cores, across-depth parallelism gives
-at most ~2x. Within-depth parallelism attacks the actual bottleneck.
+Across-depth parallelism is limited: depth 13 alone is 3208s out of the
+6746s fresh per-depth total (~48%), so even with unlimited cores,
+across-depth parallelism gives at most ~2x. Within-depth parallelism attacks
+the actual bottleneck.
 
 **Expected gain:** Linear in cores for the parallelizable fraction.
 
 **Caveat:** Sage global state may require subprocess isolation.
 
-### Withdrawn: sign-only LP
-
-Proposed solving a single coarse LP and certifying signs by checking all
-displacements are far from zero. Not sound: the canonical sign sequence is
-defined by the full lexicographic solve (bisection + stage-2 + snap + repair).
-A rough LP produces a different policy with potentially different signs.
-Certifying the rough policy's signs does not certify the canonical policy's.
+**Position in queue:** Acceptable and orthogonal, but second to the warm-start
+solver work. If warm-starting preserves exactness yet the wall-clock gain is
+modest, subprocess parallelism becomes the natural next layer.

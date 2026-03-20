@@ -34,8 +34,6 @@ zoo_names = {kind: name for name, _color, kind in PARTITION_ZOO}
 rows = []
 with open(CSV_PATH) as f:
     for r in csv.DictReader(f):
-        if r['kind'] == 'minkowski_x':
-            continue
         r['area_above'] = float(r['area_above'])
         r['area_below'] = float(r['area_below'])
         r['share_above'] = float(r['share_above'])

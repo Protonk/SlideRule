@@ -5,7 +5,11 @@ Computes the sign of (path_intercept - free_cell_intercept) for every cell
 by calling optimize_minimax directly, reusing its internal cell_free_intercepts
 map. Skips best_single_intercept and free_per_cell_metrics entirely.
 
-Caches results to disk for incremental extension.
+Cache layout:
+    results/<kind>/q<q>_<ld>_tol<tol>_db<db>.jsonl
+
+Each line in the JSONL file is one depth's sign data. To extend to a deeper
+depth, append a line. To read a specific depth, scan for it.
 
 Not intended to be run directly.
 """
@@ -31,31 +35,42 @@ CACHE_DIR = pathing('experiments', 'alternation', 'refinement', 'results')
 
 # ── Cache ────────────────────────────────────────────────────────────
 
-def _cache_path(kind, q, depth, p_num, q_den, layer_dependent,
-                tol, dyadic_bits):
-    """Return the path to the cache file for this case."""
+def _cache_path(kind, q, layer_dependent, tol, dyadic_bits):
+    """Return the JSONL cache file path for this (kind, q, ld, solver) combo."""
     ld_tag = 'LD' if layer_dependent else 'LI'
-    subdir = '%s_q%d_%s' % (kind, q, ld_tag)
-    fname = 'signs_d%d_tol%.0e_db%d.json' % (depth, tol, dyadic_bits)
-    return os.path.join(CACHE_DIR, subdir, fname)
+    fname = 'q%d_%s_tol%.0e_db%d.jsonl' % (q, ld_tag, tol, dyadic_bits)
+    return os.path.join(CACHE_DIR, kind, fname)
 
 
-def _load_cache(path):
-    """Load cached sign data if it exists and matches solver version."""
+def _load_cache_index(path):
+    """Load all cached entries from a JSONL file, indexed by depth.
+
+    Returns a dict {depth: record} or empty dict if file doesn't exist.
+    Skips lines with mismatched solver_version.
+    """
+    index = {}
     if not os.path.exists(path):
-        return None
+        return index
     with open(path, 'r') as f:
-        data = json.load(f)
-    if data.get('solver_version') != SOLVER_VERSION:
-        return None
-    return data
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get('solver_version') != SOLVER_VERSION:
+                continue
+            index[record['depth']] = record
+    return index
 
 
-def _save_cache(path, data):
-    """Write sign data to cache."""
+def _append_cache(path, record):
+    """Append one depth's record to the JSONL cache file."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w') as f:
-        json.dump(data, f, indent=2)
+    with open(path, 'a') as f:
+        f.write(json.dumps(record, separators=(',', ':')) + '\n')
 
 
 def _serialize_policy(c0_rat, delta_rat):
@@ -82,15 +97,15 @@ def compute_signs(q, depth, p_num, q_den, kind='uniform_x',
       - delta: snapped delta dict (as string keys/values)
       - tau_continuous, tau_snapped: solver metadata
     """
-    cpath = _cache_path(kind, q, depth, p_num, q_den, layer_dependent,
-                        tol, dyadic_bits)
+    cpath = _cache_path(kind, q, layer_dependent, tol, dyadic_bits)
 
     if use_cache:
-        cached = _load_cache(cpath)
-        if cached is not None:
-            cached['cached'] = True
-            cached['elapsed'] = 0.0
-            return cached
+        index = _load_cache_index(cpath)
+        if depth in index:
+            record = index[depth]
+            record['cached'] = True
+            record['elapsed'] = 0.0
+            return record
 
     t0 = time.time()
 
@@ -155,6 +170,6 @@ def compute_signs(q, depth, p_num, q_den, kind='uniform_x',
     result.update(_serialize_policy(c0_rat, delta_rat))
 
     if use_cache:
-        _save_cache(cpath, result)
+        _append_cache(cpath, result)
 
     return result
