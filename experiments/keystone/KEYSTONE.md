@@ -26,20 +26,19 @@ any other position, so all cells of the same log-width face the same task.
 
 #### Repo Support
 
-Planned artifact: `coordinate_uniqueness.sage`
+Artifact: `coordinate_uniqueness.sage` -> `results/coordinate_uniqueness.png`
 
-Target exhibit:
-
-- compare per-cell difficulty in linear coordinates against log coordinates
-- show that equal-log-width cells flatten the difficulty profile in a way
-  linear cells do not
-
-Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+Computes the peak chord error of log2(x) on each cell for 6 partition kinds
+at depth 6 (N=64). Geometric produces a perfectly flat line (max/min ratio =
+1.0000000000). Uniform peaks near x=1 at ~5x the geometric level. Harmonic
+inverts the curve. Chebyshev and ruler oscillate wildly. The flat line is
+the exhibit: it is a direct consequence of log being the coordinate where
+the approximation problem is translation-invariant under scaling.
 
 #### Status
 
-Scaffolded only. This claim is stated in the thesis, but the repo does not
-yet contain a dedicated figure or result artifact exhibiting it.
+Exhibited. The flat geometric line and the position-dependent profiles of
+all other partition kinds directly demonstrate the claim.
 
 #### Literature Linkage
 
@@ -67,21 +66,26 @@ organizes the coordinate.
 
 #### Repo Support
 
-Planned artifact: `surrogacy_test.sage`
+Artifact: `surrogacy_test.sage` -> `results/surrogacy_test.png`
 
-Target exhibit:
+Compares four surrogates for log2 on [1, 2): pseudo-log (x-1), Chebyshev
+minimax linear fit, Taylor expansion at 1.5, and reciprocal (2-2/x).
 
-- compare several surrogates for log2 on [1, 2): the pseudo-log, a Taylor
-  expansion, a Chebyshev fit, a wrong-symmetry surrogate
-- separate raw fit quality from symmetry compatibility
-- show that the pseudo-log's residual is the one geometric cells equalize
+Key result: the Chebyshev fit has the lowest peak residual (0.043 vs
+pseudo-log's 0.086), but its residual is offset by -0.043 at both binade
+boundaries. The pseudo-log is the only surrogate (besides the trivially
+related reciprocal) whose residual vanishes at x=1 and x=2 — the coarsest
+geometric cell boundaries. This means the correction task within each binade
+is self-contained: no correction budget is wasted removing a constant offset.
 
-Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+The surrogacy claim is: the pseudo-log is preferred not because it minimizes
+error, but because its error is boundary-aligned with the geometric grid,
+making it correctable by binade-local machinery.
 
 #### Status
 
-Scaffolded only. No dedicated comparison artifact yet isolates the
-approximation-theoretic claim from the more familiar FISR-style reading.
+Exhibited. The boundary-alignment property and the raw-error comparison
+directly demonstrate the claim.
 
 #### Literature Linkage
 
@@ -114,22 +118,29 @@ misaligned with binary depth structure.
 
 #### Repo Support
 
-Planned artifact: `float_formats.sage`
+Artifact: `float_formats.sage` -> `results/float_formats.png`
 
-Target exhibit:
+Defines three toy float formats (binary b=2, hex b=16, base-3 b=3) and
+plots four panels:
 
-- define 3-4 toy float formats with different binade structures
-- for each, construct its natural pseudo-log
-- show that binary binades produce a pseudo-log affine in log2, and that this
-  is what makes it a good surrogate; contrast with other bases
+1. Significand sawtooth across binades — binary resets at every power of 2,
+   hex has one wide tooth per power of 16, base-3 resets at powers of 3.
+2. Residual on [1, 2) — binary's residual is the eps(m) shape from §2
+   (zero at binade boundaries). Hex and base-3 have large residuals because
+   [1, 2) is a partial binade for them.
+3. The §2 connection — pseudo-log = significand field, with annotated
+   boundary zeros.
+4. Binade boundaries vs binary geometric grid — binary boundaries nest
+   perfectly; base-3 boundaries fall between grid lines.
 
-Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+The exhibit shows that binary scientific notation gives you the pseudo-log
+structurally: the significand field IS the pseudo-log, its teeth ARE the
+geometric grid cells, and its residual vanishes at binade boundaries.
 
 #### Status
 
-Scaffolded only. The repo currently discusses IEEE 754 specifically; the
-broader structural claim about binary scientific notation is not yet
-exhibited.
+Exhibited. The structural fact is visible in the sawtooth alignment and
+the boundary-zero property.
 
 #### Literature Linkage
 
@@ -167,26 +178,33 @@ discretization makes the grid fight the correction geometry.
 
 #### Repo Support
 
-Planned artifact: `compatibility_matrix.sage`
+Artifact: `compatibility_matrix.sage` -> `results/compatibility_matrix.png`
 
-Target exhibit:
+Compares geometric vs uniform grids at three levels: free per-cell error,
+shared-delta per-cell error (LI), and wall excess (shared minus free). Four
+panels at q=3, depth=6, exponent=1/2.
 
-- four switchable layers (coordinate, surrogate, representation,
-  discretization), each with a right and wrong choice: 2^4 = 16 combinations
-- canonical target: the all-right combination produces equalized error and a
-  small wall; flipping any single layer breaks the equalization
-  characteristically
-- acceptable staged implementation: first hold representation fixed and test
-  the 2^3 coordinate / surrogate / discretization slice, then add the
-  representation switch explicitly in a second pass
+Key results:
+- Free per-cell: geometric is flat (max/min ~ 1), uniform curves by ~2x.
+  Geometric worst = 0.0019, uniform worst = 0.0028.
+- Wall excess concentration: geometric max/min = 37.6 (distributed),
+  uniform max/min = 179.7 (concentrated on already-hard cells near x=1).
+- Under LI sharing, geometric has a larger total wall (0.040 vs 0.035) but
+  a more evenly distributed wall excess.
 
-Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+The compatibility exhibit: geometric equalizes the free error (discretization
+cooperates with the coordinate) and distributes the wall more evenly.
+Uniform has unequal free error AND concentrated wall — the sharing penalty
+piles on the cells that were already disadvantaged.
+
+The surrogate layer was tested via c0 offset but the optimizer absorbs
+the shift (c0 is a free parameter). The surrogate comparison is therefore
+structural (§2-§3 exhibits) rather than optimizer-based.
 
 #### Status
 
-Scaffolded only. The partition sweeps test a downstream piece (geometric vs
-uniform discretization), but the multi-layer compatibility claim has not been
-exhibited as a single matrix.
+Exhibited (staged: discretization layer tested; surrogate layer exhibited
+structurally in §2-§3; representation layer exhibited in §3).
 
 #### Literature Linkage
 
