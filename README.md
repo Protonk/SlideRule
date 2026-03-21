@@ -7,9 +7,9 @@ We can make that cost concrete by isolating how much error comes from each shari
 
 Our overall and rather brash goal: transform the triangle inequality into a computable measure of the cost of departure from a log-linear surrogate, producing a "computational ruler" for approximation problems governed by scaling.
 
-[`DISTANT-SHORES.md`](DISTANT-SHORES.md): overall science goal and the six-step roadmap, with steps #5 and #6 labeled with [MENEHUNE], indicating the presence of magical helpers are needed to carry the logic forward \[ed.: We aren't done yet.\].
+[`DISTANT-SHORES.md`](DISTANT-SHORES.md): overall science goal and the six-step roadmap, with steps #5 and #6 labeled with [MENEHUNE], indicating the presence of magical helpers are needed to carry the logic forward [ed.: We aren't done yet.].
 - `experiments/keystone/KEYSTONE.md` represents the immediate jumping off point from Day (steps 1-4), with `experiments/stepstone/STEPSTONE.md` and `experiments/ripple/RIPPLE.md` aligned with that.
-- `experiments/wall/WALL.md` & `experiments/damage/DAMAGE.md` represent the first real foray into [MENEHUNE] #5. 
+- `experiments/wall/WALL.md` & `experiments/wall/damage/DAMAGE.md` represent the first real foray into [MENEHUNE] #5.
 
 ## Terminology
 
@@ -22,9 +22,9 @@ experiments/          Runnable sweeps, visualizations, and analysis
   EXPERIMENTS.md        Experiment areas + hypothesis registry
   keystone/             Partition comparison (K1–K3) and thesis
   wall/                 Wall obstruction model and diagnostics
+    damage/             Foreign-error analysis (chord sharing counterfactuals)
   alternation/          Sign-pattern analysis
   stepstone/            Chord error structure
-  damage/               Foreign-error analysis
   ripple/               Coastline area convergence
 lib/                  Shared math modules (paths, day, partitions, ...)
 helpers/              Import helper (pathing.py)

@@ -24,14 +24,16 @@ Tests: K1a, K1b, K1c, K2, H1, H1a–H1d
 ### `wall/`
 
 Wall obstruction model: spatial diagnostics and exponent robustness.
-[`WALL.md`](wall/WALL.md) defines the wall;
-[`WALL-PLAN.md`](wall/WALL-PLAN.md) tracks current work.
+[`WALL.md`](wall/WALL.md) defines the wall.
 
 Scripts: `enrich_summary`, `join_layer_modes`, `worst_cell_map`,
 `wall_excess_ribbons`, `gap_collapse`, `candidate_phase_barcode`,
 `exponent_robustness_sweep`.
 
-Tests: K3
+Subfolder: `damage/` — foreign-error analysis (chord sharing
+counterfactuals). See [`DAMAGE.md`](wall/damage/DAMAGE.md).
+
+Tests: K3, W1
 
 ### `alternation/`
 
@@ -46,12 +48,6 @@ Chord error structure and visualization. Why geometric partitions
 equalize per-cell error, plus multi-partition profiles and fractal art.
 Subfolders: `profiles/`, `fractal/`.
 Exhibits: K1a mechanism (scale-equivariance -> equal cell difficulty)
-
-### `damage/`
-
-Foreign-error analysis: what happens when a cell uses another cell's
-chord. Amplification ribbons, balance ratios, counterfactual profiles.
-Supports: wall model (quantifies sharing cost per cell)
 
 ### `ripple/`
 
@@ -144,22 +140,24 @@ K1a/K1b/K1c subdivision applied to depth scaling.
 
 ### K3. The wall decomposition is partition-dependent
 
-**Status:** first evidence
+**Status:** supported
 **Tested in:** `wall/` (all scripts), `alternation/` (supports)
 
 **Question:** Does the wall's source decomposition (parameter budget /
 layer sharing / automaton coupling) change between partition kinds?
 
-**Current answer:** At (q=3, d=6, exp=1/2), LD reduces the gap by ~40%
-(uniform) and ~50% (geometric). Layer sharing is dominant for both,
-but residual gaps differ. Wall excess is distributed under LI but
-concentrated under LD for geometric. Worst-cell migrates on geometric,
-pinned near x=1 on uniform.
+**Current answer:** Confirmed across exponents 1/3, 1/2, and 2/3 (160
+new cases). Layer sharing is the dominant wall source for uniform,
+geometric, and harmonic (median wall fraction 43–75%, varying by
+exponent). Mirror_harmonic is an outlier at ~40%. Wall excess is
+distributed under LI but concentrated under LD for geometric.
+Worst-cell migrates on geometric, pinned near x=1 on uniform. LD gap
+saturates by d=7–8. See `wall/results/exponent_robustness_2026-03-20/`.
 
 **Open edges:**
-- Does the decomposition survive at non-1/2 exponents? (Sweep running.)
 - Does residual automaton-coupling wall shrink with larger q in LD?
 - Is there a scaling law in param-to-cell ratio?
+- Does sign-sequence structure predict wall properties? (Future E5.)
 
 ## Supporting observations (H1)
 
@@ -218,6 +216,28 @@ differently?
 **Current answer:** LI optima are concentrated (small active support).
 LD optima are diffuse (broad support). Confirmed at tested benchmarks,
 not yet across partition kinds.
+
+## Wall mechanism (W-series)
+
+### W1. The wall is not pairwise chord displacement
+
+**Status:** supported (negative result)
+**Tested in:** `wall/damage_vs_wall`, `wall/displacement_structure`
+
+**Question:** Is the wall explained by cells being forced to use
+neighboring cells' intercepts?
+
+**Current answer:** No. Adjacent cells' free intercepts are nearly
+interchangeable (best-donor excess is small), but the FSM's shared
+intercept causes wall excess 10–17x larger. The displacement pattern
+is spatially structured and driven by early-layer fan-out: layer 0
+must serve all 2^d cells with one delta pair, creating systematic
+positional displacement. Final residue state does not explain the
+pattern. LD cuts the displacement range ~50% by using middle layers
+to pull back. See `wall/results/exchange_rate/`.
+
+**Open edges:**
+- How does layer-0 fan-out scale with depth and q?
 
 ## Retired
 
