@@ -1,10 +1,6 @@
-# How to work here
+# How to work on DayLog
 
 > Logistical guidance lives here, see `DISTANT-SHORES.md` for mathematical direction
-
-## Experiments
-
-For experiments, claims, and output interpretation -> `experiments/EXPERIMENTS.md`, with sweep findings and dated empirical summaries in `experiments/<topic>/results/`. Reading `EXPERIMENTS` and the agent guidance will tell you how to operate there.
 
 ## Library re-use
 
@@ -23,14 +19,16 @@ Import with our path-joiner, `helpers/pathing.py`. Example:
 
 ### PLANning
 
-Processes which change the repo state should be recorded in temporary `PLAN.md`
-files, local to the activity being planned. Prefer these files (or an
-equivalent `SUBJECT-PLAN.md`) over embedding stateful planning information in
-documentation. Generate, use, and eventually dissolve these `PLAN`s as you
-work.
+Plan meaningful changes in temporary `PLAN.md` files, local to the activity being planned. Generate, use, and eventually dissolve these `PLAN`s as you work.
 
-### Python environment
+### Running
 
->Do not use the system `python3` for project scripts.
+The `sagew` wrapper handles Sage setup. Do not use the system `python3` for project scripts.
 
-The project runs Python through Sage's bundled environment, with its own venv with known-good versions of SymPy, NumPy, matplotlib, and SciPy. The `sagew` wrapper provides `--python3` and `--pip`subcommands that exec Sage's bundled Python directly, invoke it like so: `./sagew --python3 sympy/example.py`.
+>All commands from project root. 
+
+```sh
+./sagew experiments/keystone/partition_sweep.sage   # run a sweep
+./sagew tests/run_tests.sage                        # run tests
+./sagew                                             # bare Sage REPL
+```

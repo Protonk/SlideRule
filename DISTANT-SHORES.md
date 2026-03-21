@@ -88,7 +88,7 @@ Each inclusion adds distance from the target. The wall decomposition measures
 how much distance each inclusion contributes. This is what the current
 experiments quantify.
 
-## Step 5. [GNOMES] The projection distance scales predictably with structural cost
+## Step 5. [MENEHUNE] The projection distance scales predictably with structural cost
 
 Define a cost measure C on correction machinery: some function of parameter
 count, sharing depth, and automaton topology. The wall decomposition gives
@@ -115,7 +115,7 @@ generates, or enough empirical data across (q, d, alpha, partition) to fit
 a stable curve. The K1–K3 experiments are partial evidence but not yet
 sufficient.
 
-## Step 6. [GNOMES] The cost measure is a property of the problem, not the architecture
+## Step 6. [MENEHUNE] The cost measure is a property of the problem, not the architecture
 
 Given the rate from Step 5, define:
 
@@ -159,8 +159,8 @@ curve — or provably diverges, which would also be informative.
 | 2 | Done | Geometric grid = zero-cost baseline from scale symmetry |
 | 3 | Done | Shared-structure corrections live in a low-rank subspace |
 | 4 | Done | Wall = projection distance; decomposition = nested subspaces |
-| 5 | [GNOMES] | Projection distance scales predictably with cost measure |
-| 6 | [GNOMES] | Cost measure is architecture-invariant → computational ruler |
+| 5 | [MENEHUNE] | Projection distance scales predictably with cost measure |
+| 6 | [MENEHUNE] | Cost measure is architecture-invariant → computational ruler |
 
 The path from 1–4 is fair. Steps 5 and 6 each require new work: Step 5 is
 empirical or semi-theoretical (scaling law for structured projection
