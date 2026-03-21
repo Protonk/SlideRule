@@ -7,11 +7,12 @@ run from project root via `./sagew experiments/<topic>/<script>.sage`.
 
 ### `keystone/`
 
-Partition-comparison sweeps for the keystone program. Tests whether
-geometric partitions beat uniform under shared-delta optimization.
-CSV results live in `keystone/results/`.
+Partition-comparison sweeps and the guiding thesis. Tests whether geometric
+partitions achieve lower worst-case error under shared-delta optimization.
+`KEYSTONE.md` contains the thesis, hypotheses, and caveats.
 
-Scripts: `partition_sweep`, `h1_sweep`, `inspect_case`, `error_profile`.
+Scripts: `partition_sweep`, `h1_sweep`, `inspect_case`, `error_profile`,
+`wall_decomposition`, `gap_surface`, `intercept_displacement`.
 
 ### `ripple/`
 
@@ -40,6 +41,23 @@ and counterfactual error profiles.
 Scripts: `amplification`, `amplification_polar`, `balance_bars`,
 `balance_bars_anti`, `balance_linear`, `balance_polar`, `balance_scatter`,
 `balance_summary`, `counter_factual`.
+
+### `alternation/`
+
+Sign-pattern analysis of the displacement between shared and free-per-cell
+intercepts. Barcode visualizations, RLE ribbons, refinement split maps,
+and the zoo-wide split-sequence computation pipeline.
+
+See `alternation/ALTERNATION.md` for full documentation.
+
+### `wall/`
+
+The wall obstruction model: definition, decomposition into three nested
+sharing constraints, and current evidence. See `wall/WALL.md`.
+
+## Cross-cutting documents
+
+- **`HYPOTHESES.md`** — Active research claims (K1-K3, H1) and their status.
 
 ## Shared utilities
 

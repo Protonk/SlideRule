@@ -7,7 +7,7 @@ Not for: script usage, run logs, or implementation details
 ## Current headline
 
 The main live claim is the scale-equivariance thesis in
-[`KEYSTONE.md`](KEYSTONE.md). The first keystone partition-comparison run
+[`KEYSTONE.md`](keystone/KEYSTONE.md). The first keystone partition-comparison run
 exists (2026-03-11). K1has been subdivided: the cell-level advantage of
 geometric partitions is clear, but the shared-delta advantage depends on the
 parameterization regime. The corrected reciprocal-control diagnostic
@@ -348,10 +348,9 @@ Current read:
 
 ## Reading outward
 
-- For the repo-level thesis and motivation, read [`KEYSTONE.md`](KEYSTONE.md).
-- For the current obstruction model, read [`WALL.md`](WALL.md).
+- For the repo-level thesis and motivation, read [`KEYSTONE.md`](keystone/KEYSTONE.md).
+- For the current obstruction model, read [`WALL.md`](wall/WALL.md).
 - For dated numeric evidence, see the run-level reports inside
-  [`experiments/keystone/results/`](experiments/keystone/results/).
+  [`keystone/results/`](keystone/results/).
 - For how to run the scripts behind those claims and the planned keystone
-  comparisons, read
-  [`experiments/README.md`](experiments/README.md).
+  comparisons, read [`README.md`](README.md).

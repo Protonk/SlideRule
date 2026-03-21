@@ -4,8 +4,8 @@ Purpose: sketch a transformation from the triangle inequality to a computable
 measure of computational cost of departure from a log-linear surrogate.
 This is a roadmap, not a proof. Six steps, two gnomes.
 
-Reading inward: depends on [`KEYSTONE.md`](KEYSTONE.md) for the
-scale-symmetry thesis and [`WALL.md`](WALL.md) for the wall decomposition.
+Reading inward: depends on [`KEYSTONE.md`](experiments/keystone/KEYSTONE.md) for the
+scale-symmetry thesis and [`WALL.md`](experiments/wall/WALL.md) for the wall decomposition.
 
 ---
 

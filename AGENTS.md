@@ -1,14 +1,15 @@
 # How to work here
 
-> Logistical guidance lives here, see `KEYSTONE.md` for mathematical direction
+> Logistical guidance lives here, see `experiments/keystone/KEYSTONE.md` for mathematical direction
 
 ## Task -> Document
 
 - Repo orientation -> `README.md`
-- Guiding thesis / scientific north star -> `KEYSTONE.md`
+- Guiding thesis / scientific north star -> `experiments/keystone/KEYSTONE.md`
 - Partition-family analysis / selection rationale -> `PARTITIONS.md`
-- Active research claims/status -> `HYPOTHESES.md`
-- Current obstruction / wall diagnostics -> `WALL.md`
+- Overall science goal / roadmap -> `DISTANT-SHORES.md`
+- Active research claims/status -> `experiments/HYPOTHESES.md`
+- Current obstruction / wall diagnostics -> `experiments/wall/WALL.md`
 - Sweep findings and dated empirical summaries -> `experiments/<topic>/results/`
 - Experiment usage and output interpretation -> `experiments/README.md`
 - Library/module structure and numerical caveats -> `lib/README.md`

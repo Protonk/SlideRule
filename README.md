@@ -4,25 +4,29 @@ FSM-parameterised coarse-stage approximations meet scale-equivariant geometry.
 
 Day's FRSR analysis gives an exact finite candidate set for the extrema of
 piecewise-linear coarse approximations to `x^(p/q)`. This repo studies finite-
-state intercept policies for those coarse approximations. The main guiding push
-is now the thesis in [`KEYSTONE.md`](KEYSTONE.md): on `R_{>0}`, approximation
+state intercept policies for those coarse approximations. The overall science
+goal is sketched in [`DISTANT-SHORES.md`](DISTANT-SHORES.md): transform the
+triangle inequality into a computable measure of the cost of departure from a
+log-linear surrogate, producing a "computational ruler" for approximation
+problems governed by scaling.
+
+The guiding thesis is in
+[`KEYSTONE.md`](experiments/keystone/KEYSTONE.md): on `R_{>0}`, approximation
 problems governed by scaling should be organized in log coordinates,
 approximated by the affine pseudo-log, and discretized on geometric grids.
 
-The current shared-delta wall work remains important, but as supporting
-baseline machinery. It tells us how the legacy `uniform_x` baseline and its
-sharing constraints behave, and the repo now has a first direct comparison
-against `geometric_x`.
-
 ## Documentation
 
-- [`KEYSTONE.md`](KEYSTONE.md): guiding thesis, structural motivation, and
-  the primary `K1`-`K3` tests.
+- [`DISTANT-SHORES.md`](DISTANT-SHORES.md): overall science goal and the
+  six-step roadmap toward a computational ruler.
+- [`experiments/keystone/KEYSTONE.md`](experiments/keystone/KEYSTONE.md):
+  guiding thesis, structural motivation, and the primary `K1`-`K3` tests.
 - [`PARTITIONS.md`](PARTITIONS.md): analytical classification of the partition
   family and the current selection rationale.
-- [`HYPOTHESES.md`](HYPOTHESES.md): active research claims and their status.
-- [`WALL.md`](WALL.md): the current obstruction model and its
-  decomposition.
+- [`experiments/HYPOTHESES.md`](experiments/HYPOTHESES.md): active research
+  claims and their status.
+- [`experiments/wall/WALL.md`](experiments/wall/WALL.md): the current
+  obstruction model and its decomposition.
 - [`experiments/README.md`](experiments/README.md): experiment drivers, output
   columns, and which scripts support the keystone program.
 - [`lib/README.md`](lib/README.md): module graph, data contracts, and numerical caveats.

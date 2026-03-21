@@ -243,7 +243,7 @@ It is the unique partition invariant under multiplication by the grid
 ratio. In the keystone program it is the preferred scale-equivariant
 curve-agnostic geometry. In current repo terminology it is a geometry
 name, distinct from the cell's binary address. See
-[`KEYSTONE.md`](KEYSTONE.md) and [`HYPOTHESES.md`](HYPOTHESES.md) for
+[`KEYSTONE.md`](experiments/keystone/KEYSTONE.md) and [`HYPOTHESES.md`](experiments/HYPOTHESES.md) for
 the status of the partition-comparison claims.
 
 ## candidate families (H, V, D)
@@ -263,7 +263,7 @@ are expressed through the zeta function `ζ(r, k, c)`.
 The project maintains two hypothesis families. **H1–H4** concern the
 shared-delta / FSM story. **K1–K3** concern the keystone
 scale-symmetry thesis and partition comparisons. See
-[`HYPOTHESES.md`](HYPOTHESES.md) and [`KEYSTONE.md`](KEYSTONE.md).
+[`HYPOTHESES.md`](experiments/HYPOTHESES.md) and [`KEYSTONE.md`](experiments/keystone/KEYSTONE.md).
 
 ## index
 
@@ -311,7 +311,7 @@ positional effects.
 
 ## KEYSTONE
 
-The project document (`KEYSTONE.md`) that states the overarching
+The project document (`experiments/keystone/KEYSTONE.md`) that states the overarching
 scale-symmetry thesis: the logarithm is the canonical coordinate for
 approximation on R_{>0} under scaling, the affine pseudo-log is its
 coarse surrogate, and geometric grids are the natural compatible
@@ -477,7 +477,7 @@ lower bound. The wall is decomposed into three nested sources: (1)
 parameter budget, (2) layer sharing, (3) automaton coupling. It is a
 case-based decomposition supported by sweep data, not yet a theorem.
 The alternation pattern is the wall's spatial fingerprint — it shows where
-the sharing penalty concentrates across cells. See [`WALL.md`](WALL.md).
+the sharing penalty concentrates across cells. See [`WALL.md`](experiments/wall/WALL.md).
 
 ## z(x) (quality metric)
 
