@@ -135,29 +135,7 @@ This is a case-based decomposition, not yet a theorem.
 
 ## Next work
 
-### Seed inventory
-
-- `../keystone/results/wall_surface_2026-03-18/` — 200-case seed grid
-- `../keystone/results/partition_2026-03-18/` — broader zoo seed
-- H1 scaling anchors in `../keystone/results/`
-- Alternation sign/run-length tooling in `../alternation/`
-
-### Planned scripts
-
-- `join_layer_modes.sage` — pair LI/LD rows for same (kind, q, depth, exponent)
-- `collect_wall_sweep.sage` — wall-local driver with derived columns
-- `worst_cell_map.sage` — panel grid colored by worst-cell position
-- `wall_excess_ribbons.sage` — per-cell free vs optimized error
-- `gap_collapse.sage` — scatter of gap vs param-to-cell ratio
-- `candidate_phase_barcode.sage` — per-cell strip by worst-candidate type
-
-### Planned experiments
-
-- E1. Worst-cell migration: does the wall stay pinned or move with (q, depth)?
-- E2. Per-cell wall budget: is the wall broad or concentrated?
-- E3. Residual LD wall vs q and exponent (non-1/2 sweep)
-- E4. Parameter-to-cell ratio collapse
-- E5. Alternation-to-wall correlation
+Planned scripts and experiments are tracked in [`WALL-PLAN.md`](WALL-PLAN.md).
 
 ## Reading outward
 
