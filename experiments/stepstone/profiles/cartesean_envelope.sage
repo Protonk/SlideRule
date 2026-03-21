@@ -4,7 +4,7 @@ cartesean_envelope.sage — Peak envelopes for all sixteen partition kinds.
 Sixteen panels (4x4 grid) with independent y-scales showing per-cell chord
 error sawtooths with peak envelopes.
 
-Run:  ./sagew experiments/stepstone/zoo/cartesean_envelope.sage
+Run:  ./sagew experiments/stepstone/profiles/cartesean_envelope.sage
 """
 
 from helpers import pathing
@@ -89,7 +89,7 @@ def make_plot():
         fontsize=13, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/zoo/results/cartesean_envelope.png'
+    out_path = 'experiments/stepstone/profiles/results/cartesean_envelope.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

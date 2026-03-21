@@ -9,11 +9,11 @@ importers of chord error.
 This is a gestural comparison — the shape and symmetry of the ribbon
 matter more than any single value.
 
-Run:  ./sagew experiments/stepstone/damage/counter_factual.sage
+Run:  ./sagew experiments/damage/counter_factual.sage
 """
 
 from helpers import pathing
-load(pathing('experiments', 'stepstone', 'damage', '_foreign_error.sage'))
+load(pathing('experiments', 'damage', '_foreign_error.sage'))
 load(pathing('lib', 'day.sage'))
 load(pathing('experiments', 'zoo_figure.sage'))
 
@@ -110,7 +110,7 @@ def plot_ribbons(all_data):
              ha='center', fontsize=9, color='#666666')
     fig.tight_layout(rect=[0, 0, 1, 0.955])
 
-    out_path = 'experiments/stepstone/damage/results/counter_factual.png'
+    out_path = 'experiments/damage/results/counter_factual.png'
     fig.savefig(out_path, dpi=180)
     print("Saved: %s" % out_path)
 

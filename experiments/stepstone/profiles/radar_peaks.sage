@@ -6,7 +6,7 @@ Each cell gets its own angular slice; the radius is E_peak. Geometric gives a
 perfect circle; smooth monotone families give eggs and commas; scrambled
 families give starbursts.
 
-Run:  ./sagew experiments/stepstone/zoo/radar_peaks.sage
+Run:  ./sagew experiments/stepstone/profiles/radar_peaks.sage
 """
 
 from helpers import pathing
@@ -114,7 +114,7 @@ def make_plot():
         fontsize=13, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/zoo/results/radar_peaks.png'
+    out_path = 'experiments/stepstone/profiles/results/radar_peaks.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

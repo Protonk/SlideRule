@@ -7,7 +7,7 @@ Sixteen panels (4x4 grid). Each panel plots one dot per cell at
 The optimal width at position m is m * ln(2) / N (the geometric cell width).
 Points above y=1 are under-resolved; points below are over-resolved.
 
-Run:  ./sagew experiments/stepstone/zoo/curvature_mismatch.sage
+Run:  ./sagew experiments/stepstone/profiles/curvature_mismatch.sage
 """
 
 from helpers import pathing
@@ -101,7 +101,7 @@ def make_plot():
         fontsize=13, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/zoo/results/curvature_mismatch.png'
+    out_path = 'experiments/stepstone/profiles/results/curvature_mismatch.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

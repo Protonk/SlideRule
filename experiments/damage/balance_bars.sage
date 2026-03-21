@@ -6,7 +6,7 @@ intensity_share) space.  Bar height is the signed perpendicular distance
 from that line: positive = intense exporters on small territory,
 negative = diffuse exporters on large territory.
 
-Run:  ./sagew experiments/stepstone/damage/balance_bars.sage
+Run:  ./sagew experiments/damage/balance_bars.sage
 """
 
 from helpers import pathing
@@ -23,7 +23,7 @@ from math import sqrt
 
 # ── Load summary CSV ────────────────────────────────────────────────
 
-CSV_PATH = 'experiments/stepstone/damage/results/balance_summary.csv'
+CSV_PATH = 'experiments/damage/results/balance_summary.csv'
 
 zoo_colors = {kind: color for _name, color, kind in PARTITION_ZOO}
 zoo_names = {kind: name for name, _color, kind in PARTITION_ZOO}
@@ -94,7 +94,7 @@ fig.text(0.5, 0.93,
 
 fig.tight_layout(rect=[0, 0, 1, 0.92])
 
-out_path = 'experiments/stepstone/damage/results/balance_bars.png'
+out_path = 'experiments/damage/results/balance_bars.png'
 fig.savefig(out_path, dpi=200)
 print("Saved: %s" % out_path)
 print("Done.")

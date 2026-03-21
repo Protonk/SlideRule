@@ -6,7 +6,7 @@ t in [0, 2*pi], radius = cell index j, color = E(t).  Geometric gives
 uniform concentric rings; non-geometric partitions show asymmetric or
 barcode-like ring patterns.
 
-Run:  ./sagew experiments/stepstone/zoo/polar_heatmap.sage
+Run:  ./sagew experiments/stepstone/profiles/polar_heatmap.sage
 """
 
 from helpers import pathing
@@ -94,7 +94,7 @@ def make_plot():
         fontsize=13, fontweight='bold',
     )
 
-    out_path = 'experiments/stepstone/zoo/results/polar_heatmap.png'
+    out_path = 'experiments/stepstone/profiles/results/polar_heatmap.png'
     fig.savefig(out_path, dpi=180, bbox_inches='tight')
     print("Saved: %s" % out_path)
 

@@ -24,21 +24,22 @@ Scripts: `stability_heatmap`, `settlers`, `divergent`, `integrate_coastline`,
 
 ### `stepstone/`
 
-Chord error visualization and analysis. Explores per-cell error structure,
-slope deviation geometry, and fractal crossing-count art.
+Chord error structure and visualization. The theoretical argument for why
+geometric partitions equalize per-cell error, plus multi-partition error
+profile visualizations and fractal crossing-count art.
 
-Subfolders: `zoo/` (partition zoo grids), `damage/` (foreign-error ribbons),
-`hazards/` (slope deviation views), `fractal/` (fractal raster rendering and
-outputs).
+Subfolders: `profiles/` (per-partition error visualizations across the zoo),
+`fractal/` (fractal raster rendering and outputs).
 
-Fractal entry points:
+### `damage/`
 
-- `fractal/single_fractal.sage` — one partition kind to one image
-- `fractal/grid_fractals.sage` — one preset grid or the full zoo
+Foreign-error analysis: what happens when a cell is forced to use another
+cell's chord instead of its own. Amplification ribbons, balance ratios,
+and counterfactual error profiles.
 
-Generated outputs live in per-subtopic `results/` directories
-(`stepstone/results/`, `zoo/results/`, `damage/results/`, `hazards/results/`,
-`fractal/results/`).
+Scripts: `amplification`, `amplification_polar`, `balance_bars`,
+`balance_bars_anti`, `balance_linear`, `balance_polar`, `balance_scatter`,
+`balance_summary`, `counter_factual`.
 
 ## Shared utilities
 

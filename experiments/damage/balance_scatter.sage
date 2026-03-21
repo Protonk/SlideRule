@@ -10,7 +10,7 @@ The diagonal y=x is where territory equals intensity.  Points above have
 concentrated intense exporters on small territory; points below have
 diffuse exporters spread across large territory.
 
-Run:  ./sagew experiments/stepstone/damage/balance_scatter.sage
+Run:  ./sagew experiments/damage/balance_scatter.sage
 """
 
 from helpers import pathing
@@ -27,7 +27,7 @@ from math import log2
 
 # ── Load summary CSV ────────────────────────────────────────────────
 
-CSV_PATH = 'experiments/stepstone/damage/results/balance_summary.csv'
+CSV_PATH = 'experiments/damage/results/balance_summary.csv'
 
 zoo_colors = {kind: color for _name, color, kind in PARTITION_ZOO}
 zoo_names = {kind: name for name, _color, kind in PARTITION_ZOO}
@@ -148,7 +148,7 @@ fig.text(0.5, 0.94,
 
 fig.tight_layout(rect=[0, 0, 1, 0.935])
 
-out_path = 'experiments/stepstone/damage/results/balance_scatter.png'
+out_path = 'experiments/damage/results/balance_scatter.png'
 fig.savefig(out_path, dpi=200)
 print("Saved: %s" % out_path)
 print("Done.")

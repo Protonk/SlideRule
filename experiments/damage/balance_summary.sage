@@ -8,11 +8,11 @@ For each partition, computes:
   share_above  — fraction of domain where balance > 0.5 (net exporter)
   share_below  — fraction of domain where balance < 0.5 (net importer)
 
-Run:  ./sagew experiments/stepstone/damage/balance_summary.sage
+Run:  ./sagew experiments/damage/balance_summary.sage
 """
 
 from helpers import pathing
-load(pathing('experiments', 'stepstone', 'damage', '_foreign_error.sage'))
+load(pathing('experiments', 'damage', '_foreign_error.sage'))
 load(pathing('lib', 'day.sage'))
 load(pathing('experiments', 'zoo_figure.sage'))
 
@@ -130,7 +130,7 @@ for r in rows:
 print()
 
 # Write CSV
-out_path = 'experiments/stepstone/damage/results/balance_summary.csv'
+out_path = 'experiments/damage/results/balance_summary.csv'
 fieldnames = ['kind', 'name', 'crossings', 'area_above', 'area_below',
               'share_above', 'share_below']
 with open(out_path, 'w', newline='') as f:

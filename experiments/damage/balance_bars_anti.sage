@@ -9,7 +9,7 @@ perpendicular distance from that line: positive = loud damage economy
 Bars are horizontal, arranged vertically, so the chart can be read as a
 marginal strip alongside the main scatter.
 
-Run:  ./sagew experiments/stepstone/damage/balance_bars_anti.sage
+Run:  ./sagew experiments/damage/balance_bars_anti.sage
 """
 
 from helpers import pathing
@@ -26,7 +26,7 @@ from math import sqrt
 
 # ── Load summary CSV ────────────────────────────────────────────────
 
-CSV_PATH = 'experiments/stepstone/damage/results/balance_summary.csv'
+CSV_PATH = 'experiments/damage/results/balance_summary.csv'
 
 zoo_colors = {kind: color for _name, color, kind in PARTITION_ZOO}
 zoo_names = {kind: name for name, _color, kind in PARTITION_ZOO}
@@ -98,7 +98,7 @@ fig.text(0.5, 0.95,
 
 fig.tight_layout(rect=[0, 0, 1, 0.945])
 
-out_path = 'experiments/stepstone/damage/results/balance_bars_anti.png'
+out_path = 'experiments/damage/results/balance_bars_anti.png'
 fig.savefig(out_path, dpi=200)
 print("Saved: %s" % out_path)
 print("Done.")

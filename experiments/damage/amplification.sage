@@ -13,11 +13,11 @@ flare near x=1, where cells have tiny native errors and are proportionally
 most sensitive to chord displacement — the reverse of the absolute-error
 ribbon in counter_factual.sage.
 
-Run:  ./sagew experiments/stepstone/damage/amplification.sage
+Run:  ./sagew experiments/damage/amplification.sage
 """
 
 from helpers import pathing
-load(pathing('experiments', 'stepstone', 'damage', '_foreign_error.sage'))
+load(pathing('experiments', 'damage', '_foreign_error.sage'))
 load(pathing('lib', 'day.sage'))
 load(pathing('experiments', 'zoo_figure.sage'))
 
@@ -130,7 +130,7 @@ def plot_ribbons(all_data):
              ha='center', fontsize=9, color='#666666')
     fig.tight_layout(rect=[0, 0, 1, 0.955])
 
-    out_path = 'experiments/stepstone/damage/results/amplification.png'
+    out_path = 'experiments/damage/results/amplification.png'
     fig.savefig(out_path, dpi=180)
     print("Saved: %s" % out_path)
 
