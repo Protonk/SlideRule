@@ -109,7 +109,7 @@ differently with the two cell geometries.
 
 The gap is also consistently larger on geometric across the full depth sweep
 (q=5, d=3..6) in the layer-invariant model, which is why K1b is not generally
-supported. See [`HYPOTHESES.md`](../HYPOTHESES.md) for the K1a/K1b/K1c
+supported. See [`EXPERIMENTS.md`](../EXPERIMENTS.md) for the K1a/K1b/K1c
 subdivision and the run-level reports inside
 [`keystone/results/`](../keystone/results/) for the dated sweep data.
 
@@ -141,6 +141,6 @@ Planned scripts and experiments are tracked in [`WALL-PLAN.md`](WALL-PLAN.md).
 
 - For the repo-level thesis and why partition choice matters, read
   [`KEYSTONE.md`](../keystone/KEYSTONE.md).
-- For status labels and next tests, read [`HYPOTHESES.md`](../HYPOTHESES.md).
+- For status labels and next tests, read [`EXPERIMENTS.md`](../EXPERIMENTS.md).
 - For the sweep tables and dated observations behind this decomposition, see
   the run-level reports inside [`keystone/results/`](../keystone/results/).
