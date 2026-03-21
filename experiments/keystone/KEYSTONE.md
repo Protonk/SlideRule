@@ -8,9 +8,10 @@ alternatives under the FSM sharing constraint.
 
 The logarithm is the canonical coordinate for approximation on R_{>0} when the
 governing symmetry is scaling; the affine pseudo-log is a coarse affine
-surrogate for that coordinate, and a uniform grid in log space -- equivalently,
-a geometric grid in x -- is the natural discretization compatible with that
-symmetry.
+surrogate whose approximation-theoretic utility is explained by scale
+equivariance; any binary scientific notation format gives you this surrogate
+for free on log2(x); and the coordinate, surrogate, and discretization are
+jointly adapted so that breaking any one layer degrades the error structure.
 
 ### 1. The coordinate
 
@@ -19,36 +20,178 @@ of variable, the logarithm is the unique coordinate that turns this symmetry
 into translation: u(lambda * x) = u(x) + c(lambda). Under mild regularity,
 u = A log x + B.
 
+This is the reason equal-log-width cells have equal difficulty: the
+approximation problem at one position is a translated copy of the problem at
+any other position, so all cells of the same log-width face the same task.
+
+#### Repo Support
+
+Planned artifact: `coordinate_uniqueness.sage`
+
+Target exhibit:
+
+- compare per-cell difficulty in linear coordinates against log coordinates
+- show that equal-log-width cells flatten the difficulty profile in a way
+  linear cells do not
+
+Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+
+#### Status
+
+Scaffolded only. This claim is stated in the thesis, but the repo does not
+yet contain a dedicated figure or result artifact exhibiting it.
+
+#### Literature Linkage
+
+- TODO: find prior proof or demonstration of the scaling-to-translation
+  functional equation
+- TODO: state exact overlap with the claim made here
+- TODO: explain what this repo's mechanism adds
+- TODO: note where the literature stops short of the repo's framing
+
 ### 2. The surrogate
 
-The affine pseudo-log is a coarse affine surrogate for log x, induced by the
-number representation. Within each binade the integer reinterpretation of an
-IEEE 754 significand is already an approximately linear function of log_2(x).
-The piecewise-affine coarse stage of the Day model exploits exactly this: one
-affine piece per dyadic cell, each a local linearization of the log coordinate.
+The affine pseudo-log L(x) = x - 1 is a coarse surrogate for log2(x) on
+[1, 2). Its approximation-theoretic utility is explained by scale equivariance:
+L is not the best pointwise fit to log2 (a Chebyshev minimax linear fit wins
+on raw error), but it is the surrogate whose residual eps(m) = log2(m) - (m-1)
+has scale-equivariant structure. Geometric cells equalize this residual. A
+Chebyshev surrogate has lower peak error but its residual is not organized by
+scale symmetry, making it less correctable by scale-symmetric machinery.
 
-### 3. The discretization
+This is the distinctive claim of the keystone thesis. The FISR connection
+("the bit layout approximates log") is well-known and does not require this
+framing. The thesis adds: the pseudo-log is preferred not because it minimizes
+error, but because its error is correctable by the same symmetry that
+organizes the coordinate.
 
-A uniform grid in log space assigns each cell a constant multiplicative width.
-Equivalently, a geometric grid in x. This is the natural discretization
-compatible with scaling: it is the unique partition (up to offset and step
-size) that is invariant under multiplication by the grid ratio.
+#### Repo Support
+
+Planned artifact: `surrogacy_test.sage`
+
+Target exhibit:
+
+- compare several surrogates for log2 on [1, 2): the pseudo-log, a Taylor
+  expansion, a Chebyshev fit, a wrong-symmetry surrogate
+- separate raw fit quality from symmetry compatibility
+- show that the pseudo-log's residual is the one geometric cells equalize
+
+Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+
+#### Status
+
+Scaffolded only. No dedicated comparison artifact yet isolates the
+approximation-theoretic claim from the more familiar FISR-style reading.
+
+#### Literature Linkage
+
+- TODO: find prior treatments of pseudo-log surrogacy, FISR interpretations,
+  or coarse-log approximations
+- TODO: state exact overlap with the claim made here
+- TODO: explain what this repo's mechanism adds (scale-equivariant
+  correctability, not just computational convenience)
+- TODO: note where the literature stops short of the repo's framing
+
+### 3. The representation
+
+Any number format that expresses values in binary scientific notation --
+sign, exponent, significand -- gets the affine pseudo-log for free on
+log2(x). This is not specific to IEEE 754.
+
+Within any binade [2^k, 2^{k+1}), a number x has a significand m = x / 2^k
+in [1, 2). The significand field stores m as a fixed-point value. Reading
+that field as a number gives you m, and m - 1 is the affine pseudo-log of
+log2(x) restricted to that binade.
+
+This is a structural fact about binary scientific notation: IEEE 754,
+Knuth's MIX floats, historic IBM hex floats (with wider binades), posits
+(with variable-width binades), and any format where the significand is a
+linear encoding within a power-of-2 interval. The binary format's pseudo-log
+is affine in log2(x) within each binade. A hex format gets a coarser version
+(affine in log16, proportional to log2 but with 4x wider binades). A
+hypothetical base-3 format would get a pseudo-log affine in log3(x),
+misaligned with binary depth structure.
+
+#### Repo Support
+
+Planned artifact: `float_formats.sage`
+
+Target exhibit:
+
+- define 3-4 toy float formats with different binade structures
+- for each, construct its natural pseudo-log
+- show that binary binades produce a pseudo-log affine in log2, and that this
+  is what makes it a good surrogate; contrast with other bases
+
+Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+
+#### Status
+
+Scaffolded only. The repo currently discusses IEEE 754 specifically; the
+broader structural claim about binary scientific notation is not yet
+exhibited.
+
+#### Literature Linkage
+
+- TODO: find prior treatments of significands as coarse logs, FISR-style
+  interpretations, and non-IEEE float analogues
+- TODO: state exact overlap with the claim made here
+- TODO: explain what this repo's mechanism adds (generalization beyond
+  IEEE 754 to any binary scientific notation)
+- TODO: note where the literature stops short of the repo's framing
 
 ### 4. Compatibility
 
-These three layers -- coordinate, surrogate, discretization -- are mutually
-adapted:
+These four layers -- coordinate, surrogate, representation, discretization --
+are mutually adapted:
 
 - The coordinate linearizes the function class (power laws become linear in
   log).
-- The surrogate approximates that coordinate cheaply within the number format.
-- The discretization respects the symmetry of the coordinate, so the minimax
-  objective does not fight the geometry.
+- The surrogate approximates that coordinate with scale-equivariant error.
+- The representation provides that surrogate for free from binary scientific
+  notation.
+- The discretization (geometric grid = uniform in log space) respects the
+  symmetry of the coordinate, so the minimax objective does not fight the
+  geometry.
 
 The result is that equal-width bins in log are equally hard, the worst-case
 error does not concentrate at any particular scale, and the approximation
 scheme cooperates with the structure of the problem rather than working
 against it.
+
+Breaking any one layer degrades the cooperation in a characteristic way:
+wrong coordinate makes error position-dependent; wrong surrogate makes the
+residual uncorrectable by scale-symmetric machinery; wrong representation
+misaligns the free surrogate with the binary depth structure; wrong
+discretization makes the grid fight the correction geometry.
+
+#### Repo Support
+
+Planned artifact: `compatibility_matrix.sage`
+
+Target exhibit:
+
+- three switchable layers (coordinate, surrogate, discretization), each
+  with a right and wrong choice: 2^3 = 8 combinations
+- show that the all-right combination produces equalized error and a small
+  wall; flipping any single layer breaks the equalization characteristically
+
+Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
+
+#### Status
+
+Scaffolded only. The partition sweeps test a downstream piece (geometric vs
+uniform discretization), but the multi-layer compatibility claim has not been
+exhibited as a single matrix.
+
+#### Literature Linkage
+
+- TODO: find prior arguments about matched coordinates, matched
+  discretizations, or surrogate-geometry compatibility
+- TODO: state exact overlap with the claim made here
+- TODO: explain what this repo's mechanism adds (the three-layer joint
+  formulation)
+- TODO: note where the literature stops short of the repo's framing
 
 ## Hypotheses
 
@@ -77,19 +220,14 @@ This is not fatal -- good frameworks do explain known facts -- but it means
 these predictions should not be treated as evidence for the thesis on the same
 footing as K1--K3. They are consistency checks, not tests.
 
-There is also a specificity problem. "FISR works because the bit layout
-approximates log" is well-known and does not require this thesis. The thesis
-adds the claim that the *approximation-theoretic* utility of the pseudo-log --
-not just its computational convenience -- is explained by scale equivariance.
-That is a stronger and more specific claim, and it is the one that K1--K3
-actually test.
-
 ## Reading outward
 
 - For the wall decomposition that motivates the K1--K3 tests, read
   [`WALL.md`](../wall/WALL.md).
 - For the current hypothesis status labels, read
   [`HYPOTHESES.md`](../HYPOTHESES.md).
+- For the overall science goal, read
+  [`DISTANT-SHORES.md`](../../DISTANT-SHORES.md).
 
 ---
 
