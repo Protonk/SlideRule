@@ -171,10 +171,14 @@ Planned artifact: `compatibility_matrix.sage`
 
 Target exhibit:
 
-- three switchable layers (coordinate, surrogate, discretization), each
-  with a right and wrong choice: 2^3 = 8 combinations
-- show that the all-right combination produces equalized error and a small
-  wall; flipping any single layer breaks the equalization characteristically
+- four switchable layers (coordinate, surrogate, representation,
+  discretization), each with a right and wrong choice: 2^4 = 16 combinations
+- canonical target: the all-right combination produces equalized error and a
+  small wall; flipping any single layer breaks the equalization
+  characteristically
+- acceptable staged implementation: first hold representation fixed and test
+  the 2^3 coordinate / surrogate / discretization slice, then add the
+  representation switch explicitly in a second pass
 
 Transient execution tracking lives in [`KEYS-PLAN.md`](KEYS-PLAN.md).
 
