@@ -218,7 +218,7 @@ structurally in §2-§3; representation layer exhibited in §3).
 ## Hypotheses
 
 The testable predictions of this thesis are tracked in
-[`HYPOTHESES.md`](../HYPOTHESES.md). The primary tests are K1 (partition
+[`EXPERIMENTS.md`](../EXPERIMENTS.md). The primary tests are K1 (partition
 performance under sharing), K2 (depth scaling), and K3 (wall decomposition
 dependence on partition geometry).
 
@@ -247,7 +247,7 @@ footing as K1--K3. They are consistency checks, not tests.
 - For the wall decomposition that motivates the K1--K3 tests, read
   [`WALL.md`](../wall/WALL.md).
 - For the current hypothesis status labels, read
-  [`HYPOTHESES.md`](../HYPOTHESES.md).
+  [`EXPERIMENTS.md`](../EXPERIMENTS.md).
 - For the overall science goal, read
   [`DISTANT-SHORES.md`](../../DISTANT-SHORES.md).
 

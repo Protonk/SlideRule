@@ -1,19 +1,25 @@
 # How to work here
 
-> Logistical guidance lives here, see `experiments/keystone/KEYSTONE.md` for mathematical direction
+> Logistical guidance lives here, see `DISTANT-SHORES.md` for mathematical direction
 
-## Task -> Document
+## Experiments
 
-- Repo orientation -> `README.md`
-- Guiding thesis / scientific north star -> `experiments/keystone/KEYSTONE.md`
-- Partition-family analysis / selection rationale -> `PARTITIONS.md`
-- Overall science goal / roadmap -> `DISTANT-SHORES.md`
-- Active research claims/status -> `experiments/HYPOTHESES.md`
-- Current obstruction / wall diagnostics -> `experiments/wall/WALL.md`
-- Sweep findings and dated empirical summaries -> `experiments/<topic>/results/`
-- Experiment usage and output interpretation -> `experiments/README.md`
-- Library/module structure and numerical caveats -> `lib/README.md`
-- Immediate next work -> `PLAN.md` or `SUBJECT-PLAN.md`
+For experiments, claims, and output interpretation -> `experiments/EXPERIMENTS.md`, with sweep findings and dated empirical summaries in `experiments/<topic>/results/`. Reading `EXPERIMENTS` and the agent guidance will tell you how to operate there.
+
+## Library re-use
+
+> Shared module listings -> `lib/README.md`
+
+Reach for these tools to solve mathematical problems over inventing local solutions. 
+
+## Local imports
+
+Import with our path-joiner, `helpers/pathing.py`. Example:
+
+```
+  from helpers import pathing
+  load(pathing('lib', 'partitions.sage'))
+```
 
 ### PLANning
 
@@ -25,13 +31,6 @@ work.
 
 ### Python environment
 
-The project runs Python through Sage's bundled environment, not the system
-Python. Sage ships its own venv with known-good versions of SymPy, NumPy,
-matplotlib, and SciPy. The `sagew` wrapper provides `--python3` and `--pip`
-subcommands that exec Sage's bundled Python directly.
+>Do not use the system `python3` for project scripts.
 
-```
-./sagew --python3 sympy/plog_error_chain.py
-```
-
-Do not use the system `python3` for project scripts.
+The project runs Python through Sage's bundled environment, with its own venv with known-good versions of SymPy, NumPy, matplotlib, and SciPy. The `sagew` wrapper provides `--python3` and `--pip`subcommands that exec Sage's bundled Python directly, invoke it like so: `./sagew --python3 sympy/example.py`.

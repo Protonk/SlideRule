@@ -1,46 +1,41 @@
-# smale
+# DayLog
 
-FSM-parameterised coarse-stage approximations meet scale-equivariant geometry.
+TODO:IGNORE FOR NOW 
 
-Day's FRSR analysis gives an exact finite candidate set for the extrema of
-piecewise-linear coarse approximations to `x^(p/q)`. This repo studies finite-
-state intercept policies for those coarse approximations. The overall science
-goal is sketched in [`DISTANT-SHORES.md`](DISTANT-SHORES.md): transform the
-triangle inequality into a computable measure of the cost of departure from a
-log-linear surrogate, producing a "computational ruler" for approximation
-problems governed by scaling.
+>FSM-parameterised coarse-stage approximations meet scale-equivariant geometry.
 
-The guiding thesis is in
-[`KEYSTONE.md`](experiments/keystone/KEYSTONE.md): on `R_{>0}`, approximation
-problems governed by scaling should be organized in log coordinates,
-approximated by the affine pseudo-log, and discretized on geometric grids.
+>
+
+Mike Day's 2023 FRSR analysis gives an exact finite candidate set for the extrema of piecewise-linear coarse approximations to `x^(p/q)`. 
+
+Studying finite-state intercept policies for those coarse approximations shows us something rather interesting: 
+> 
+
+proof that the log-linear relationship in binary scientific notation style floating point representations known since at least Mitchell 1962 is not just useful but optimal in a very specific way: 
+
+
+This repo studies finite-state intercept policies for those coarse approximations. 
+
+The overall and rather brash goal: transform the triangle inequality into a computable measure of the cost of departure from a log-linear surrogate, producing a "computational ruler" for approximation problems governed by scaling.
+
+
 
 ## Documentation
 
 - [`DISTANT-SHORES.md`](DISTANT-SHORES.md): overall science goal and the
   six-step roadmap toward a computational ruler.
-- [`experiments/keystone/KEYSTONE.md`](experiments/keystone/KEYSTONE.md):
-  guiding thesis, structural motivation, and the primary `K1`-`K3` tests.
+- [`experiments/EXPERIMENTS.md`](experiments/EXPERIMENTS.md): experiment drivers, output
+  columns, and which scripts support the keystone program.
 - [`PARTITIONS.md`](PARTITIONS.md): analytical classification of the partition
   family and the current selection rationale.
-- [`experiments/HYPOTHESES.md`](experiments/HYPOTHESES.md): active research
-  claims and their status.
-- [`experiments/wall/WALL.md`](experiments/wall/WALL.md): the current
-  obstruction model and its decomposition.
-- [`experiments/README.md`](experiments/README.md): experiment drivers, output
-  columns, and which scripts support the keystone program.
-- [`lib/README.md`](lib/README.md): module graph, data contracts, and numerical caveats.
 
 ## Terminology
 
-- `uniform_x`: equal additive width on `[1,2)`.
-- `geometric_x`: equal width in `log x` on `[1,2)`.
-- `bits` / `binary_prefix`: binary address of a cell, not the cell geometry.
-- `index`: integer cell id `0 .. 2^depth - 1`.
-- Historical notes may still say "dyadic" for binary addressing or the older
-  baseline; in current repo docs, it is not the canonical geometry name.
+TODO:REPLACE WITH POINTER TO GLOSSARY
 
 ## Running
+
+TODO:MIGRATE (A MINIMAL VERSION) TO AGENTS.MD
 
 All commands below are run from project root.
 
@@ -52,20 +47,3 @@ python3 lib/trajectory.py
 ./sagew tests/run_tests.sage
 ./sagew
 ```
-
-## Dependencies And Runtime
-
-- SageMath is required for the `.sage` drivers.
-- The optimizer in [`lib/optimize.sage`](lib/optimize.sage) uses `numpy` and
-  `scipy.optimize.linprog`.
-- [`experiments/keystone/partition_sweep.sage`](experiments/keystone/partition_sweep.sage) is
-  the primary partition-comparison driver for `K1`-`K3`.
-- [`experiments/keystone/h1_sweep.sage`](experiments/keystone/h1_sweep.sage) is the
-  uniform-only H1 hypothesis baseline.
-- [`experiments/keystone/inspect_case.sage`](experiments/keystone/inspect_case.sage) is the
-  single-case diagnostic workbench.
-- The minimax optimizer is implemented as float bisection plus LP feasibility,
-  followed by dyadic snapping of the returned parameters. Treat it as a strong
-  numerical solver, not a fully certified rational optimum.
-
-Project-local Sage state is stored in `.sage/`.
