@@ -54,6 +54,17 @@ Exhibits: K1a mechanism (scale-equivariance -> equal cell difficulty)
 Coastline area across partition families. Scaled-area convergence,
 wobble, and stability diagnostics.
 
+### `tiling/`
+
+Hyperbolic binary tiling framework: the representation displacement
+field Δ^L and its connection to the wall. Tests whether the wall
+responds to a representation-level forcing function.
+[`TILING.md`](tiling/TILING.md) contains the framework.
+
+Scripts: `displacement_field_test`, `leading_bit_projection`.
+
+Tests: T1, T2
+
 ## Shared utilities
 
 - **`zoo_figure.sage`** — Zoo-grid subplot helpers.
@@ -237,7 +248,47 @@ pattern. LD cuts the displacement range ~50% by using middle layers
 to pull back. See `wall/results/exchange_rate/`.
 
 **Open edges:**
-- How does layer-0 fan-out scale with depth and q?
+- Layer-0 fan-out stabilizes with depth (T1/Stage D confirms bounded
+  forcing). Remaining question: does a second binary architecture
+  see the same forcing? (ABYSSAL-DOUBT resolution path 1.)
+
+## Tiling displacement field (T-series)
+
+### T1. The free intercept field has the same leading-bit residual shape as Δ^L
+
+**Status:** supported (strengthened by adversary test)
+**Tested in:** `tiling/displacement_field_test` (Stage A)
+
+**Question:** After removing the best leading-bit step, does the free
+intercept field c* track the representation displacement field Δ^L
+across partitions and depths?
+
+**Current answer:** Yes. R0(c*) correlates with R0(Δ^L) at r=0.80–0.89
+across all 20 geometry-only cases (4 Group A kinds x 5 depths). Three
+adversary partitions (Group H) designed to break this correlation all
+failed: half_geometric 0.876, eps_density 0.80–0.83, midpoint_dense
+0.88. The residual is a property of the approximation problem, not the
+partition geometry. See `tiling/results/displacement_field/`.
+
+### T2. The optimizer's layer-0 allocation is near the best leading-bit projection
+
+**Status:** partially supported
+**Tested in:** `tiling/displacement_field_test` (Stages B, C)
+
+**Question:** Does the optimizer use layer 0 as the best coarse
+absorber, with LD gains coming from later-layer repair?
+
+**Current answer:** Layer 0 is in the right neighborhood of the best
+leading-bit projection (median fit gap ~0.020) but systematically
+offset by deeper path-algebra constraints. The cumulative absorption
+test confirms LD gains come from layers 1+ repairing the coarse
+forcing, not from a different layer-0 picture. Stage D shows the
+forcing stabilizes with depth (bounded allocation problem).
+See `tiling/results/displacement_field/`.
+
+**Open edges:**
+- Harmonic q=3 d=6 LD has an outlier fit gap (0.048). Investigate.
+- Does the picture hold at non-1/2 exponents?
 
 ## Retired
 

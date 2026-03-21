@@ -1,12 +1,12 @@
 # Partition Classification
 
-The partition zoo contains **23 kinds** defined in `lib/partitions.sage`.
+The partition zoo contains **25 kinds** defined in `lib/partitions.sage`.
 Each kind produces a partition of a domain `[x_start, x_start + x_width)`
 into `2^depth` cells with distinct geometric character.
 
 The thesis argues that **geometric** (equal log-width) achieves near-optimal
 chord error for `1/(x ln 2)` while remaining curve-agnostic — a claim tested
-by comparing against all 22 alternatives.
+by comparing against all 24 alternatives.
 
 ---
 
@@ -161,6 +161,31 @@ Parameters:
 
 ---
 
+## Group H — Tiling Adversaries
+
+Stress-test partitions for the displacement field experiment
+(`experiments/tiling/`). Each targets a specific vulnerability in the
+Stage A residual correlation test between R0(c*) and R0(Δ^L).
+
+| Kind | Density | Symmetry | Arithmetic | Description |
+|------|---------|----------|------------|-------------|
+| `half_geometric_x` | piecewise log-uniform | asymmetric | HiR | Geometric within each leading-bit half |
+| `eps_density_x` | interior-dense | asymmetric | HiR | Density proportional to ε(m) |
+| `midpoint_dense_x` | center-dense | symmetric | HiR | Wigner semicircle density at m = 0.5 |
+
+**half_geometric** makes each leading-bit half internally geometric,
+designed to kill the within-half R0(c*) signal. **eps_density**
+concentrates cells where Δ^L is largest, designed to pre-absorb the
+forcing geometrically. **midpoint_dense** concentrates cells at the
+leading-bit split, designed to put R0(c*) and R0(Δ^L) out of phase.
+
+All three adversaries failed: correlations held at 0.80–0.88,
+matching or exceeding Group A. The displacement field's residual
+shape is a property of the approximation problem, not the partition
+geometry. See `experiments/tiling/TILING.md` for the full analysis.
+
+---
+
 ## Equivalences
 
 One known boundary-array identity:
@@ -172,7 +197,7 @@ One known boundary-array identity:
 
 ## Quick Reference
 
-All 22 partitions in zoo order:
+All 25 partitions in zoo order:
 
 | # | Kind | Display | Color | Group | Density | Arith | Curve-aware |
 |---|------|---------|-------|-------|---------|-------|-------------|
@@ -198,3 +223,6 @@ All 22 partitions in zoo order:
 | 19 | `beta_x` | beta | `#ff7f00` | E | right-dense | HiR | no |
 | 20 | `arc_length_x` | arc-length | `#a65628` | F | left-dense | HiR | yes |
 | 21 | `minimax_chord_x` | minimax-chord | `#f781bf` | F | left-dense | HiR | yes |
+| 22 | `half_geometric_x` | half-geometric | `#636363` | H | piecewise-log-uniform | HiR | no |
+| 23 | `eps_density_x` | eps-density | `#252525` | H | interior-dense | HiR | yes |
+| 24 | `midpoint_dense_x` | midpoint-dense | `#969696` | H | center-dense | HiR | no |

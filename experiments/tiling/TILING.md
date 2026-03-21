@@ -4,6 +4,11 @@ Purpose: argue that hyperbolic binary tiling provides a framework for
 approaching DISTANT-SHORES steps 5 and 6 via a representation-intrinsic
 displacement field, and sketch what's testable now.
 
+Reading inward: depends on [`ABYSSAL-DOUBT.md`](../../ABYSSAL-DOUBT.md)
+for the doubt this framework responds to, and
+[`WALL.md`](../wall/WALL.md) for the fan-out displacement analysis that
+motivates it.
+
 ---
 
 ## Background: binary tiling of the hyperbolic plane
@@ -15,15 +20,14 @@ doubling exactly compensates the 1/y scaling: every tile has the same
 hyperbolic area. Binary subdivision produces hyperbolically congruent
 tiles.
 
-The connection to the Smith chart (Mizuhashi 1937, Smith 1939) is not
-metaphorical. The Smith chart is a conformal mapping of the impedance
+The Smith chart (Mizuhashi 1937, Smith 1939) is a conformal mapping of the impedance
 plane to the reflection coefficient plane. Its grid structure — circles
 of constant resistance, arcs of constant reactance — is a binary tiling
 of hyperbolic space. The two representations (impedance and reflection
 coefficient) are related by a Möbius transformation, and the gridlines
 are horocycles and geodesics of the hyperbolic plane.
 
-The relevance to this project: the binary partition of [1, 2) and the
+The binary partition of [1, 2) and the
 geometric partition of [1, 2) are two coordinate views of the same
 hyperbolic structure. Uniform-width cells (additive subdivision) and
 equal-log-width cells (geometric subdivision) are the horocyclic and
@@ -141,20 +145,58 @@ If the prediction fails — if D^{L0} has structure uncorrelated with
 component, and the tiling framework does not buy us what we need for
 Step 6.
 
-### Data requirements
+### Why a naive correlation is insufficient
 
-This test requires only quantities already computed or cheaply
-computable from existing infrastructure:
+Layer 0 has 3 free parameters (c₀, δ(0,0), δ(0,1)), so δ^{L0}_j is
+a step function: one constant for the left half (bit 0), another for
+the right half (bit 1). Subtracting the nearly-flat δ*_j (on a
+geometric partition, where K1a says all cells face the same task)
+leaves D^{L0} ≈ a step function. And Δ^L = −ε(m) is a concave hump
+peaking left of center. Any leftward-heavy hump correlates with any
+step function that's higher on the left. A positive raw correlation
+is nearly guaranteed and tells us very little.
 
-- Free-per-cell optimal intercepts δ*_j (from the LP at the geometric
-  partition).
-- Layer-0-only intercepts δ^{L0}_j (from the delta table with only
-  the first layer applied).
-- The representation displacement Δ^L_k = k/2^d − log₂(1 + k/2^d),
-  which is a closed-form expression.
+The actual testable content is the **residual curvature** within each
+half after the piecewise-constant fit is removed. On a geometric
+partition this residual is small (δ* is flat), making the test
+near-vacuous at a single partition. The test gains discriminating
+power across partitions and depths:
 
-The comparison is a scatter plot or correlation coefficient: D^{L0}_j
-vs. Δ^L at the corresponding cell location, across several depths.
+- **Across partitions:** On uniform_x, δ* varies substantially with
+  position, producing a large residual whose shape should track ε
+  curvature. The residual magnitude should rank-order with partition
+  departure from geometric.
+- **Across depths:** Layer 0 always has 2 values but serves 2^d cells.
+  The piecewise-constant fit gets coarser relative to the smooth ε
+  hump as d grows, so the residual curvature should grow with depth,
+  tracking the curvature ε'' = −1/((1+m)² ln 2).
+
+### Test results (2026-03-21)
+
+The four-stage test (`displacement_field_test.sage`) confirmed that
+R0(c*) correlates with R0(Δ^L) at r = 0.80–0.89 across 20 cases
+(4 Group A kinds × 5 depths). The match is robust:
+
+- Stage A (geometry-only): PASS. Correlations stable across depths.
+- Stage B (layer-0 allocation): MIXED. Optimizer's layer 0 is close
+  to the best leading-bit projection but systematically offset by
+  path-algebra constraints.
+- Stage C (cumulative absorption): PASS. LD beats LI by repairing at
+  layers 1+, not by changing the layer-0 picture.
+- Stage D (depth scaling): forcing stabilises by d = 6–7.
+
+Three adversary partitions (Group H) designed to break Stage A all
+failed to find its boundary:
+
+| Adversary | Design intent | Actual corr |
+|---|---|---|
+| `half_geometric_x` | Kill R0(c*) by making halves geometric | 0.876 |
+| `eps_density_x` | Pre-absorb forcing via ε-proportional density | 0.80–0.83 |
+| `midpoint_dense_x` | Put R0(c*) and R0(Δ^L) out of phase | 0.88 |
+
+The residual shape is a property of the approximation problem, not
+the partition geometry. This strengthens the claim that Δ^L is the
+right zeroth-order forcing field for this FSM family.
 
 ---
 
@@ -268,3 +310,37 @@ The tiling framework reframes the [MENEHUNE] in Steps 5 and 6 from
 function dominates the wall and that the combinatorial absorption
 ordering it induces is architecture-invariant." The second formulation
 is more modest and more testable.
+
+---
+
+## Connection to the displacement analysis
+
+The fan-out analysis (2026-03-21, `wall/displacement_structure.sage`)
+found that the wall is dominated by early-layer fan-out, not by
+pairwise chord displacement or residue-state assignment. The tiling
+framework explains *why*: the fan-out is the FSM's encounter with
+the representation displacement field Δ^L. Layer 0 splits the domain
+at the binary midpoint (m = 0.5), which is algebraic. The target
+structure peaks at m* ≈ 0.44, which is logarithmic. The mismatch
+between these two reference points — one set by the representation,
+the other by the function — is exactly the displacement that cascades
+through subsequent layers.
+
+The circle closes: Δ^L = −ε(m), the displacement field between the
+binary and geometric grids, is the same function that KEYSTONE §2
+identifies as the free cost of using the pseudo-log surrogate. The
+wall, the surrogate error, and the grid displacement are the same
+object viewed from three angles. The tiling framework provides the
+geometric setting (hyperbolic plane, horocyclic vs geodesic slicings)
+in which this identity is natural rather than coincidental.
+
+## Reading outward
+
+- [`ABYSSAL-DOUBT.md`](../../ABYSSAL-DOUBT.md): the doubt this
+  responds to.
+- [`DISTANT-SHORES.md`](../../DISTANT-SHORES.md): the roadmap whose
+  steps 5–6 this framework addresses.
+- [`WALL.md`](../wall/WALL.md): the wall decomposition and
+  displacement analysis.
+- [`KEYSTONE.md`](../keystone/KEYSTONE.md) §2: the surrogate error
+  ε(m) that Δ^L turns out to equal.

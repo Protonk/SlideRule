@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "source": "lib/partitions.sage",
-    "n_kinds": 23
+    "n_kinds": 25
   },
   "partitions": [
     {
@@ -312,6 +312,48 @@
       "density": "left_dense",
       "params": {"minimax_tol": 1e-12},
       "equivalences": []
+    },
+    {
+      "kind": "half_geometric_x",
+      "display_name": "half-geometric",
+      "zoo_index": 23,
+      "color": "#636363",
+      "category": "tiling_adversary",
+      "description": "Geometric within each leading-bit half",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "asymmetric",
+      "density": "piecewise_log_uniform",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "eps_density_x",
+      "display_name": "eps-density",
+      "zoo_index": 24,
+      "color": "#252525",
+      "category": "tiling_adversary",
+      "description": "Density proportional to ε(m) = log₂(1+m) − m",
+      "arithmetic": "HiR",
+      "curve_aware": true,
+      "symmetry": "asymmetric",
+      "density": "interior_dense",
+      "params": {},
+      "equivalences": []
+    },
+    {
+      "kind": "midpoint_dense_x",
+      "display_name": "midpoint-dense",
+      "zoo_index": 25,
+      "color": "#969696",
+      "category": "tiling_adversary",
+      "description": "Wigner semicircle density centered at m = 0.5",
+      "arithmetic": "HiR",
+      "curve_aware": false,
+      "symmetry": "symmetric",
+      "density": "center_dense",
+      "params": {},
+      "equivalences": []
     }
   ],
   "categories": {
@@ -321,7 +363,8 @@
     "symbolic_dynamics": {"label": "Symbolic Dynamics", "group": "D"},
     "approximation_parametric": {"label": "Approximation / Parametric", "group": "E"},
     "curve_aware": {"label": "Curve-Aware", "group": "F"},
-    "null_model": {"label": "Null Model", "group": "G"}
+    "null_model": {"label": "Null Model", "group": "G"},
+    "tiling_adversary": {"label": "Tiling Adversaries", "group": "H"}
   },
   "equivalences": [
     {"pair": ["radical_inverse_x", "uniform_x"], "condition": "vdc_base=2"}

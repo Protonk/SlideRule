@@ -40,7 +40,8 @@ PARTITION_KINDS = ('uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x'
                    'bitrev_geometric_x', 'stern_brocot_x', 'reverse_geometric_x',
                    'random_x', 'dyadic_x', 'powerlaw_x', 'golden_x', 'cantor_x',
                    'farey_rank_x', 'radical_inverse_x',
-                   'sturmian_x', 'beta_x', 'arc_length_x', 'minimax_chord_x')
+                   'sturmian_x', 'beta_x', 'arc_length_x', 'minimax_chord_x',
+                   'half_geometric_x', 'eps_density_x', 'midpoint_dense_x')
 PARTITION_KIND_ALIASES = {
     'reciprocal_x': 'harmonic_x',
     'mirror_reciprocal_x': 'mirror_harmonic_x',
@@ -493,6 +494,96 @@ def _minimax_chord_boundaries(N, a_hir, x_end_hir, minimax_tol):
     return bdry
 
 
+def _half_geometric_boundaries(N, a_hir, x_end_hir):
+    """Geometric within each leading-bit half, split at midpoint (HiR)."""
+    x_mid = (a_hir + x_end_hir) / HiR(2)
+    half = int(N) // 2
+    bdry = []
+    # Left half: geometric on [a, x_mid)
+    r_left = x_mid / a_hir
+    for j in range(half + 1):
+        bdry.append(a_hir * r_left ^ (HiR(j) / HiR(half)))
+    # Right half: geometric on [x_mid, x_end)
+    r_right = x_end_hir / x_mid
+    for j in range(1, half + 1):
+        bdry.append(x_mid * r_right ^ (HiR(j) / HiR(half)))
+    bdry[0] = a_hir
+    bdry[-1] = x_end_hir
+    return bdry
+
+
+def _eps_density_boundaries(N, a_hir, w_hir):
+    """Boundary points with density proportional to ε(m) = log₂(1+m) − m (HiR).
+
+    CDF inversion by bisection.  Total ∫₀¹ ε(m) dm = 3/2 − 1/ln2.
+    """
+    import math
+    ln2 = math.log(2.0)
+    a_f = float(a_hir)
+    w_f = float(w_hir)
+
+    def eps(m):
+        if m <= 0:
+            return 0.0
+        return math.log2(1.0 + m) - m
+
+    def eps_antideriv(m):
+        # ∫ ε(t) dt = (1/ln2)[(1+m)ln(1+m) - (1+m)] - m²/2
+        if m <= 0:
+            return -1.0 / ln2
+        return (1.0 / ln2) * ((1.0 + m) * math.log(1.0 + m) - (1.0 + m)) - m * m / 2.0
+
+    total = eps_antideriv(1.0) - eps_antideriv(0.0)  # = 3/2 - 1/ln2
+
+    bdry = [a_hir]
+    for j in range(1, int(N)):
+        target = j * total / int(N)
+        lo, hi = 0.0, 1.0
+        for _ in range(60):
+            mid = (lo + hi) / 2.0
+            val = eps_antideriv(mid) - eps_antideriv(0.0)
+            if val < target:
+                lo = mid
+            else:
+                hi = mid
+        bdry.append(HiR(a_f + w_f * (lo + hi) / 2.0))
+    bdry.append(a_hir + w_hir)
+    return bdry
+
+
+def _midpoint_dense_boundaries(N, a_hir, w_hir):
+    """Boundary points with Wigner semicircle density √(m(1−m)), centered at m=0.5 (HiR).
+
+    CDF: F(m) = (1/π)[arcsin(2m−1) + (2m−1)√(m(1−m))] + 1/2.
+    Inversion by bisection.
+    """
+    import math
+    a_f = float(a_hir)
+    w_f = float(w_hir)
+
+    def wigner_cdf(m):
+        if m <= 0:
+            return 0.0
+        if m >= 1:
+            return 1.0
+        return (1.0 / math.pi) * (math.asin(2.0 * m - 1.0)
+                                   + (2.0 * m - 1.0) * math.sqrt(m * (1.0 - m))) + 0.5
+
+    bdry = [a_hir]
+    for j in range(1, int(N)):
+        target = j / int(N)
+        lo, hi = 0.0, 1.0
+        for _ in range(60):
+            mid = (lo + hi) / 2.0
+            if wigner_cdf(mid) < target:
+                lo = mid
+            else:
+                hi = mid
+        bdry.append(HiR(a_f + w_f * (lo + hi) / 2.0))
+    bdry.append(a_hir + w_hir)
+    return bdry
+
+
 def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
     """
     Build a partition of [x_start, x_start + x_width) into 2^depth cells.
@@ -624,6 +715,12 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
         if float(minimax_tol) <= 0:
             raise ValueError(f"minimax_tol must be positive, got {minimax_tol}")
         bdry = _minimax_chord_boundaries(N, a, x_end, minimax_tol)
+    elif kind == 'half_geometric_x':
+        bdry = _half_geometric_boundaries(N, a, x_end)
+    elif kind == 'eps_density_x':
+        bdry = _eps_density_boundaries(N, a, w)
+    elif kind == 'midpoint_dense_x':
+        bdry = _midpoint_dense_boundaries(N, a, w)
 
     rows = []
 
@@ -677,7 +774,9 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
         elif kind in ('reverse_geometric_x', 'random_x', 'dyadic_x',
                        'powerlaw_x', 'golden_x', 'cantor_x',
                        'radical_inverse_x', 'beta_x', 'arc_length_x',
-                       'minimax_chord_x'):
+                       'minimax_chord_x',
+                       'half_geometric_x', 'eps_density_x',
+                       'midpoint_dense_x'):
             x_lo = bdry[j]
             x_hi = bdry[j + 1]
 
@@ -759,6 +858,9 @@ PARTITION_ZOO = [
     ('beta',              '#ff7f00', 'beta_x'),
     ('arc-length',        '#a65628', 'arc_length_x'),
     ('minimax-chord',     '#f781bf', 'minimax_chord_x'),
+    ('half-geometric',   '#636363', 'half_geometric_x'),
+    ('eps-density',      '#252525', 'eps_density_x'),
+    ('midpoint-dense',   '#969696', 'midpoint_dense_x'),
 ]
 
 

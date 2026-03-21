@@ -39,6 +39,12 @@ triple; the layer-dependent model has `1 + 2q × depth` parameters for
 `2^depth` leaves, so parameters are still reused. The residual gap
 `opt_err(layer-dependent) − free_err` is attributed to this coupling.
 
+The displacement analysis (2026-03-21) showed that this coupling does
+not operate through residue-state assignment (all final states have
+similar displacement statistics). It operates through the path algebra:
+the accumulation of shared delta entries along binary paths imposes a
+global distortion pattern.
+
 ## beta (β)
 
 Day notation: `β = max(a, b)`. For FRSR, `β = 2`.
@@ -126,15 +132,32 @@ partition in this repo has `2^d` leaf cells. Depth also equals the
 number of bits consumed by the FSM in determining the intercept for a
 given input.
 
-## displacement
+## displacement (per-cell)
 
 The signed difference `path_intercept_j − free_cell_intercept_j` for a
 given cell under a shared-delta policy. Positive displacement means the
 sharing constraint pushes the cell's intercept above its per-cell optimum;
 negative means below. The sign of the displacement gives the alternation
-pattern; the magnitude gives the local cost of sharing. The displacement
-profile across all cells is the continuous precursor to the binary
-alternation sequence.
+pattern; the magnitude gives the local cost of sharing.
+
+Not to be confused with the representation displacement field Δ^L, which
+is an architecture-free quantity. See **displacement field**.
+
+## displacement field (Δ^L)
+
+The architecture-free representation displacement field:
+
+    Δ^L(m) = m − log₂(1 + m) = −ε(m)
+
+This is the pointwise displacement between the binary (uniform) grid
+and the geometric (log-equivariant) grid on the mantissa interval
+[0, 1). It depends only on the binary representation, not on the FSM,
+the delta table, or any correction strategy. Any correction architecture
+that processes binary significand bits must absorb this field.
+
+The tiling framework identifies Δ^L as the forcing function that
+organises the wall's coarse structure. See
+[`experiments/tiling/TILING.md`](experiments/tiling/TILING.md).
 
 ## dyadic
 
@@ -167,31 +190,31 @@ pseudo-log on one binade. It is concave, zero at both endpoints
 derivative is `ε''(m) = −1/(m² ln 2)`. The tilt decomposition writes
 each per-cell chord error as `ε(m) − δ(m)` where δ is the affine tilt.
 
-## evaluation regime
+## fan-out (early-layer)
 
-The repo has two evaluation regimes for per-cell and global error
-computation.
+The mechanism by which layer 0's single delta pair must serve all 2^d
+cells, imposing a systematic positional displacement that cascades
+through subsequent layers. Identified as the dominant source of the
+wall. Under LI, the displacement correlates with cell position
+(r ≈ 0.4–0.6); under LD, later layers partially repair the
+distortion, cutting the displacement range roughly in half.
 
-The **reference exact `uniform_x` oracle** computes exact extrema on the
-equal-additive `uniform_x` cells. It is the authoritative regression and
-validation target.
-
-The **arbitrary-cell regime** computes the same style of error metrics from
-general cell bounds, typically supplied as `plog_lo` / `plog_hi` from a
-partition row. This is the regime used for current cross-partition
-keystone comparisons.
-
-The relationship between them is important: on `uniform_x`, the
-arbitrary-cell regime is checked against the reference exact `uniform_x`
-oracle, and the exact oracle remains the validation anchor for the more
-general path.
+The fan-out cost stabilises with depth (bounded allocation problem,
+not structurally growing). See
+[`experiments/wall/WALL.md`](experiments/wall/WALL.md).
 
 ## foreign-chord error matrix, E[j, k]
 
-A matrix whose (j, k) entry records the error when the chord optimised
-for cell j is applied to cell k instead. This is a tool for reasoning
-about how FSM policies, which force cells to share correction parameters,
-incur error by using "foreign" chords.
+A matrix whose (j, k) entry records the absolute error when the chord
+optimised for cell j is applied to cell k instead. Built by
+`_foreign_error.sage` in the damage analysis.
+
+The damage-vs-wall experiment also introduced a **foreign-intercept
+excess matrix** F[j, k], which measures the *excess* error on cell k
+when using cell j's free-optimal intercept instead of its own:
+`F[j,k] = err(c_free_j on cell k) − err(c_free_k on cell k)`. The
+diagonal is zero by construction. F is commensurate with wall excess
+(both are excesses over the free baseline); E is not.
 
 ## free-per-cell lower bound (free_err)
 
@@ -199,6 +222,14 @@ The best worst-case error achievable when each leaf cell independently
 optimises its own intercept with no sharing constraint. This is the
 unconstrained floor — no FSM or shared policy can beat it. The wall is
 defined as `opt_err − free_err`.
+
+## free intercept field (c*)
+
+The vector of free-per-cell optimal intercepts across all cells:
+`c*_j` is the intercept minimising worst-case error on cell j with no
+sharing constraint. Used as the target field in the tiling displacement
+analysis. On a geometric partition, c* is nearly flat (scale
+equivariance makes all cells face the same task).
 
 ## FRGR (Fast Reciprocal General Root)
 
@@ -243,8 +274,9 @@ It is the unique partition invariant under multiplication by the grid
 ratio. In the keystone program it is the preferred scale-equivariant
 curve-agnostic geometry. In current repo terminology it is a geometry
 name, distinct from the cell's binary address. See
-[`KEYSTONE.md`](experiments/keystone/KEYSTONE.md) and [`HYPOTHESES.md`](experiments/HYPOTHESES.md) for
-the status of the partition-comparison claims.
+[`KEYSTONE.md`](experiments/keystone/KEYSTONE.md) and
+[`EXPERIMENTS.md`](experiments/EXPERIMENTS.md) for the status of the
+partition-comparison claims.
 
 ## candidate families (H, V, D)
 
@@ -258,12 +290,17 @@ The minimum z comes from whichever of H or V has the smaller index
 (`α_Day = min(a,b)`); the maximum z always comes from D. All three families
 are expressed through the zeta function `ζ(r, k, c)`.
 
-## hypotheses H1–H4, K1–K3
+## hypothesis series
 
-The project maintains two hypothesis families. **H1–H4** concern the
-shared-delta / FSM story. **K1–K3** concern the keystone
-scale-symmetry thesis and partition comparisons. See
-[`HYPOTHESES.md`](experiments/HYPOTHESES.md) and [`KEYSTONE.md`](experiments/keystone/KEYSTONE.md).
+The project maintains four hypothesis series in
+[`EXPERIMENTS.md`](experiments/EXPERIMENTS.md):
+
+- **K1–K3**: keystone scale-symmetry thesis and partition comparisons.
+- **H1–H4**: supporting baseline observations on `uniform_x`.
+- **W-series**: wall mechanism findings (e.g., W1: the wall is not
+  pairwise chord displacement).
+- **T-series**: tiling displacement field predictions (e.g., T1: the
+  free intercept field tracks Δ^L).
 
 ## index
 
@@ -473,11 +510,28 @@ notes say "dyadic partition" in the cell-geometry sense.
 
 The central object of study: the persistent gap `wall = opt_err − free_err`
 between the best shared-delta FSM policy and the unconstrained per-cell
-lower bound. The wall is decomposed into three nested sources: (1)
-parameter budget, (2) layer sharing, (3) automaton coupling. It is a
-case-based decomposition supported by sweep data, not yet a theorem.
-The alternation pattern is the wall's spatial fingerprint — it shows where
-the sharing penalty concentrates across cells. See [`WALL.md`](experiments/wall/WALL.md).
+lower bound. Decomposed into three nested sources: (1) parameter budget,
+(2) layer sharing, (3) automaton coupling. The dominant mechanism is
+early-layer fan-out: layer 0 must serve all cells with one delta pair,
+creating systematic positional displacement.
+
+The wall is not necessarily intrinsic to the approximation problem. The
+displacement field analysis shows it is driven by the mismatch between
+binary fan-out and logarithmic self-similarity. It is a cost of the
+binary representation, not a proven lower bound on shared-structure
+approximation in general. The forcing stabilises with depth (bounded
+allocation problem). See [`WALL.md`](experiments/wall/WALL.md) and
+[`ABYSSAL-DOUBT.md`](ABYSSAL-DOUBT.md).
+
+## wall excess
+
+The per-cell sharing penalty:
+`wall_excess_j = cell_worst_err_j(shared) − cell_worst_err_j(free)`.
+This is NOT a spatial decomposition of the global wall (which is
+`max(shared_j) − max(free_j)`, not `max(shared_j − free_j)`). It is
+an upper-envelope diagnostic showing where the sharing constraint
+hurts most. Summary statistics include max excess, top-quartile share,
+and max/median ratio.
 
 ## z(x) (quality metric)
 
