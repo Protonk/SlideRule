@@ -1,15 +1,17 @@
 # DayLog
 
-Day's 2023 FRSR analysis gives an exact finite candidate set for the
-extrema of piecewise-linear coarse approximations to `x^(p/q)`. We study finite-state intercept policies for those approximations and find that the log-linear structure in binary floating point (known since Mitchell 1962) is not just useful but optimal: geometric partitions are the zero-cost baseline under scale symmetry; any departure has measurable structural cost.
+Binary floating point approximates the logarithm via a piecewise-linear surrogate whose error `ε(m) = log₂(1+m) − m` is known and fixed. Any correction architecture processing binary significand bits must absorb this error. We study the structural cost of that absorption and find that ε itself — recast as a representation displacement field — organises the cost at first order, across partition geometries, adversarial constructions, and width-position scrambles.
 
-We can make that cost concrete by isolating how much error comes from each sharing constraint in the finite-state machine — parameter budget, layer sharing, and automaton coupling. This potentially opens a path to quantitative exchange rates between structural investment and approximation quality.
+Day's 2023 FRSR analysis provides the analytical foundation: an exact finite candidate set for the extrema of piecewise-linear coarse approximations to `x^(p/q)`, which gives us exact minimax solutions rather than numerical approximations.
+
+We can make the cost concrete by isolating how much error comes from each sharing constraint in the finite-state machine — parameter budget, layer sharing, and automaton coupling. The displacement field Δ^L = −ε is the forcing function that every binary-representation corrector must respond to. Its shape predicts the exchange rate between structural investment and approximation quality.
 
 Our overall and rather brash goal: transform the triangle inequality into a computable measure of the cost of departure from a log-linear surrogate, producing a "computational ruler" for approximation problems governed by scaling.
 
-[`DISTANT-SHORES.md`](DISTANT-SHORES.md): overall science goal and the six-step roadmap, with steps #5 and #6 labeled with [MENEHUNE], indicating the presence of magical helpers are needed to carry the logic forward [ed.: We aren't done yet.].
-- `experiments/keystone/KEYSTONE.md` represents the immediate jumping off point from Day (steps 1-4), with `experiments/stepstone/STEPSTONE.md` and `experiments/ripple/RIPPLE.md` aligned with that.
-- `experiments/wall/WALL.md` & `experiments/wall/damage/DAMAGE.md` represent the first real foray into [MENEHUNE] #5.
+- [`DISTANT-SHORES.md`](DISTANT-SHORES.md): six-step roadmap toward the computational ruler.
+- `experiments/keystone/KEYSTONE.md`: scale-symmetry thesis and partition comparisons (steps 1–4).
+- `experiments/wall/WALL.md`: wall obstruction model, fan-out mechanism, displacement analysis.
+- `experiments/tiling/TILING.md`: hyperbolic tiling framework and the displacement field.
 
 ## Terminology
 
@@ -32,6 +34,11 @@ tests/                Test suite (run via ./sagew tests/run_tests.sage)
 sources/              Reference material
 DISTANT-SHORES.md     Six-step roadmap toward the computational ruler
 PARTITIONS.md         Partition family classification
+  tiling/               Displacement field and hyperbolic tiling framework
+DISTANT-SHORES.md     Six-step roadmap toward the computational ruler
+ABYSSAL-DOUBT.md      Serious doubts about the path
+PARTITIONS.md         Partition family classification (26 kinds)
 GLOSSARY.md           Project terminology
+REFERENCES.md         Literature (Day 2023, Mitchell 1962, and lineage)
 AGENTS.md             How to work here (imports, running, planning)
 ```

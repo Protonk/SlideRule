@@ -41,7 +41,8 @@ PARTITION_KINDS = ('uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x'
                    'random_x', 'dyadic_x', 'powerlaw_x', 'golden_x', 'cantor_x',
                    'farey_rank_x', 'radical_inverse_x',
                    'sturmian_x', 'beta_x', 'arc_length_x', 'minimax_chord_x',
-                   'half_geometric_x', 'eps_density_x', 'midpoint_dense_x')
+                   'half_geometric_x', 'eps_density_x', 'midpoint_dense_x',
+                   'scramble_x')
 PARTITION_KIND_ALIASES = {
     'reciprocal_x': 'harmonic_x',
     'mirror_reciprocal_x': 'mirror_harmonic_x',
@@ -494,6 +495,56 @@ def _minimax_chord_boundaries(N, a_hir, x_end_hir, minimax_tol):
     return bdry
 
 
+def _scramble_boundaries(N, a_hir, x_end_hir, scramble_mode):
+    """Width-preserving position scramble sourced from geometric_x.
+
+    scramble_mode='peak_swap': narrowest widths near m*, widest at boundaries.
+    scramble_mode='peak_avoid': widest widths near m*, narrowest at boundaries.
+
+    Uses fixed uniform reference slots for ranking. Ties broken by lower index.
+    """
+    import math
+    MSTAR = 1.0 / math.log(2.0) - 1.0
+    a_f = float(a_hir)
+    w_f = float(x_end_hir - a_hir)
+
+    # 1. Get geometric widths
+    r = float(x_end_hir / a_hir)
+    geo_bounds = [a_f * r**(j / int(N)) for j in range(int(N) + 1)]
+    widths = [geo_bounds[j + 1] - geo_bounds[j] for j in range(int(N))]
+
+    # 2. Sort widths ascending
+    widths_sorted = sorted(widths)
+
+    # 3. Reference slot midpoints (uniform)
+    ref_mids = [(j + 0.5) / int(N) for j in range(int(N))]
+
+    # 4. Rank reference slots by |r_j - m*|, ties by lower index
+    slot_order = sorted(range(int(N)), key=lambda j: (abs(ref_mids[j] - MSTAR), j))
+
+    # 5. Assign widths to slots
+    assignment = [0.0] * int(N)
+    if scramble_mode == 'peak_swap':
+        # k-th narrowest to k-th closest
+        for k, slot in enumerate(slot_order):
+            assignment[slot] = widths_sorted[k]
+    elif scramble_mode == 'peak_avoid':
+        # k-th widest to k-th closest
+        for k, slot in enumerate(slot_order):
+            assignment[slot] = widths_sorted[int(N) - 1 - k]
+    else:
+        raise ValueError("scramble_mode must be 'peak_swap' or 'peak_avoid', got '%s'" % scramble_mode)
+
+    # 6. Lay down left-to-right
+    bdry = [a_hir]
+    cum = a_f
+    for j in range(int(N)):
+        cum += assignment[j]
+        bdry.append(HiR(cum))
+    bdry[-1] = x_end_hir  # force exact endpoint
+    return bdry
+
+
 def _half_geometric_boundaries(N, a_hir, x_end_hir):
     """Geometric within each leading-bit half, split at midpoint (HiR)."""
     x_mid = (a_hir + x_end_hir) / HiR(2)
@@ -721,6 +772,9 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
         bdry = _eps_density_boundaries(N, a, w)
     elif kind == 'midpoint_dense_x':
         bdry = _midpoint_dense_boundaries(N, a, w)
+    elif kind == 'scramble_x':
+        scramble_mode = kwargs.get('scramble_mode', 'peak_swap')
+        bdry = _scramble_boundaries(N, a, x_end, scramble_mode)
 
     rows = []
 
@@ -776,7 +830,7 @@ def build_partition(depth, kind='uniform_x', x_start=1, x_width=1, **kwargs):
                        'radical_inverse_x', 'beta_x', 'arc_length_x',
                        'minimax_chord_x',
                        'half_geometric_x', 'eps_density_x',
-                       'midpoint_dense_x'):
+                       'midpoint_dense_x', 'scramble_x'):
             x_lo = bdry[j]
             x_hi = bdry[j + 1]
 

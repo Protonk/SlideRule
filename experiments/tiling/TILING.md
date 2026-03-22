@@ -334,6 +334,67 @@ object viewed from three angles. The tiling framework provides the
 geometric setting (hyperbolic plane, horocyclic vs geodesic slicings)
 in which this identity is natural rather than coincidental.
 
+## Basis identification and scramble test (2026-03-21)
+
+The displacement field test established that R0(c*) tracks R0(Δ^L).
+The basis identification asked: what specifically about ε organises
+c*? Seven candidate basis families competed to predict g = R0(c*) in
+native cell coordinates, trained on baselines and scored on held-out
+adversaries.
+
+Result: H_width is eliminated (holdout NRMSE 1.57). A single scalar
+— ε(m_mid) — captures most of the signal (H_value holdout corr
+0.86). H_balance (endpoint-balance geometry) wins the ranking but
+its margin over H_value is only 0.026 NRMSE. On affine-detrended
+geometric partitions, all ε-based families score corr > 0.999.
+
+Width-preserving position scrambles (peak_swap and peak_avoid) then
+tested whether inverting the width-ε coupling breaks the ε predictor.
+It does not. H_value holds at corr 0.85–0.89 on both scrambles.
+H_balance's margin is width-modulated (shrinks on peak_swap, widens
+on peak_avoid), confirming it captures a width × ε interaction rather
+than a purely positional signal.
+
+The summary figure (`results/t3_summary.png`) shows 9 partitions'
+transported R0(c*) collapsing onto the scaled ε template at depths
+6 and 8. The collapse is indifferent to construction method: baselines
+(solid), adversaries (dashed), and scrambles (dotted) all track the
+same curve.
+
+See `results/basis_identification/basis_holdout_summary.md` for
+detailed analysis.
+
+## Current status of the tiling program
+
+The displacement field Δ^L = −ε is established as the first-order
+organiser of c* across all tested partition families, robust to
+adversarial and scrambled geometries. The remaining open question is
+purely about the corrector side: how different architectures absorb
+the forcing. Steps 5 and 6 of DISTANT-SHORES can now be framed
+against this forcing rather than discovered empirically.
+
+## Other hyperbolic tilings
+
+The binary tiling in TILING.md is not the only hyperbolic tessellation
+relevant to this project. The Farey tessellation / Stern-Brocot tree
+produces a different binary tree of the interval, where splits occur
+at Farey mediants rather than binary midpoints. At depth 1, both
+tilings split [1, 2) at 3/2 (the mediant of 1/1 and 2/1 equals the
+binary midpoint). At depth 2, they diverge: binary splits at 5/4 and
+7/4, while Farey-mediants split at 4/3 and 5/3.
+
+The Farey tiling is interesting because its splits are
+rational-approximation-optimal (each mediant is the simplest fraction
+in its interval), while binary splits are digit-processing-optimal
+(each split corresponds to reading one bit). The project already has
+`stern_brocot_x` and `farey_rank_x` partitions in the zoo.
+
+The Farey connection becomes relevant if a second
+binary-representation architecture is needed for DISTANT-SHORES
+Step 6: Farey-mediant splitting is a different way to process binary
+representations, and its (C, gap) curve could be compared to the
+FSM's curve to test architecture-invariance of the exchange rate.
+
 ## Reading outward
 
 - [`ABYSSAL-DOUBT.md`](../../ABYSSAL-DOUBT.md): the doubt this

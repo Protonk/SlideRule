@@ -182,13 +182,21 @@ synonym for binary addressing.
 
 ## epsilon function, ε(m)
 
-The global pseudo-log error: `ε(m) = log₂(m) − (m − 1)` for
-`m ∈ [1, 2)`. This is the gap between the true logarithm and the affine
-pseudo-log on one binade. It is concave, zero at both endpoints
-(`ε(1) = 0`, `ε(2) = log₂(2) − 1 = 0`), with maximum at
-`m* = 1 / ln 2`. Its second
-derivative is `ε''(m) = −1/(m² ln 2)`. The tilt decomposition writes
-each per-cell chord error as `ε(m) − δ(m)` where δ is the affine tilt.
+The pseudo-log error on the mantissa interval: `ε(m) = log₂(1 + m) − m`
+for `m ∈ [0, 1)`, where m is the mantissa (m = x − 1 for x ∈ [1, 2)).
+This is the gap between the true logarithm and the affine pseudo-log on
+one binade. It is concave, zero at both endpoints (`ε(0) = 0`,
+`ε(1) = 0`), with maximum at `m* = 1/ln 2 − 1 ≈ 0.4427`. Its second
+derivative is `ε''(m) = −1/((1+m)² ln 2)`.
+
+ε is the central function of the project. It appears in three roles:
+- The surrogate error (KEYSTONE §2): the cost of using L instead of log₂.
+- The representation displacement field: Δ^L = −ε (TILING.md).
+- The first-order organiser of c*: the free intercept field's nonlinear
+  variation tracks ε across all tested partition families (T3).
+
+The tilt decomposition writes each per-cell chord error as `ε(m) − δ(m)`
+where δ is the affine tilt.
 
 ## fan-out (early-layer)
 
@@ -228,8 +236,13 @@ defined as `opt_err − free_err`.
 The vector of free-per-cell optimal intercepts across all cells:
 `c*_j` is the intercept minimising worst-case error on cell j with no
 sharing constraint. Used as the target field in the tiling displacement
-analysis. On a geometric partition, c* is nearly flat (scale
-equivariance makes all cells face the same task).
+analysis.
+
+On a geometric partition, all cells have equal worst-case *error*
+(K1a), but the optimal *intercept* varies with position: the nonlinear
+part of c* tracks ε almost perfectly (corr > 0.999 after affine
+detrending). The distinction between equal error and equal intercept
+is central to T3.
 
 ## FRGR (Fast Reciprocal General Root)
 
@@ -379,8 +392,8 @@ At larger depth, cell count growth (`2^d`) outruns both parameterisations.
 
 The collection of partition kinds implemented in `lib/partitions.sage`,
 organised into labelled subgroups by construction method (elementary
-geometric, number-theoretic, fractal, etc.). The zoo is open-ended — the
-current count is 23 but may grow. Subgroup definitions and per-kind
+geometric, number-theoretic, fractal, tiling adversaries, etc.). The
+zoo is open-ended — the current count is 26. Subgroup definitions and per-kind
 metadata are in [`PARTITIONS.md`](PARTITIONS.md) and serialised in
 [`lib/partitions.json`](lib/partitions.json).
 

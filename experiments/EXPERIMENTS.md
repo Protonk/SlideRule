@@ -61,9 +61,10 @@ field Δ^L and its connection to the wall. Tests whether the wall
 responds to a representation-level forcing function.
 [`TILING.md`](tiling/TILING.md) contains the framework.
 
-Scripts: `displacement_field_test`, `leading_bit_projection`.
+Scripts: `displacement_field_test`, `leading_bit_projection`,
+`basis_identification`, `basis_overlay`, `t3_summary_plot`.
 
-Tests: T1, T2
+Tests: T1, T2, T3
 
 ## Shared utilities
 
@@ -289,6 +290,31 @@ See `tiling/results/displacement_field/`.
 **Open edges:**
 - Harmonic q=3 d=6 LD has an outlier fit gap (0.048). Investigate.
 - Does the picture hold at non-1/2 exponents?
+
+### T3. The within-half variation of c* is primarily organised by pointwise ε
+
+**Status:** supported
+**Tested in:** `tiling/basis_identification`, `tiling/t3_summary_plot`
+
+**Question:** After Π₀ projection, is the residual of c* predicted
+by ε(m_mid) across partitions with different cell-width distributions,
+including those with inverted width-position coupling?
+
+**Current answer:** Yes. H_value (single feature ε(m_mid)) achieves
+holdout corr 0.85–0.89 across 3 adversaries and 2 width-scrambles
+that invert or maximise the width-ε coupling. H_width is eliminated
+(corr 0.17–0.54). On affine-detrended geometric, corr > 0.999.
+H_balance adds a correction of 0.01–0.07 NRMSE from endpoint-balance
+geometry; this margin is width-modulated (shrinks on peak_swap,
+widens on peak_avoid). The transported residual collapses onto a
+shared ε template across all 9 partition families tested.
+See `tiling/results/t3_summary.png`.
+
+**Open edges:**
+- Path 2 (local asymptotic model): derive c*(m, w) ≈ c₀(m) + c₁(m)·w
+  through the Day candidate structure. The basis competition has
+  reverse-engineered the term structure: c₀ tracks ε, corrections
+  track balance features.
 
 ## Retired
 
