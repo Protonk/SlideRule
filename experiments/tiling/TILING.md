@@ -13,25 +13,16 @@ motivates it.
 
 ## Background: binary tiling of the hyperbolic plane
 
-In the Poincaré half-plane model, a binary tiling consists of
-axis-aligned rectangles whose Euclidean width doubles at each level
-upward. The hyperbolic metric is ds² = (dx² + dy²)/y², so the Euclidean
-doubling exactly compensates the 1/y scaling: every tile has the same
-hyperbolic area. Binary subdivision produces hyperbolically congruent
-tiles.
+In the Poincare half-plane model, scaling `(x, y) -> (lambda * x, lambda * y)`
+is an isometry of the hyperbolic metric `ds^2 = (dx^2 + dy^2) / y^2`. A
+binary tiling can therefore be viewed as a family of rectangles related by
+dyadic scaling: moving up one level doubles Euclidean width and height while
+preserving hyperbolic shape and area.
 
-The Smith chart (Mizuhashi 1937, Smith 1939) is a conformal mapping of the impedance
-plane to the reflection coefficient plane. Its grid structure — circles
-of constant resistance, arcs of constant reactance — is a binary tiling
-of hyperbolic space. The two representations (impedance and reflection
-coefficient) are related by a Möbius transformation, and the gridlines
-are horocycles and geodesics of the hyperbolic plane.
-
-The binary partition of [1, 2) and the
-geometric partition of [1, 2) are two coordinate views of the same
-hyperbolic structure. Uniform-width cells (additive subdivision) and
-equal-log-width cells (geometric subdivision) are the horocyclic and
-geodesic slicings of the same tiling.
+The binary partition of [1, 2) and the geometric partition of [1, 2) are two
+coordinate views of the same structure. Uniform-width cells (additive
+subdivision) and equal-log-width cells (geometric subdivision) are the
+horocyclic and geodesic slicings of the same tiling.
 
 ---
 
@@ -47,53 +38,37 @@ and the geometric partition point
 
     g_k = 2^(k / 2^d),     k = 0, 1, ..., 2^d.
 
-Both grids agree at the endpoints: b_0 = g_0 = 1, b_{2^d} = g_{2^d} = 2.
-At every interior point they disagree. The pointwise displacement is
+Both grids agree at the endpoints: b_0 = g_0 = 1, b_{2^d} = g_{2^d} = 2. At
+every interior point they disagree. The pointwise displacement is
 
     Δ_k = b_k − g_k = (1 + k/2^d) − 2^(k/2^d).
 
-Equivalently, in pseudo-log space (where the uniform grid is equally
-spaced by construction), the displacement is
+Equivalently, in pseudo-log space (where the uniform grid is equally spaced by
+construction), the displacement is
 
     Δ^L_k = (k / 2^d) − log₂(1 + k/2^d),
 
-which is exactly −ε(k/2^d), the negated pseudo-log error evaluated at
-the uniform grid point's mantissa. This is not a coincidence: the
-displacement between the two grids is the same function that KEYSTONE §2
-identifies as the free cost of using L instead of log₂.
+which is exactly `−ε(k/2^d)`, the negated pseudo-log error evaluated at the
+uniform grid point's mantissa. This is the same function that KEYSTONE §2
+identifies as the free cost of using `L` instead of `log₂`.
 
-### Architecture-independence
-
-The displacement field Δ^L depends only on (d, k). It does not reference
-the FSM, the delta table, the number of states, or any correction
-strategy. It is a property of the representation: the cost of the fact
-that binary scientific notation partitions [1, 2) uniformly rather than
-geometrically.
-
-Any correction architecture that processes the bits of a binary
-significand — FSM, lookup table, shared-coefficient polynomial,
-neural network with binary input encoding — receives its input cells
-at the binary partition points and must produce corrections appropriate
-for a target organized at the geometric partition points. The
-displacement field Δ^L is the forcing function that every such
-architecture must absorb.
+Because `Δ^L` depends only on `(d, k)`, not on the FSM, the delta table, or
+the number of states, it is a property of the representation rather than a
+particular corrector. Any architecture that processes binary significand bits
+must absorb this same forcing field.
 
 ### Hyperbolic interpretation
 
-In the half-plane model with y-axis as the logarithmic coordinate,
-place horocycles at heights y_k = 2^(k/2^d). The binary grid points
-b_k lie on a different family of horocycles, at heights 1 + k/2^d.
-The hyperbolic distance between corresponding points is
+In the half-plane model with the y-axis as logarithmic coordinate, place the
+geometric grid at heights `y_k = 2^(k/2^d)` and the binary grid at heights
+`y_k = 1 + k/2^d`. The hyperbolic distance between corresponding points is
 
     d_hyp(k) = |log(b_k / g_k)| = |log((1 + k/2^d) / 2^(k/2^d))|.
 
-Since all tiles in a binary tiling are hyperbolically congruent, this
-distance is measuring how far the "wrong" horocycle family (additive) is
-from the "right" one (geometric) at each cell. The maximum of d_hyp over
-k occurs near k/2^d ≈ 1/ln 2 − 1 ≈ 0.4427, which is the mantissa
-value m* where ε(m) peaks. The displacement field inherits the structure
-of ε, which is to say the structure of the curvature mismatch between
-additive and multiplicative coordinates.
+This measures the separation between additive and multiplicative coordinates at
+cell `k`. The maximum occurs near `k/2^d ≈ 1/ln 2 − 1 ≈ 0.4427`, the same
+mantissa value `m*` where `ε(m)` peaks. The displacement field therefore
+inherits the shape of the pseudo-log error.
 
 ---
 
@@ -101,183 +76,113 @@ additive and multiplicative coordinates.
 
 ### Setup
 
-The displacement analysis of 2026-03-21 showed that layer 0's single
-delta pair must serve all 2^d cells, imposing a systematic positional
-displacement that cascades through subsequent layers. ABYSSAL-DOUBT
-identifies this as the dominant wall source and asks whether it is
-FSM-specific or representation-intrinsic.
+The displacement analysis of 2026-03-21 showed that layer 0's single delta pair
+must serve all `2^d` cells, imposing a systematic positional displacement that
+cascades through subsequent layers. ABYSSAL-DOUBT identifies this as the
+dominant wall source and asks whether it is FSM-specific or
+representation-intrinsic.
 
-The tiling framework answers: the layer-0 displacement should track
-the representation displacement field Δ^L.
+The tiling framework predicts that the layer-0 displacement should track the
+representation displacement field `Δ^L`.
 
 ### The prediction
 
-Let δ*_j be the free-per-cell optimal intercept for cell j under the
-geometric partition, and let δ^{L0}_j be the intercept produced by
-layer 0 alone (the base intercept c₀ plus the single layer-0 delta
-correction for cell j's leading bit). The layer-0 displacement is
+Let `δ*_j` be the free-per-cell optimal intercept for cell `j` under the
+geometric partition, and let `δ^{L0}_j` be the intercept produced by layer 0
+alone (the base intercept `c₀` plus the single layer-0 delta correction for
+cell `j`'s leading bit). The layer-0 displacement is
 
     D^{L0}_j = δ^{L0}_j − δ*_j.
 
-**Prediction:** D^{L0}_j correlates with the representation displacement
-Δ^L evaluated at the midpoint (or boundary) of cell j. Specifically,
-the shape of D^{L0} across j = 0, ..., 2^d − 1 should resemble the
-shape of −ε(m) sampled at the binary grid, modulo a scale factor and
-an additive constant absorbed by c₀.
+Layer 0 has three free parameters (`c₀`, `δ(0,0)`, `δ(0,1)`), so it can absorb
+a global offset and a left-half/right-half split. What it cannot absorb is the
+within-half curvature of `ε`. That residual curvature is the actual testable
+content.
 
-The scale factor and constant are free because layer 0 has two
-parameters (one delta for bit 0, one for bit 1) plus the base
-intercept, which together can absorb a global offset and a
-left-half/right-half split. What they cannot absorb is the curvature
-of ε within each half: the residual after removing a piecewise-constant
-fit from Δ^L. That residual shape is the testable content.
+Write `R0(v)` for "remove the best leading-bit piecewise-constant fit from
+`v`." The prediction is that the residual curvature of `D^{L0}` should match
+the residual curvature of `Δ^L`. In practice the experiment measures this by
+comparing `R0(c*)` with `R0(Δ^L)`, where `c*` is the free-per-cell intercept
+field.
 
-### What the test discriminates
+On the geometric partition alone this test is weak, because `δ*_j` is nearly
+flat. It becomes discriminating across partitions and depths:
 
-If the prediction holds, the layer-0 wall is representation-intrinsic:
-the FSM is faithfully measuring the binary-to-geometric displacement,
-and a different architecture processing the same bits would see the
-same forcing. The wall is measuring the cost of binary representation,
-not the cost of being an FSM.
+- **Across partitions:** On `uniform_x`, `δ*` varies substantially with
+  position, producing a large residual whose shape should track `ε`
+  curvature. The residual magnitude should rank-order with partition departure
+  from geometric.
+- **Across depths:** Layer 0 always has 2 values but serves `2^d` cells. The
+  piecewise-constant fit gets coarser relative to the smooth `ε` hump as depth
+  grows, so the residual curvature should grow with depth, tracking
+  `ε'' = −1/((1+m)^2 ln 2)`.
 
-If the prediction fails — if D^{L0} has structure uncorrelated with
-Δ^L — then the layer-0 wall contains a substantial FSM-specific
-component, and the tiling framework does not buy us what we need for
-Step 6.
-
-### Why a naive correlation is insufficient
-
-Layer 0 has 3 free parameters (c₀, δ(0,0), δ(0,1)), so δ^{L0}_j is
-a step function: one constant for the left half (bit 0), another for
-the right half (bit 1). Subtracting the nearly-flat δ*_j (on a
-geometric partition, where K1a says all cells face the same task)
-leaves D^{L0} ≈ a step function. And Δ^L = −ε(m) is a concave hump
-peaking left of center. Any leftward-heavy hump correlates with any
-step function that's higher on the left. A positive raw correlation
-is nearly guaranteed and tells us very little.
-
-The actual testable content is the **residual curvature** within each
-half after the piecewise-constant fit is removed. On a geometric
-partition this residual is small (δ* is flat), making the test
-near-vacuous at a single partition. The test gains discriminating
-power across partitions and depths:
-
-- **Across partitions:** On uniform_x, δ* varies substantially with
-  position, producing a large residual whose shape should track ε
-  curvature. The residual magnitude should rank-order with partition
-  departure from geometric.
-- **Across depths:** Layer 0 always has 2 values but serves 2^d cells.
-  The piecewise-constant fit gets coarser relative to the smooth ε
-  hump as d grows, so the residual curvature should grow with depth,
-  tracking the curvature ε'' = −1/((1+m)² ln 2).
+If the residual match holds, the evidence supports a representation-intrinsic
+forcing at layer 0: the FSM is responding to the binary-to-geometric mismatch
+rather than inventing an arbitrary distortion. If it fails, then a substantial
+part of the layer-0 wall is still FSM-specific.
 
 ### Test results (2026-03-21)
 
-The four-stage test (`displacement_field_test.sage`) confirmed that
-R0(c*) correlates with R0(Δ^L) at r = 0.80–0.89 across 20 cases
-(4 Group A kinds × 5 depths). The match is robust:
+The four-stage test (`displacement_field_test.sage`) found that `R0(c*)`
+correlates with `R0(Δ^L)` at `r = 0.80–0.89` across 20 baseline cases
+(`4` partition kinds × `5` depths). The match is robust:
 
 - Stage A (geometry-only): PASS. Correlations stable across depths.
-- Stage B (layer-0 allocation): MIXED. Optimizer's layer 0 is close
-  to the best leading-bit projection but systematically offset by
-  path-algebra constraints.
-- Stage C (cumulative absorption): PASS. LD beats LI by repairing at
-  layers 1+, not by changing the layer-0 picture.
-- Stage D (depth scaling): forcing stabilises by d = 6–7.
+- Stage B (layer-0 allocation): MIXED. The optimizer's layer 0 is close to the
+  best leading-bit projection but systematically offset by path-algebra
+  constraints.
+- Stage C (cumulative absorption): PASS. LD beats LI by repairing at layers 1+,
+  not by changing the layer-0 picture.
+- Stage D (depth scaling): forcing stabilises by `d = 6–7`.
 
-Three adversary partitions (Group H) designed to break Stage A all
-failed to find its boundary:
+Three adversary partitions designed to break Stage A all failed to find its
+boundary:
 
 | Adversary | Design intent | Actual corr |
 |---|---|---|
-| `half_geometric_x` | Kill R0(c*) by making halves geometric | 0.876 |
-| `eps_density_x` | Pre-absorb forcing via ε-proportional density | 0.80–0.83 |
-| `midpoint_dense_x` | Put R0(c*) and R0(Δ^L) out of phase | 0.88 |
+| `half_geometric_x` | Kill `R0(c*)` by making halves geometric | 0.876 |
+| `eps_density_x` | Pre-absorb forcing via `ε`-proportional density | 0.80–0.83 |
+| `midpoint_dense_x` | Put `R0(c*)` and `R0(Δ^L)` out of phase | 0.88 |
 
-The residual shape is a property of the approximation problem, not
-the partition geometry. This strengthens the claim that Δ^L is the
-right zeroth-order forcing field for this FSM family.
+These results support, rather than prove, that `Δ^L` is the right zeroth-order
+forcing field for this FSM family.
 
 ---
 
 ## 3. Why the exchange rate might not be smooth
 
-### The binding-cell argument
+### Why a staircase is plausible
 
-The minimax objective means the optimized error equals the worst cell's
-error. As parameters are added to a correction architecture, the
-identity of the worst cell changes. The exchange rate — gap reduction
-per unit of structural cost — is smooth only if the worst cell migrates
-smoothly as parameters increase. It won't.
+The minimax objective makes the optimized error equal to the worst cell's
+error. As parameters are added, the identity of the binding cell changes
+discretely. Because `Δ^L` is zero at the boundaries, maximal near
+`k/2^d ≈ 0.44`, and flat-topped near its peak, a low-capacity corrector
+absorbs easy boundary cells first and harder peak cells in clusters.
 
-The representation displacement Δ^L is not uniform across cells. It is
-zero at the boundaries (k = 0 and k = 2^d), maximal near k/2^d ≈ 0.44,
-and has a specific concave shape inherited from ε. A correction
-architecture with few parameters can absorb the displacement in regions
-where Δ^L is small (near the boundaries) but not where it is large (near
-the peak). As parameters increase, the absorbed region expands outward
-from the boundaries toward the peak.
-
-The minimax error is controlled by the worst unabsorbed cell. This cell
-sits at the frontier of the absorbed region, and the frontier advances
-in discrete jumps as each new parameter brings a new cell below the
-current worst. The (C, gap) curve is therefore a staircase: flat
-stretches where new parameters reduce already-non-binding cells,
-punctuated by drops when the binding cell finally flips.
-
-### The shape of Δ^L predicts the staircase
-
-The staircase structure is not random. The order in which cells become
-absorbable is determined by the shape of Δ^L. Cells with small Δ^L
-(near the domain boundaries) are cheap to absorb; cells near the peak
-are expensive. The density of cells at each displacement level
-determines the width of each stair.
-
-Near the peak of ε, the displacement varies slowly (ε is concave and
-flat-topped near m*), so many cells cluster at similar displacement
-values. An architecture must absorb all of them roughly simultaneously
-to reduce the minimax error. This predicts a wide plateau in the
-(C, gap) curve near the displacement peak, followed by a cliff when
-enough parameters finally cover the cluster.
-
-Near the boundaries of [1, 2), the displacement varies steeply
-(ε' is large near m = 0 and m = 1), so cells at different displacement
-levels are well separated. Each new parameter picks off one cell at a
-time, producing narrow stairs — which may look smooth at coarse
-resolution.
-
-### Relation to observed wall structure
-
-The plateau/cliff pattern in the existing wall data — cheap initial
-gains followed by a sharing-induced cliff — is consistent with this
-picture. The cheap initial gains correspond to absorbing the
-steep-gradient boundary cells; the cliff corresponds to hitting the
-flat-topped cluster near m*. If the cliff location (in parameter count)
-correlates with the number of cells within a fixed displacement
-tolerance of the ε peak, the staircase model makes a quantitative
-prediction rather than just a qualitative one.
+That predicts a staircase in the `(C, gap)` curve: narrow early stairs near the
+steep boundary regions, then a wide plateau and cliff near the peak where many
+cells have similar displacement. The plateau/cliff pattern in the existing wall
+data is consistent with this picture. Cheap initial gains correspond to
+absorbing steep-gradient boundary cells; the later cliff corresponds to hitting
+the flat-topped cluster near `m*`. If the cliff location correlates with the
+number of cells within a fixed displacement tolerance of the `ε` peak, the
+staircase model becomes quantitative rather than merely descriptive.
 
 ### Why this helps with Steps 5–6
 
 A smooth exchange rate would require discovering its functional form
-empirically and then arguing that the form is architecture-invariant.
-A staircase exchange rate is actually easier to work with, because:
+empirically and then arguing that the form is architecture-invariant. A
+staircase is easier to use. The step heights may differ between architectures,
+but the step locations are set by `Δ^L`: architectures processing the same
+binary representation confront the same displacement profile and therefore the
+same binding-cell ordering, at least after normalization by absorptive
+capacity.
 
-The stair locations are set by Δ^L, which is architecture-free. Two
-architectures processing the same binary representation encounter the
-same displacement profile and therefore the same cell-absorption
-ordering. Their staircases may have different step heights (one
-architecture may absorb cells more efficiently than another), but the
-step locations — the parameter counts at which the binding cell
-changes — should coincide after normalization by absorptive capacity.
-
-This replaces the strong Step 5 claim ("the rate has a recognizable
-functional form") with a weaker but more defensible claim: the
-*combinatorial structure* of the exchange rate — which cells bind when
-— is representation-intrinsic, even if the quantitative rate is not.
+This weakens the Step 5 claim from "the rate has a recognizable functional
+form" to "the combinatorial structure of the rate is representation-intrinsic."
 Step 6 then needs only that different architectures respect the same
-combinatorial ordering, not that they achieve the same numerical
-efficiency.
+binding-cell ordering, not that they achieve the same numerical efficiency.
 
 ---
 
@@ -285,123 +190,90 @@ efficiency.
 
 **Buys:**
 
-- A closed-form, architecture-free forcing function (Δ^L) that every
+- A closed-form, architecture-free forcing function (`Δ^L`) that every
   binary-representation corrector must respond to.
-- A testable prediction (§2) that can be checked against existing data
-  without new implementation.
-- A structural explanation for non-smooth exchange rates that is
-  consistent with observed wall behavior.
+- A testable prediction (§2) that can be checked against existing data without
+  new implementation.
+- A structural explanation for non-smooth exchange rates that is consistent
+  with observed wall behavior.
 - A weaker but potentially sufficient version of Steps 5 and 6:
-  combinatorial ordering invariance rather than quantitative rate
-  invariance.
+  combinatorial ordering invariance rather than quantitative rate invariance.
 
 **Does not buy:**
 
-- A closed-form scaling law for the (C, gap) curve.
+- A closed-form scaling law for the `(C, gap)` curve.
 - A proof that the displacement field is the dominant wall source
   (this is the content of the §2 test).
-- Elimination of the need for a second architecture (De Caro or
-  equivalent) to validate Step 6.
-- Tightness of the representation displacement as a lower bound on
-  the wall.
-
-The tiling framework reframes the [MENEHUNE] in Steps 5 and 6 from
-"discover a universal scaling law" to "verify that a known forcing
-function dominates the wall and that the combinatorial absorption
-ordering it induces is architecture-invariant." The second formulation
-is more modest and more testable.
+- Elimination of the need for a second architecture (De Caro or equivalent) to
+  validate Step 6.
+- Tightness of the representation displacement as a lower bound on the wall.
 
 ---
 
 ## Connection to the displacement analysis
 
-The fan-out analysis (2026-03-21, `wall/displacement_structure.sage`)
-found that the wall is dominated by early-layer fan-out, not by
-pairwise chord displacement or residue-state assignment. The tiling
-framework explains *why*: the fan-out is the FSM's encounter with
-the representation displacement field Δ^L. Layer 0 splits the domain
-at the binary midpoint (m = 0.5), which is algebraic. The target
-structure peaks at m* ≈ 0.44, which is logarithmic. The mismatch
-between these two reference points — one set by the representation,
-the other by the function — is exactly the displacement that cascades
-through subsequent layers.
+The fan-out analysis (2026-03-21, `wall/displacement_structure.sage`) found
+that the wall is dominated by early-layer fan-out, not by pairwise chord
+displacement or residue-state assignment. The tiling framework gives that
+result a geometric reading: layer 0 splits the domain at the binary midpoint
+`m = 0.5`, while the forcing field peaks at `m* ≈ 0.44`. The mismatch between
+those two reference points propagates through later layers.
 
-The circle closes: Δ^L = −ε(m), the displacement field between the
-binary and geometric grids, is the same function that KEYSTONE §2
-identifies as the free cost of using the pseudo-log surrogate. The
-wall, the surrogate error, and the grid displacement are the same
-object viewed from three angles. The tiling framework provides the
-geometric setting (hyperbolic plane, horocyclic vs geodesic slicings)
-in which this identity is natural rather than coincidental.
+This does not make the wall identical to `ε`. Rather, the pseudo-log error
+`ε`, the binary/geometric grid displacement `Δ^L`, and the early-layer wall
+all involve the same underlying forcing. The first two are literally the same
+function; the third is the corrector's response to it. The tiling framework
+supplies the geometric setting in which that relationship looks natural rather
+than accidental.
 
 ## Basis identification and scramble test (2026-03-21)
 
-The displacement field test established that R0(c*) tracks R0(Δ^L).
-The basis identification asked: what specifically about ε organises
-c*? Seven candidate basis families competed to predict g = R0(c*) in
-native cell coordinates, trained on baselines and scored on held-out
-adversaries.
+The displacement-field test established that `R0(c*)` tracks `R0(Δ^L)`, where
+`c*` is the free-per-cell intercept field. Basis identification then asked
+which simple basis best predicts that residual in native cell coordinates,
+trained on baseline partitions and scored on held-out adversaries.
 
-Result: H_width is eliminated (holdout NRMSE 1.57). A single scalar
-— ε(m_mid) — captures most of the signal (H_value holdout corr
-0.86). H_balance (endpoint-balance geometry) wins the ranking but
-its margin over H_value is only 0.026 NRMSE. On affine-detrended
-geometric partitions, all ε-based families score corr > 0.999.
+Among the tested families, width alone (`H_width`) fails badly (holdout NRMSE
+`1.57`). A single scalar `ε(m_mid)` (`H_value`) captures most of the signal
+(holdout corr `0.86`), and endpoint-balance geometry (`H_balance`) performs
+best by a narrow margin of `0.026` NRMSE. On affine-detrended geometric
+partitions, all `ε`-based families score `corr > 0.999`.
 
-Width-preserving position scrambles (peak_swap and peak_avoid) then
-tested whether inverting the width-ε coupling breaks the ε predictor.
-It does not. H_value holds at corr 0.85–0.89 on both scrambles.
-H_balance's margin is width-modulated (shrinks on peak_swap, widens
-on peak_avoid), confirming it captures a width × ε interaction rather
-than a purely positional signal.
+Width-preserving position scrambles (`peak_swap` and `peak_avoid`) tested
+whether inverting the width-`ε` coupling breaks the `ε` predictor. It does not.
+`H_value` holds at `corr 0.85–0.89` on both scrambles, while `H_balance`'s
+margin shrinks on `peak_swap` and widens on `peak_avoid`, confirming that it
+captures a width × `ε` interaction rather than a purely positional signal.
 
-The summary figure (`results/t3_summary.png`) shows 9 partitions'
-transported R0(c*) collapsing onto the scaled ε template at depths
-6 and 8. The collapse is indifferent to construction method: baselines
-(solid), adversaries (dashed), and scrambles (dotted) all track the
-same curve.
+Scramble results at depth 6 (trained on baselines `d = 5, 6, 7`):
 
-See `results/basis_identification/basis_holdout_summary.md` for
-detailed analysis.
+| Partition | H_value corr | H_value NRMSE | H_balance corr | H_balance NRMSE | H_width corr |
+|---|---|---|---|---|---|
+| peak_swap | 0.851 | 0.457 | 0.860 | 0.444 | 0.543 |
+| peak_avoid | 0.885 | 0.451 | 0.923 | 0.382 | 0.839 |
 
-## Current status of the tiling program
+Coupling diagnostics confirm the intervention achieved near-perfect inversion:
+geometric `rho_peak = −0.17`, `peak_swap = −0.99`, `peak_avoid = +0.99`.
 
-The displacement field Δ^L = −ε is established as the first-order
-organiser of c* across all tested partition families, robust to
-adversarial and scrambled geometries. The remaining open question is
-purely about the corrector side: how different architectures absorb
-the forcing. Steps 5 and 6 of DISTANT-SHORES can now be framed
-against this forcing rather than discovered empirically.
+The affine-detrended geometric case remains the cleanest result: with the
+affine ramp removed, `c*`'s nonlinear residual is almost perfectly `ε`. The
+summary figure (`results/t3_summary.png`) shows 9 partitions' transported
+`R0(c*)` collapsing onto the scaled `ε` template at depths 6 and 8 across
+baselines, adversaries, and scrambles.
 
-## Other hyperbolic tilings
+Taken together, these tests support `Δ^L = −ε` as the first-order organiser of
+`c*` across the tested partition families. The open question is now on the
+corrector side: how different architectures absorb that forcing.
 
-The binary tiling in TILING.md is not the only hyperbolic tessellation
-relevant to this project. The Farey tessellation / Stern-Brocot tree
-produces a different binary tree of the interval, where splits occur
-at Farey mediants rather than binary midpoints. At depth 1, both
-tilings split [1, 2) at 3/2 (the mediant of 1/1 and 2/1 equals the
-binary midpoint). At depth 2, they diverge: binary splits at 5/4 and
-7/4, while Farey-mediants split at 4/3 and 5/3.
-
-The Farey tiling is interesting because its splits are
-rational-approximation-optimal (each mediant is the simplest fraction
-in its interval), while binary splits are digit-processing-optimal
-(each split corresponds to reading one bit). The project already has
-`stern_brocot_x` and `farey_rank_x` partitions in the zoo.
-
-The Farey connection becomes relevant if a second
-binary-representation architecture is needed for DISTANT-SHORES
-Step 6: Farey-mediant splitting is a different way to process binary
-representations, and its (C, gap) curve could be compared to the
-FSM's curve to test architecture-invariance of the exchange rate.
+See `results/basis_identification/basis_holdout_summary.md` for detailed
+analysis.
 
 ## Reading outward
 
-- [`ABYSSAL-DOUBT.md`](../../ABYSSAL-DOUBT.md): the doubt this
-  responds to.
-- [`DISTANT-SHORES.md`](../../DISTANT-SHORES.md): the roadmap whose
-  steps 5–6 this framework addresses.
-- [`WALL.md`](../wall/WALL.md): the wall decomposition and
-  displacement analysis.
-- [`KEYSTONE.md`](../keystone/KEYSTONE.md) §2: the surrogate error
-  ε(m) that Δ^L turns out to equal.
+- [`ABYSSAL-DOUBT.md`](../../ABYSSAL-DOUBT.md): the doubt this responds to.
+- [`DISTANT-SHORES.md`](../../DISTANT-SHORES.md): the roadmap whose steps 5–6
+  this framework addresses.
+- [`WALL.md`](../wall/WALL.md): the wall decomposition and displacement
+  analysis.
+- [`KEYSTONE.md`](../keystone/KEYSTONE.md) §2: the surrogate error `ε(m)` that
+  `Δ^L` turns out to equal.

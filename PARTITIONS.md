@@ -184,6 +184,29 @@ matching or exceeding Group A. The displacement field's residual
 shape is a property of the approximation problem, not the partition
 geometry. See `experiments/tiling/TILING.md` for the full analysis.
 
+Two additional width-preserving position scrambles test whether the
+intercept template depends on which widths land at which positions:
+
+| Kind | Density | Symmetry | Arithmetic | Description |
+|------|---------|----------|------------|-------------|
+| `scramble_x` (peak_swap) | scrambled | asymmetric | HiR | Geometric widths, narrowest at ε peak |
+| `scramble_x` (peak_avoid) | scrambled | asymmetric | HiR | Geometric widths, widest at ε peak |
+
+These hold geometric's width histogram exactly and permute the
+width-to-position assignment. The construction uses fixed uniform
+reference slots ranked by distance to m* = 1/ln2 − 1 (ties broken
+by lower index). Source widths are sorted ascending and assigned to
+slots: peak_swap assigns the k-th narrowest to the k-th closest
+slot; peak_avoid assigns the k-th widest.
+
+Result: H_value (ε at midpoint) holds at corr 0.85–0.89 on both
+scrambles despite near-perfect coupling inversion (rho_peak = −0.99
+on peak_swap vs −0.17 on geometric). Position dominates width
+assignment. See `experiments/tiling/TILING.md`.
+
+Parameters:
+- `scramble_x`: `scramble_mode` ('peak_swap' or 'peak_avoid')
+
 ---
 
 ## Equivalences

@@ -4,7 +4,7 @@ Binary floating point approximates the logarithm via a piecewise-linear surrogat
 
 We can make the cost concrete by isolating how much error comes from each sharing constraint in the finite-state machine — parameter budget, layer sharing, and automaton coupling. The displacement field Δ^L = −ε is the forcing function that every binary-representation corrector must respond to. 
 
-Our overall and rather brash goal: transform the triangle inequality into a computable measure of the cost of departure from a log-linear surrogate, producing a "computational ruler" for approximation problems governed by scaling. Follow where we are on our way to [distant shores](DISTANT-SHORES.md).
+Our overall and rather brash goal: transform the triangle inequality into a computable measure of the cost of departure from a log-linear surrogate, producing a "computational ruler" for approximation problems governed by scaling. Follow us on our way to [distant shores](DISTANT-SHORES.md).
 
 ## Terminology
 
@@ -30,6 +30,7 @@ PARTITIONS.md         Partition family classification
   tiling/               Displacement field and hyperbolic tiling framework
 DISTANT-SHORES.md     Six-step roadmap toward the computational ruler
 ABYSSAL-DOUBT.md      Serious doubts about the path
+DANGEROUS-SHOALS.md   The hardest part
 PARTITIONS.md         Partition family classification (26 kinds)
 GLOSSARY.md           Project terminology
 REFERENCES.md         Literature (Day 2023, Mitchell 1962, and lineage)

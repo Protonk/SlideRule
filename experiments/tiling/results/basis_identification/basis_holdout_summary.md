@@ -1,6 +1,6 @@
 # Basis Identification: Holdout Summary
 
-For experimental design: see `experiments/tiling/INTERCEPT-ORGANIZE-PLAN.md`.
+For experimental design: see `experiments/tiling/SCRAMBLE-PLAN.md`.
 For the broader framework: see `experiments/tiling/TILING.md`.
 
 ## Ranking (d6+ NRMSE, partition holdout)
