@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "source": "lib/partitions.sage",
-    "n_kinds": 25
+    "n_kinds": 26
   },
   "partitions": [
     {

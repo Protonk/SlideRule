@@ -80,6 +80,73 @@ def optimal_cell_intercept_arb(plog_lo, plog_hi, p_num, q_den, c_init=None,
     return c_opt, worst
 
 
+def free_intercepts_from_partition(partition, p_num, q_den):
+    """Compute free-per-cell optimal intercepts from a pre-built partition.
+
+    This is the common path for any code that needs free intercepts on
+    parameterised partitions (scramble_x, etc.) where free_per_cell_metrics
+    cannot be used because it does not accept arbitrary kwargs.
+
+    Domain information (x_start, x_width) is inferred from the partition
+    rows, so this works on any pre-built partition regardless of domain.
+
+    Parameters
+    ----------
+    partition : list of row dicts from build_partition
+    p_num, q_den : int — target exponent numerator/denominator
+
+    Returns
+    -------
+    dict with:
+      rows : list of dicts in partition order, each with
+             bits, index, c_opt, cell_worst, zmin, zmax, cell_ratio
+      by_bits : dict from bits -> row for quick lookup
+      worst_abs : float — global worst-case error
+      c_star : list of float — c_opt values in partition order
+    """
+    # Infer domain from partition boundaries
+    x_start = float(partition[0]['x_lo'])
+    x_end = float(partition[-1]['x_hi'])
+    x_width = x_end - x_start
+    c_init = float(default_c0(QQ(p_num) / QQ(q_den), x_width))
+
+    rows = []
+    worst_abs = 0.0
+    c_star = []
+
+    for row in partition:
+        plog_lo = QQ(row['plog_lo'])
+        plog_hi = QQ(row['plog_hi'])
+        c_opt, _ = optimal_cell_intercept_arb(
+            plog_lo, plog_hi, p_num, q_den, c_init=c_init,
+            x_start=x_start)
+        zmin, zmax, cell_worst, cell_ratio, _ = cell_logerr_arb(
+            plog_lo, plog_hi, p_num, q_den, c_opt,
+            x_start=x_start)
+        entry = {
+            'bits': row['bits'],
+            'index': row.get('index', None),
+            'c_opt': c_opt,
+            'cell_worst': cell_worst,
+            'zmin': zmin,
+            'zmax': zmax,
+            'cell_ratio': cell_ratio,
+        }
+        rows.append(entry)
+        c_star.append(float(c_opt))
+        if cell_worst > worst_abs:
+            worst_abs = cell_worst
+
+    by_bits = {r['bits']: r for r in rows}
+
+    return {
+        'rows': rows,
+        'by_bits': by_bits,
+        'worst_abs': worst_abs,
+        'c_star': c_star,
+    }
+
+
 def free_per_cell_optimum(depth, p_num, q_den, partition_kind=None,
                           x_start=1, x_width=1):
     """

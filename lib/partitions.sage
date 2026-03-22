@@ -35,14 +35,27 @@ Depends on: lib/day.sage must be loaded first (provides HiR, LN2).
 """
 
 
-PARTITION_KINDS = ('uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x',
-                   'ruler_x', 'sinusoidal_x', 'chebyshev_x', 'thuemorse_x',
-                   'bitrev_geometric_x', 'stern_brocot_x', 'reverse_geometric_x',
-                   'random_x', 'dyadic_x', 'powerlaw_x', 'golden_x', 'cantor_x',
-                   'farey_rank_x', 'radical_inverse_x',
-                   'sturmian_x', 'beta_x', 'arc_length_x', 'minimax_chord_x',
-                   'half_geometric_x', 'eps_density_x', 'midpoint_dense_x',
-                   'scramble_x')
+_PARTITION_KIND_ORDER = (
+    'uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x',
+    'ruler_x', 'sinusoidal_x', 'chebyshev_x', 'thuemorse_x',
+    'bitrev_geometric_x', 'stern_brocot_x', 'reverse_geometric_x',
+    'random_x', 'dyadic_x', 'powerlaw_x', 'golden_x', 'cantor_x',
+    'farey_rank_x', 'radical_inverse_x',
+    'sturmian_x', 'beta_x', 'arc_length_x', 'minimax_chord_x',
+    'half_geometric_x', 'eps_density_x', 'midpoint_dense_x',
+)
+# scramble_x is a parameterised kind, not a standalone zoo entry.
+# It appears in PARTITION_REGISTRY (for build_partition dispatch)
+# but not in _PARTITION_KIND_ORDER or PARTITION_ZOO. The two
+# scramble modes are synthetic cases in build_case_table().
+# PARTITION_KINDS is derived from PARTITION_REGISTRY (defined below).
+# _PARTITION_KIND_ORDER sets the canonical ordering.
+# The early assignment here is a forward declaration for functions that
+# reference PARTITION_KINDS before the registry is defined; it is
+# overwritten after the registry with a consistency-checked derivation.
+PARTITION_KINDS = _PARTITION_KIND_ORDER
+# Parameterised kinds not in the zoo but accepted by build_partition.
+_PARAMETERISED_KINDS = ('scramble_x',)
 PARTITION_KIND_ALIASES = {
     'reciprocal_x': 'harmonic_x',
     'mirror_reciprocal_x': 'mirror_harmonic_x',
@@ -53,7 +66,7 @@ def normalize_partition_kind(kind):
     """Map legacy or descriptive aliases onto canonical partition names."""
     if kind in PARTITION_KIND_ALIASES:
         return PARTITION_KIND_ALIASES[kind]
-    if kind in PARTITION_KINDS:
+    if kind in PARTITION_KINDS or kind in _PARAMETERISED_KINDS:
         return kind
     raise ValueError(
         f"unknown partition kind: {kind!r}; expected one of "
@@ -547,6 +560,8 @@ def _scramble_boundaries(N, a_hir, x_end_hir, scramble_mode):
 
 def _half_geometric_boundaries(N, a_hir, x_end_hir):
     """Geometric within each leading-bit half, split at midpoint (HiR)."""
+    if int(N) <= 1:
+        return [a_hir, x_end_hir]
     x_mid = (a_hir + x_end_hir) / HiR(2)
     half = int(N) // 2
     bdry = []
@@ -887,35 +902,116 @@ def depth_for_N(N):
     return d
 
 
-# Canonical ordering, display names, and colors for all partitions.
-# Used by visualization scripts to iterate zoo grids.
+# ── Executable partition registry ────────────────────────────────────
+#
+# This is the authoritative source of truth for partition metadata.
+# lib/partitions.json is a doc-facing artifact derived from this.
+# Each entry carries everything needed to execute a partition and
+# build stable sweep metadata.
+
+import math as _math
+
+PARTITION_REGISTRY = {
+    'uniform_x':          {'display_name': 'uniform',          'color': '#1f77b4', 'category': 'elementary_geometric', 'group': 'A', 'density': 'flat',                'symmetry': 'symmetric',  'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'geometric_x':        {'display_name': 'geometric',        'color': '#9467bd', 'category': 'elementary_geometric', 'group': 'A', 'density': 'log_uniform',          'symmetry': 'log_symmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'harmonic_x':         {'display_name': 'harmonic',         'color': '#2ca02c', 'category': 'elementary_geometric', 'group': 'A', 'density': 'left_dense',           'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'mirror_harmonic_x':  {'display_name': 'mirror-harmonic',  'color': '#d62728', 'category': 'elementary_geometric', 'group': 'A', 'density': 'right_dense',          'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'ruler_x':            {'display_name': 'ruler',            'color': '#e67e22', 'category': 'fractal',              'group': 'C', 'density': 'fractal_scattered',     'symmetry': 'asymmetric', 'arithmetic': 'QQ',  'curve_aware': False, 'params': {}},
+    'sinusoidal_x':       {'display_name': 'sinusoidal',       'color': '#17becf', 'category': 'approximation_parametric', 'group': 'E', 'density': 'fractal_scattered', 'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {'sin_k': 3, 'sin_alpha': 0.6}},
+    'chebyshev_x':        {'display_name': 'chebyshev',        'color': '#8c564b', 'category': 'approximation_parametric', 'group': 'E', 'density': 'both_endpoints',   'symmetry': 'symmetric',  'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'thuemorse_x':        {'display_name': 'thue-morse',       'color': '#e377c2', 'category': 'fractal',              'group': 'C', 'density': 'fractal_scattered',     'symmetry': 'asymmetric', 'arithmetic': 'QQ',  'curve_aware': False, 'params': {'tm_ratio': 2}},
+    'bitrev_geometric_x': {'display_name': 'bitrev-geometric', 'color': '#7f7f7f', 'category': 'fractal',              'group': 'C', 'density': 'fractal_scattered',     'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'stern_brocot_x':     {'display_name': 'stern-brocot',     'color': '#bcbd22', 'category': 'number_theory',        'group': 'B', 'density': 'rational_dense',        'symmetry': 'asymmetric', 'arithmetic': 'QQ',  'curve_aware': False, 'params': {}},
+    'reverse_geometric_x':{'display_name': 'reverse-geometric','color': '#ff7f0e', 'category': 'elementary_geometric', 'group': 'A', 'density': 'right_dense',           'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'random_x':           {'display_name': 'random',           'color': '#aec7e8', 'category': 'null_model',           'group': 'G', 'density': 'quasi_uniform',         'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {'random_seed': 42}},
+    'dyadic_x':           {'display_name': 'dyadic',           'color': '#98df8a', 'category': 'null_model',           'group': 'G', 'density': 'quantized_log_uniform', 'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'powerlaw_x':         {'display_name': 'power-law',        'color': '#ff9896', 'category': 'approximation_parametric', 'group': 'E', 'density': 'left_dense',        'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {'pl_exponent': 3}},
+    'golden_x':           {'display_name': 'golden',           'color': '#c5b0d5', 'category': 'symbolic_dynamics',    'group': 'D', 'density': 'quasi_uniform',         'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'cantor_x':           {'display_name': 'cantor',           'color': '#c49c94', 'category': 'fractal',              'group': 'C', 'density': 'fractal_scattered',     'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {'cantor_levels': 3}},
+    'farey_rank_x':       {'display_name': 'farey-rank',       'color': '#377eb8', 'category': 'number_theory',        'group': 'B', 'density': 'rational_dense',        'symmetry': 'asymmetric', 'arithmetic': 'QQ',  'curve_aware': False, 'params': {}},
+    'radical_inverse_x':  {'display_name': 'radical-inverse',  'color': '#4daf4a', 'category': 'number_theory',        'group': 'B', 'density': 'quasi_uniform',         'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {'vdc_base': 2}},
+    'sturmian_x':         {'display_name': 'sturmian',         'color': '#984ea3', 'category': 'symbolic_dynamics',    'group': 'D', 'density': 'quasi_uniform',         'symmetry': 'asymmetric', 'arithmetic': 'QQ',  'curve_aware': False, 'params': {'st_alpha': (_math.sqrt(5.0) - 1.0) / 2.0, 'st_phase': 0.0, 'st_ratio': 2}},
+    'beta_x':             {'display_name': 'beta',             'color': '#ff7f00', 'category': 'approximation_parametric', 'group': 'E', 'density': 'right_dense',       'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {'beta_alpha': 5.0, 'beta_beta': 2.0}},
+    'arc_length_x':       {'display_name': 'arc-length',       'color': '#a65628', 'category': 'curve_aware',          'group': 'F', 'density': 'left_dense',            'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': True,  'params': {}},
+    'minimax_chord_x':    {'display_name': 'minimax-chord',    'color': '#f781bf', 'category': 'curve_aware',          'group': 'F', 'density': 'left_dense',            'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': True,  'params': {'minimax_tol': 1e-12}},
+    'half_geometric_x':   {'display_name': 'half-geometric',   'color': '#636363', 'category': 'tiling_adversary',     'group': 'H', 'density': 'piecewise_log_uniform', 'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'eps_density_x':      {'display_name': 'eps-density',      'color': '#252525', 'category': 'tiling_adversary',     'group': 'H', 'density': 'interior_dense',        'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': True,  'params': {}},
+    'midpoint_dense_x':   {'display_name': 'midpoint-dense',   'color': '#969696', 'category': 'tiling_adversary',     'group': 'H', 'density': 'center_dense',          'symmetry': 'symmetric',  'arithmetic': 'HiR', 'curve_aware': False, 'params': {}},
+    'scramble_x':         {'display_name': 'scramble',         'color': '#b5651d', 'category': 'tiling_adversary',     'group': 'H', 'density': 'scrambled',             'symmetry': 'asymmetric', 'arithmetic': 'HiR', 'curve_aware': False, 'params': {'scramble_mode': 'peak_swap'}},
+}
+
+
+# Derive PARTITION_KINDS from the registry, using the canonical ordering.
+# scramble_x is excluded (parameterised, not a standalone zoo entry).
+PARTITION_KINDS = tuple(k for k in _PARTITION_KIND_ORDER
+                        if k in PARTITION_REGISTRY)
+# Every zoo kind must be in the registry; the registry may also contain
+# parameterised kinds (like scramble_x) not in the zoo.
+assert set(PARTITION_KINDS).issubset(set(PARTITION_REGISTRY.keys())), \
+    "Zoo kind not in PARTITION_REGISTRY"
+assert set(_PARTITION_KIND_ORDER) == set(PARTITION_KINDS), \
+    "_PARTITION_KIND_ORDER contains kinds not in PARTITION_REGISTRY"
+
+# Derived: zoo list for backward compatibility with visualization scripts.
 PARTITION_ZOO = [
-    ('uniform',           '#1f77b4', 'uniform_x'),
-    ('geometric',         '#9467bd', 'geometric_x'),
-    ('harmonic',          '#2ca02c', 'harmonic_x'),
-    ('mirror-harmonic',   '#d62728', 'mirror_harmonic_x'),
-    ('ruler',             '#e67e22', 'ruler_x'),
-    ('sinusoidal',        '#17becf', 'sinusoidal_x'),
-    ('chebyshev',         '#8c564b', 'chebyshev_x'),
-    ('thue-morse',        '#e377c2', 'thuemorse_x'),
-    ('bitrev-geometric',  '#7f7f7f', 'bitrev_geometric_x'),
-    ('stern-brocot',      '#bcbd22', 'stern_brocot_x'),
-    ('reverse-geometric', '#ff7f0e', 'reverse_geometric_x'),
-    ('random',            '#aec7e8', 'random_x'),
-    ('dyadic',            '#98df8a', 'dyadic_x'),
-    ('power-law',         '#ff9896', 'powerlaw_x'),
-    ('golden',            '#c5b0d5', 'golden_x'),
-    ('cantor',            '#c49c94', 'cantor_x'),
-    ('farey-rank',        '#377eb8', 'farey_rank_x'),
-    ('radical-inverse',   '#4daf4a', 'radical_inverse_x'),
-    ('sturmian',          '#984ea3', 'sturmian_x'),
-    ('beta',              '#ff7f00', 'beta_x'),
-    ('arc-length',        '#a65628', 'arc_length_x'),
-    ('minimax-chord',     '#f781bf', 'minimax_chord_x'),
-    ('half-geometric',   '#636363', 'half_geometric_x'),
-    ('eps-density',      '#252525', 'eps_density_x'),
-    ('midpoint-dense',   '#969696', 'midpoint_dense_x'),
+    (PARTITION_REGISTRY[kind]['display_name'],
+     PARTITION_REGISTRY[kind]['color'],
+     kind)
+    for kind in PARTITION_KINDS
 ]
+
+
+# ── Executable case table ────────────────────────────────────────────
+
+def build_case_table():
+    """Build the executable case table for zoo sweeps.
+
+    Returns a list of dicts, one per executable case. Ordinary kinds
+    get one case each. scramble_x gets two (peak_swap, peak_avoid).
+    """
+    cases = []
+    for kind in PARTITION_KINDS:
+        if kind == 'scramble_x':
+            continue  # handled below as synthetic cases
+        reg = PARTITION_REGISTRY[kind]
+        cases.append({
+            'case_id': kind,
+            'kind': kind,
+            'kwargs': dict(reg['params']),
+            'scramble_mode': '',
+            'source_kind': '',
+            'display_name': reg['display_name'],
+            'color': reg['color'],
+            'category': reg['category'],
+            'group': reg['group'],
+            'density': reg['density'],
+            'symmetry': reg['symmetry'],
+            'arithmetic': reg['arithmetic'],
+            'curve_aware': reg['curve_aware'],
+        })
+
+    # Synthetic scramble cases
+    for mode, label, color in [
+        ('peak_swap',  'peak-swap',  '#d4a017'),
+        ('peak_avoid', 'peak-avoid', '#20b2aa'),
+    ]:
+        cases.append({
+            'case_id': 'scramble_x__%s' % mode,
+            'kind': 'scramble_x',
+            'kwargs': {'scramble_mode': mode},
+            'scramble_mode': mode,
+            'source_kind': 'geometric_x',
+            'display_name': label,
+            'color': color,
+            'category': 'tiling_adversary',
+            'group': 'H',
+            'density': 'scrambled',
+            'symmetry': 'asymmetric',
+            'arithmetic': 'HiR',
+            'curve_aware': False,
+        })
+
+    return cases
 
 
 def zoo_grid_shape(zoo=None):

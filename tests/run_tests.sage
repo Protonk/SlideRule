@@ -1254,15 +1254,17 @@ def test_depth_for_N():
 
 
 def test_partition_zoo():
-    """PARTITION_ZOO has 22 entries, all valid kinds, all unique colors."""
-    assert_true(len(PARTITION_ZOO) == 22, "PARTITION_ZOO should have 22 entries")
+    """PARTITION_ZOO matches PARTITION_KINDS, all valid, all unique colors."""
+    n = len(PARTITION_KINDS)
+    assert_true(len(PARTITION_ZOO) == n,
+                "PARTITION_ZOO should have %d entries, got %d" % (n, len(PARTITION_ZOO)))
     kinds = [kind for _, _, kind in PARTITION_ZOO]
     colors = [color for _, color, _ in PARTITION_ZOO]
     for kind in kinds:
         assert_true(kind in PARTITION_KINDS,
                     "PARTITION_ZOO kind %s not in PARTITION_KINDS" % kind)
-    assert_true(len(set(kinds)) == 22, "PARTITION_ZOO has duplicate kinds")
-    assert_true(len(set(colors)) == 22, "PARTITION_ZOO has duplicate colors")
+    assert_true(len(set(kinds)) == n, "PARTITION_ZOO has duplicate kinds")
+    assert_true(len(set(colors)) == n, "PARTITION_ZOO has duplicate colors")
 
 
 # ── Layer 1: Universal contract harness ──────────────────────────────

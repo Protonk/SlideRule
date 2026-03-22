@@ -42,7 +42,18 @@ def load_metadata():
 
 
 def metadata_by_kind(data):
-    return {entry['kind']: entry for entry in data['partitions']}
+    """Build kind -> metadata lookup, preferring the Sage registry."""
+    meta = {}
+    # Start with JSON entries (for any fields not in registry)
+    for entry in data.get('partitions', []):
+        meta[entry['kind']] = entry
+    # Override with authoritative Sage registry
+    for kind, reg in PARTITION_REGISTRY.items():
+        if kind in meta:
+            meta[kind].update(reg)
+        else:
+            meta[kind] = dict(reg)
+    return meta
 
 
 def build_panel(kind, n_colors, cmap, title):
