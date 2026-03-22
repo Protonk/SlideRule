@@ -1,4 +1,4 @@
-# How to work on DayLog
+# How to work on SlideRule
 
 > Logistical guidance lives here, see `DISTANT-SHORES.md` for mathematical direction
 

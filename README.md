@@ -1,4 +1,4 @@
-# DayLog
+# SlideRule
 
 Binary floating point approximates the logarithm via a piecewise-linear surrogate whose error `ε(m) = log₂(1+m) − m` is known and fixed. Any correction architecture processing binary significand bits must absorb this error. We study the structural cost of that absorption and find that ε itself — recast as a representation displacement field — organises the cost at first order, across partition geometries, adversarial constructions, and width-position scrambles.
 
