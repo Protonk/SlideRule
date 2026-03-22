@@ -2,7 +2,7 @@
 
 Binary floating point approximates the logarithm via a piecewise-linear surrogate whose error `ε(m) = log₂(1+m) − m` is known and fixed. Any correction architecture processing binary significand bits must absorb this error. We study the structural cost of that absorption and find that ε itself — recast as a representation displacement field — organises the cost at first order, across partition geometries, adversarial constructions, and width-position scrambles.
 
-Day's 2023 FRSR analysis provides the analytical foundation: an exact finite candidate set for the extrema of piecewise-linear coarse approximations to `x^(p/q)`, which gives us exact minimax solutions rather than numerical approximations.
+Day's 2023 FRSR analysis provides the analytical foundation: an exact finite candidate set for the extrema of piecewise-linear coarse approximations to `x^(p/q)`, which gives us exact minimax solutions off of which we may pivot.
 
 We can make the cost concrete by isolating how much error comes from each sharing constraint in the finite-state machine — parameter budget, layer sharing, and automaton coupling. The displacement field Δ^L = −ε is the forcing function that every binary-representation corrector must respond to. Its shape predicts the exchange rate between structural investment and approximation quality.
 
