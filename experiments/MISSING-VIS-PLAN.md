@@ -10,9 +10,11 @@ visualizations.
 
 ### Summary
 
-~50 PNG files across 6 experiment areas. All static matplotlib rendered
-from SageMath at DPI 180-200. One custom raster renderer (fractal grids).
-No interactive, animated, or 3D-beyond-surface visualizations.
+51 PNG files across 10 results/ directories. 26 CSVs, 22 JSONL caches.
+All static matplotlib rendered from SageMath at DPI 180-200, plus one
+custom raster renderer (fractal grids). No interactive, animated, or
+3D-beyond-surface visualizations. Zero broken documentation references
+across 17 .md files.
 
 ### By area
 
@@ -73,6 +75,428 @@ I identified gaps by cross-referencing: (a) the mathematical objects in
 | **G13** | **Partition zoo gallery** | complete_atlas exists as fractals, but no clean gallery of partition boundary positions on [1,2) for all 25 kinds at a reference depth (say d=6). Just the geometry, before any error analysis. |
 | **G14** | **Hypothesis status dashboard** | The hypothesis registry is text. A visual status board (supported/mixed/not supported/retired) keyed to experiment area would help navigation. |
 | **G15** | **Scaling law summary** | Tables exist in CSVs. No combined plot of free_err, opt_err, wall vs depth for the core partitions (geometric, uniform, harmonic) on one canvas, which is the single most-asked question. |
+
+---
+
+## Part B′. Deep Inventory Summary (Phase 1 output)
+
+Phase 1 complete. Key findings:
+
+### Artifact census
+
+- **51 PNGs** across 10 results/ directories — all verified on disk
+- **26 CSVs** + 22 JSONL caches — all verified
+- **65 .sage scripts** cataloged (35 plot scripts, 14 sweep/data, 16 helpers)
+- **Zero broken references** in documentation (17 .md files cross-checked)
+
+### Plottable data in lib/ that has no visualization
+
+| Module | Function | Returns | Gap |
+|--------|----------|---------|-----|
+| day.sage | `cell_breakpoints_arb()` | sorted list of plog-domain H-grid crossings | G1 area |
+| day.sage | `cell_logerr_arb()` | meta['candidates'] list of (plog, value, type) | no error curve viz |
+| day.sage | `build_active_pattern_family()` | unique_vectors, multiplicities, coordinate_keys | G3 |
+| paths.sage | `residue_paths()` | (edges, paths, edge_index) — automaton structure | G2 |
+| optimize.sage | `optimize_minimax()` | delta_rat dict, cell_free_intercepts, interval_stats | G4, G9 |
+| optimize.sage | `build_intercept_matrix()` | (n_paths × n_params) numpy array | G5 |
+| optimize.sage | `free_per_cell_metrics()` | per-cell rows: (bits, c_opt, zmin, zmax, cell_worst) | G15 |
+| jukna.sage | `summarize_vector_family()` | 13-key dict: sumset, energy, Sidon/CF subsets | G3 |
+| leading_bit_projection.sage | `eps_val()`, `delta_L()` | scalar functions on [0,1) | G1, G12 |
+| trajectory.py | `growth_table()`, `sum_sweep()` | numeric tables (n, counts) | G3 area |
+
+### CSVs cited in docs but never visualized
+
+| CSV | Rows | Could become |
+|-----|------|-------------|
+| wall/results/enriched_summary.csv | ~200 | G10, G15 |
+| wall/results/joined_layer_modes.csv | ~40 | G9 |
+| wall/results/exponent_robustness_2026-03-20/summary.csv | ~160 | G10 |
+| tiling/results/zoo/zoo_case_metrics.csv | ~100 | G16 (new) |
+| alternation/refinement/results/zoo_split_sequences.csv | 22 | G17 (new) |
+| tiling/results/basis_identification/basis_fit_summary.csv | 14 | minor |
+
+### Scripts that compute but don't plot
+
+| Script | Computes | Could become |
+|--------|----------|-------------|
+| h1_sweep.sage | `delta_shape_stats()` — l1, l2, nnz, top2_mass | G4, G9 |
+| inspect_case.sage | pattern family, delta table, cell report | G3, G4 |
+| coastline_series.sage | per-kind area series (kind → [areas]) | (covered by ripple) |
+| zoo_sweep.sage | per-cell g, δ^L, ε features; case-level correlations | G16 |
+| displacement_field_test.sage | residual arrays, cumulative c^(≤t), correlation sequences | G8 |
+
+---
+
+## Part B″. Gap Cards (Phase 2 output)
+
+### P0 — Blocks roadmap
+
+---
+
+### G1. Epsilon portrait
+
+**Object:** ε(m) = log₂(1+m) − m on [0, 1) — the pseudo-log error / forcing function
+**Priority:** P0 (dependency of G6 and G12; the central object has no standalone figure)
+**Difficulty:** trivial (pure function, no data needed)
+**Data source:** `leading_bit_projection.sage::eps_val(m)`, `eps_prime(m)`, `eps_pp(m)`;
+equivalently `day.sage::plog()` minus identity
+**Suggested encoding:** 3-panel column:
+  (1) ε(m) with peak at m\* ≈ 0.4427 annotated, zero endpoints marked;
+  (2) ε′(m) = 1/((1+m)ln2) − 1 showing sign change at m\*;
+  (3) ε″(m) = −1/((1+m)²ln2) showing uniform concavity.
+  Optional: light fill under ε in panel 1, vertical m\* line shared across panels.
+**Suggested location:** `experiments/stepstone/results/epsilon_portrait.png`
+**Depends on:** none
+**Roadmap link:** DISTANT-SHORES Steps 1–2, 5 (forcing function); T3 (ε organizes c\*)
+
+---
+
+### G6. Absorption staircase
+
+**Object:** Wall (opt_err − free_err) vs parameter budget q at fixed depth and partition
+**Priority:** P0 (directly serves DISTANT-SHORES Step 5 — the project's active frontier)
+**Difficulty:** moderate (needs q-sweep: run `compute_case()` for q=1,3,5,7,9,11,13,15
+at fixed depth=6, for geometric_x and uniform_x, both LI and LD)
+**Data source:** `keystone_runner.sage::compute_case(q, depth, kind, ...)` → extract
+`opt_err`, `free_err`, `worst_cell_index`, `worst_cell_plog_mid` per q.
+Partial data exists in `h1a_gap_vs_q.csv` (uniform_x LI only, d=4, q=1..15).
+**Suggested encoding:** 2-panel figure:
+  (1) Top: step-like curve (q on x-axis, gap on y-axis) for 4 series
+  (geometric LI/LD, uniform LI/LD). Staircase prediction: flat plateaus
+  separated by drops. Mark stair edges.
+  (2) Bottom: worst-cell plog midpoint vs q (same 4 series), with ε(m)
+  shape as gray background. Staircase prediction: worst cell migrates
+  inward from boundaries toward m\* as q grows.
+**Suggested location:** `experiments/wall/results/absorption_staircase.png`
+**Depends on:** G1 (ε reference line in bottom panel)
+**Roadmap link:** DISTANT-SHORES Step 5 (absorption rate and stair structure)
+
+---
+
+### G7. Binding-cell migration
+
+**Object:** Which cell is worst (binding) and how it moves as q increases
+**Priority:** P0 (tests the staircase prediction: boundary cells bind first, peak cells last)
+**Difficulty:** moderate (reuses G6 sweep data; adds spatial overlay)
+**Data source:** Same `compute_case()` sweep as G6. Extract per-cell error vectors
+at each q. Also: `worst_cell_map.png` exists but shows (q, depth) heatmap — this
+gap needs a spatial (cell position) view across q.
+**Suggested encoding:** Multi-panel strip (one panel per q value, q=1,3,5,7,9,11):
+  x-axis = cell midpoint m, y-axis = per-cell error. Worst cell highlighted with
+  marker. Gray fill = ε(m) scaled to match. Shows binding cell migrating from
+  domain edges toward ε peak as q grows.
+  Alternative: single panel with colored vertical bars at worst-cell position,
+  one bar per q, overlaid on ε.
+**Suggested location:** `experiments/wall/results/binding_cell_migration.png`
+**Depends on:** G6 (shares sweep data), G1 (ε overlay)
+**Roadmap link:** DISTANT-SHORES Step 5 (binding-cell ordering prediction)
+
+---
+
+### P1 — Strengthens key hypotheses
+
+---
+
+### G4. Delta table heatmaps
+
+**Object:** Optimized delta[state, bit] tables (LI) and delta[layer, state, bit] (LD)
+**Priority:** P1 (the optimizer's actual product; H1d observes concentrated vs diffuse
+but never shows it)
+**Difficulty:** trivial (data computed by `optimize_minimax()`, returned in policy dict
+as `delta_rat`; also `h1_sweep.sage::delta_shape_stats()` computes l1, nnz, top2_mass)
+**Data source:** Run `compute_case(q=5, depth=6, kind='geometric_x', ...)` for LI and
+LD. Extract `case['opt_pol']['delta_rat']`. Convert to matrix: rows=states (0..q-1),
+cols=bits (0,1) for LI; layers × (states, bits) for LD.
+**Suggested encoding:** Side-by-side heatmaps:
+  (1) LI: q×2 grid, cells colored by delta magnitude, annotated with exact QQ value.
+  (2) LD: depth panels each showing q×2 grid. Colorbar shared.
+  Color: diverging (blue-white-red) centered at 0.
+  Bottom strip: bar chart of delta_shape_stats (l1, nnz, top2_mass) for quick comparison.
+**Suggested location:** `experiments/keystone/results/delta_tables.png`
+**Depends on:** none
+**Roadmap link:** H1d (delta shape depends on parameterization)
+
+---
+
+### G9. LI vs LD delta shape comparison
+
+**Object:** Structural difference between layer-invariant and layer-dependent optima
+**Priority:** P1 (H1d is "observed" status — visualization would strengthen to "supported")
+**Difficulty:** trivial (data exists in `h1c_layer_dependent.csv` and
+`joined_layer_modes.csv`; delta tables from G4)
+**Data source:** `joined_layer_modes.csv` for gap_reduction, worst_cell_shift.
+`h1_sweep.sage::delta_shape_stats()` for l1, nnz, top2_mass at LI vs LD.
+`compute_case()` for delta_rat dicts.
+**Suggested encoding:** 3-panel figure:
+  (1) Paired bar chart: LI vs LD sparsity metrics (l1, nnz, top2_mass) across q values.
+  (2) Gap reduction waterfall: how much wall each LD layer removes (from G8 data).
+  (3) Overlay: LI delta as stem plot, LD layer-0 delta as stems on same axes,
+  showing concentrated vs diffuse.
+**Suggested location:** `experiments/wall/results/li_vs_ld_shape.png`
+**Depends on:** G4 (delta table data)
+**Roadmap link:** H1d (delta shape), K1b vs K1c (LI hurts geometric, LD helps)
+
+---
+
+### G8. Layer allocation heatmap
+
+**Object:** Per-layer contribution to intercept correction across cells
+**Priority:** P1 (cumulative_absorption.png shows aggregate; need spatial detail)
+**Difficulty:** moderate (need `cumulative_intercept()` from leading_bit_projection.sage
+for layers 0..d-1, already called in displacement_field_test.sage Stage C)
+**Data source:** `leading_bit_projection.sage::cumulative_intercept(bits, c0, delta, q, up_to_layer)`.
+Stage BC CSV at `tiling/results/displacement_field/stage_bc.csv` has aggregate metrics
+but not per-cell per-layer arrays. Recompute from `compute_case()` at one benchmark
+(geometric, q=5, d=6, LD).
+**Suggested encoding:** Heatmap: x-axis = cell index (0..63), y-axis = layer (0..5).
+Cell color = delta contribution at that layer for that cell. Colorbar: diverging.
+Bottom row: free intercept c\* for reference. Top annotation: total displacement.
+Side panel: L∞ norm per layer (from Stage C data).
+**Suggested location:** `experiments/tiling/results/layer_allocation.png`
+**Depends on:** none (but shares data pipeline with G4)
+**Roadmap link:** T2 (layer-0 is coarse absorber, layers 1+ repair)
+
+---
+
+### G10. Cross-exponent wall figures
+
+**Object:** How wall structure changes across target exponents 1/3, 1/2, 2/3
+**Priority:** P1 (exponent_robustness_sweep ran 160 cases on 2026-03-20; data exists,
+no figure)
+**Difficulty:** trivial (CSV exists: `wall/results/exponent_robustness_2026-03-20/summary.csv`)
+**Data source:** Load CSV. Columns include partition_kind, q, depth, exponent,
+layer_dependent, opt_err, free_err, gap, worst_cell_*.
+Also: `enriched_summary.csv` has param_to_cell_ratio, gap_over_free.
+**Suggested encoding:** 3-column figure (one column per exponent):
+  Each column: gap_collapse-style scatter (param_to_cell_ratio vs gap/free) with
+  partition kinds as colored markers. Shared y-axis to see cross-exponent shift.
+  Annotation: median wall fraction for layer-sharing source per exponent.
+**Suggested location:** `experiments/wall/results/exponent_robustness.png`
+**Depends on:** none
+**Roadmap link:** K3 (wall decomposition is partition-dependent), DISTANT-SHORES Step 5
+(does forcing shape change with exponent?)
+
+---
+
+### G15. Scaling law summary
+
+**Object:** free_err, opt_err, wall vs depth for core partitions on one canvas
+**Priority:** P1 (most-asked question; data spread across multiple CSVs)
+**Difficulty:** trivial (data in `wall_surface_2026-03-18/summary.csv` and
+`exponent_robustness_2026-03-20/summary.csv`)
+**Data source:** Load summary CSVs. Filter to geometric_x, uniform_x, harmonic_x.
+Extract (depth, free_err, opt_err, gap) grouped by (kind, layer_mode).
+**Suggested encoding:** 2×2 grid:
+  Rows = LI / LD. Columns = log-scale error / wall fraction.
+  Left panels: log y-axis, three curves per panel (free, opt, single) across depth,
+  colored by partition kind.
+  Right panels: gap/free_err (wall fraction) across depth, same kind colors.
+  Shared x-axis (depth 3..8 or 3..10).
+**Suggested location:** `experiments/keystone/results/scaling_summary.png`
+**Depends on:** none
+**Roadmap link:** K1 (geometric outperforms), K2 (depth scaling), H1b (improvement decays)
+
+---
+
+### G16. Zoo displacement field metrics (new)
+
+**Object:** T1-T3 diagnostic metrics across all 27 zoo cases
+**Priority:** P1 (strengthens T-series by showing which partitions conform and which don't)
+**Difficulty:** trivial (data exists: `tiling/results/zoo/zoo_case_metrics.csv`,
+~100 rows × 15 columns including corr_g_dL, nrmse_g_dL, rho_peak)
+**Data source:** Load `zoo_case_metrics.csv`. Key columns: kind, depth, corr_g_dL
+(correlation of residual with Δ^L), nrmse_g_dL, worst_abs, rho_peak.
+**Suggested encoding:** 2-panel figure:
+  (1) Scatter: x = corr_g_dL, y = nrmse_g_dL, sized by worst_abs, colored by
+  partition category. Adversaries labeled. Shows clustering near high-corr / low-NRMSE.
+  (2) Strip chart or heatmap: kinds on y-axis, depths on x-axis, colored by corr_g_dL.
+  Shows whether correlation strengthens or weakens with depth.
+**Suggested location:** `experiments/tiling/results/zoo_field_summary.png`
+**Depends on:** none
+**Roadmap link:** T1 (free intercept tracks Δ^L), T3 (ε organizes c\*)
+
+---
+
+### P2 — Aids communication
+
+---
+
+### G12. Epsilon + displacement field composite
+
+**Object:** ε(m), Δ^L(m), and c\*(m) overlaid, showing they share the same shape
+**Priority:** P2
+**Difficulty:** trivial (eps_val, delta_L, free intercepts all available)
+**Data source:** `leading_bit_projection.sage::eps_val()`, `delta_L()`;
+`free_intercepts_from_partition()` for c\* on geometric_x at reference depth.
+**Suggested encoding:** Single panel: three curves on [0,1), vertically shifted or
+scaled for alignment. Dashed reference at m\*, zero endpoints. Legend. Annotation
+showing correlation coefficient.
+**Suggested location:** `experiments/tiling/results/forcing_composite.png`
+**Depends on:** G1 (ε portrait establishes the baseline)
+**Roadmap link:** T1, T3 (forcing function organizes c\*)
+
+---
+
+### G13. Partition zoo gallery
+
+**Object:** Cell boundary positions on [1, 2) for all 25 kinds at d=6
+**Priority:** P2
+**Difficulty:** trivial (`float_cells(6, kind)` for each kind)
+**Data source:** `lib/partitions.sage::float_cells()` or `build_partition(6, kind=...)`.
+**Suggested encoding:** Zoo-grid (use `zoo_subplots()` from zoo_figure.sage).
+Each panel: thin vertical lines at cell boundaries, colored by category.
+No error data — pure geometry.
+**Suggested location:** `experiments/stepstone/results/partition_gallery.png`
+**Depends on:** none
+**Roadmap link:** General orientation
+
+---
+
+### G11. Project overview figure
+
+**Object:** Pipeline: partition → Day evaluation → FSM correction → wall measurement
+**Priority:** P2
+**Difficulty:** moderate (composition, not computation; needs design)
+**Data source:** Schematic; no data computation. Could embed small insets from existing
+figures (error_profile, wall_decomposition, fractal).
+**Suggested encoding:** Horizontal flow diagram with 4-5 annotated stages. Each stage
+has a small embedded plot from existing figures. Matplotlib + text annotations.
+**Suggested location:** `experiments/keystone/results/overview.png`
+**Depends on:** G13 (partition gallery for stage 1 inset), G1 (ε for stage 2 inset)
+**Roadmap link:** DISTANT-SHORES overview
+
+---
+
+### G15b. Basis ranking visualization (new, folded under P2)
+
+**Object:** Basis family fit quality from T3 holdout analysis
+**Priority:** P2
+**Difficulty:** trivial (`basis_fit_summary.csv` has 14 rows)
+**Data source:** `tiling/results/basis_identification/basis_fit_summary.csv`
+**Suggested encoding:** Horizontal bar chart: bases on y-axis, test NRMSE on x-axis,
+colored by holdout type (partition vs depth). Annotate feature count per basis.
+**Suggested location:** `experiments/tiling/results/basis_ranking.png`
+**Depends on:** none
+**Roadmap link:** T3 (ε organizes c\*)
+
+---
+
+### P3 — Nice to have
+
+---
+
+### G2. Automaton state trajectories
+
+**Object:** FSM transition graph, fan-out from layer 0, path multiplicities
+**Priority:** P3
+**Difficulty:** moderate (`residue_paths(q, depth)` returns edges and paths;
+need graph layout)
+**Data source:** `lib/paths.sage::residue_paths(q, depth)` → edges list, path dicts
+**Suggested encoding:** Layered directed graph: nodes = (layer, state), edges colored
+by bit (0/1). Width proportional to path count through edge. For q=5, d=4.
+**Suggested location:** `experiments/stepstone/results/automaton_graph.png`
+**Depends on:** none
+**Roadmap link:** W1 (layer-0 fan-out drives displacement)
+
+---
+
+### G3. Induced pattern families
+
+**Object:** Day-induced 0-1 vector families and their additive structure
+**Priority:** P3 (H2/H3 retired — pattern families too small for discrimination)
+**Difficulty:** moderate (`build_active_pattern_family()` + `summarize_vector_family()`)
+**Data source:** `day.sage::build_active_pattern_family()` returns unique_vectors and
+multiplicities; `jukna.sage::summarize_vector_family()` returns sumset/energy/subsets
+**Suggested encoding:** Incidence matrix heatmap (rows=unique vectors, cols=coordinates),
+annotated with multiplicity. Side panel: sumset size, additive energy, Sidon subset size.
+**Suggested location:** `experiments/stepstone/results/pattern_family.png`
+**Depends on:** none
+**Roadmap link:** retired H2/H3 (diagnostic, not active)
+
+---
+
+### G5. LP constraint geometry
+
+**Object:** Feasible region of the minimax LP in low-dimensional projection
+**Priority:** P3
+**Difficulty:** hard (need to extract LP constraints, project to 2-3D, render polytope)
+**Data source:** `optimize.sage::build_intercept_matrix()` → A matrix;
+`_cell_feasible_interval()` → per-cell bounds
+**Suggested encoding:** 2D projection: scatter of feasible intercept vectors at several
+tau values, showing how the feasible region shrinks to a point as tau → opt_err.
+**Suggested location:** `experiments/wall/results/lp_geometry.png`
+**Depends on:** none
+**Roadmap link:** DISTANT-SHORES Step 4 (wall = projection distance)
+
+---
+
+### G14. Hypothesis status dashboard
+
+**Object:** Visual status board for hypothesis registry
+**Priority:** P3
+**Difficulty:** trivial (hand-coded from EXPERIMENTS.md)
+**Data source:** Text in EXPERIMENTS.md — parse status labels
+**Suggested encoding:** Grid: rows = hypotheses (K1a..K3, H1..H1d, W1, T1..T3),
+columns = (status icon, experiment area, key figure). Color by status.
+**Suggested location:** `experiments/results/hypothesis_dashboard.png`
+**Depends on:** none
+**Roadmap link:** project navigation
+
+---
+
+### G17. Split sequence patterns (new)
+
+**Object:** Refinement split-count sequences for all 22 partition kinds
+**Priority:** P3
+**Difficulty:** trivial (`zoo_split_sequences.csv` exists with 22 rows)
+**Data source:** `alternation/refinement/results/zoo_split_sequences.csv`
+**Suggested encoding:** Matrix heatmap: kinds on y-axis, depth transitions on x-axis,
+colored by split count. Side annotation: total sequence string.
+**Suggested location:** `experiments/alternation/refinement/results/split_matrix.png`
+**Depends on:** none
+**Roadmap link:** alternation framework (future E5)
+
+---
+
+## Part B‴. Priority Order and Dependency DAG (Phase 3 output)
+
+### Execution order
+
+| Order | Gap | Priority | Difficulty | Data status |
+|-------|-----|----------|------------|-------------|
+| 1 | G1 | P0 | trivial | pure function |
+| 2 | G15 | P1 | trivial | CSV exists |
+| 3 | G10 | P1 | trivial | CSV exists |
+| 4 | G16 | P1 | trivial | CSV exists |
+| 5 | G4 | P1 | trivial | compute_case() |
+| 6 | G9 | P1 | trivial | CSV + G4 data |
+| 7 | G6 | P0 | moderate | needs q-sweep |
+| 8 | G7 | P0 | moderate | shares G6 data |
+| 9 | G8 | P1 | moderate | partial recompute |
+
+Rationale: trivial P0/P1 first (quick wins that unblock dependencies), then
+moderate-difficulty items that need new computation. G6/G7 are P0 but ordered
+after G1 (which they depend on) and after trivial P1s (to maximize delivered
+figures before hitting the compute wall).
+
+### Dependency DAG
+
+```
+G1 (epsilon portrait)
+├──> G6 (staircase — needs ε reference line)
+│    └──> G7 (binding cell — shares G6 sweep data)
+├──> G12 (forcing composite — needs ε curve) [P2]
+└──> G11 (overview — needs ε inset) [P2]
+
+G4 (delta tables)
+├──> G9 (LI vs LD — compares G4 heatmaps)
+└──> G8 (layer allocation — related delta data)
+
+G13 (partition gallery) ──> G11 (overview — needs gallery inset) [P2]
+
+G15, G10, G16: independent (CSV-only, no cross-dependencies)
+G17, G14, G2, G3, G5: independent [P3]
+```
 
 ---
 
@@ -249,3 +673,50 @@ dependency graph.
   visualizations descriptively, not thematically.
 
 - **Read `AGENTS.md`** for import conventions and how to run scripts.
+
+---
+
+## Part D. Implementation Status (Phase 4b output)
+
+8 scripts implemented covering all 9 P0+P1 gaps (G6 and G7 share one script).
+
+| Gap | Script | Output | Data | Runtime est. |
+|-----|--------|--------|------|-------------|
+| G1 | `stepstone/epsilon_portrait.sage` | `stepstone/results/epsilon_portrait.png` | pure function | <5s |
+| G15 | `keystone/scaling_summary.sage` | `keystone/results/scaling_summary.png` | wall_surface CSV + enriched CSV | <5s |
+| G10 | `wall/exponent_robustness.sage` | `wall/results/exponent_robustness.png` | enriched CSV + robustness CSV | <5s |
+| G16 | `tiling/zoo_field_summary.sage` | `tiling/results/zoo_field_summary.png` | zoo_case_metrics.csv | <5s |
+| G4 | `keystone/delta_tables.sage` | `keystone/results/delta_tables.png` | compute_case() x2 | ~60s |
+| G9 | `wall/li_vs_ld_shape.sage` | `wall/results/li_vs_ld_shape.png` | joined_layer_modes.csv + h1a/h1c CSVs | <5s |
+| G6+G7 | `wall/absorption_staircase.sage` | `wall/results/absorption_staircase.png` + `binding_cell_migration.png` | q-sweep: compute_case() x24 | ~5-15min |
+| G8 | `tiling/layer_allocation.sage` | `tiling/results/layer_allocation.png` | compute_case() x1 (LD) | ~30s |
+
+### Run order
+
+```sh
+# Trivial (CSV / pure function) — seconds each
+./sagew experiments/stepstone/epsilon_portrait.sage
+./sagew experiments/keystone/scaling_summary.sage
+./sagew experiments/wall/exponent_robustness.sage
+./sagew experiments/tiling/zoo_field_summary.sage
+./sagew experiments/wall/li_vs_ld_shape.sage
+
+# Moderate (needs optimize_minimax calls)
+./sagew experiments/keystone/delta_tables.sage          # ~60s
+./sagew experiments/tiling/layer_allocation.sage         # ~30s
+./sagew experiments/wall/absorption_staircase.sage       # ~5-15min (q-sweep)
+```
+
+### What each script validates
+
+| Gap | If hypothesis correct | If hypothesis wrong |
+|-----|----------------------|---------------------|
+| G1 | ε is smooth, concave, peaks at m\*≈0.44, zero at endpoints | (pure math — always correct) |
+| G6 | Wall drops in discrete steps; plateaus between stairs | Wall drops smoothly — no staircase |
+| G7 | Worst cell migrates from boundaries toward m\* | Worst cell stays near boundary or jumps randomly |
+| G4 | LD tables are diffuse (many nonzero entries); LI concentrated | Both have similar sparsity patterns |
+| G8 | Layer 0 has largest L∞ norm; layers 1+ have smaller repair contributions | Contributions distributed evenly across layers |
+| G9 | Gap reduction > 0 for all kinds; geometric benefits most from LD | LD doesn't help or hurts some kinds |
+| G10 | Wall structure is qualitatively similar across exponents | Exponent changes wall structure fundamentally |
+| G15 | Geometric free_err < uniform at all depths; gap grows with depth under LI | Scaling relationships differ from K1/K2 claims |
+| G16 | Most partition kinds have corr > 0.8 with Δ^L; adversaries don't break it | Low correlation for many kinds — field theory fails |

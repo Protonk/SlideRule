@@ -80,7 +80,7 @@ the summary visuals exist, and we pause to reflect before escalating.
 
 ### Execution steps
 
-**1. Make `lib/partitions.sage` the executable source of truth.**
+**1. Make `lib/partitions.sage` the executable source of truth.** — DONE
 
 Add one cleanup step ahead of the zoo sweep: convert the executable parts of
 `lib/partitions.json` into `lib/partitions.sage`, so the Sage code itself owns
@@ -106,7 +106,7 @@ After this migration, `lib/partitions.json` should be treated as either:
 
 but not the authoritative executable source.
 
-**2. Build an explicit executable case table.**
+**2. Build an explicit executable case table.** — DONE
 
 Once `lib/partitions.sage` owns the executable registry, build a local `CASES`
 table from that registry:
@@ -118,7 +118,7 @@ table from that registry:
 Each case row should include `case_id`, `kind`, `kwargs`, `scramble_mode`,
 `source_kind`, `display_name`, `category`, and `group`.
 
-**3. Factor out free-intercept computation from a built partition.**
+**3. Factor out free-intercept computation from a built partition.** — DONE
 
 `free_per_cell_metrics` accepts `partition_kind` but not arbitrary `**kwargs`,
 so parameterized kinds and scrambles cannot be routed through it directly.
@@ -138,7 +138,7 @@ Requirements:
 This helper should become the common path for `zoo_sweep.sage` and any tiling
 script that needs parameterized partitions.
 
-**4. Write `zoo_sweep.sage`.**
+**4. Write `zoo_sweep.sage`.** — DONE
 
 Single script that loops over all cases at depths `5, 6, 7, 8`
 (depth `4` remains excluded from the primary summary to match the basis
@@ -165,7 +165,7 @@ Runtime should be described in terms of case count and depth, not baked into
 the plan. With the current zoo size this is still a geometry-only, single-digit
 minutes sweep.
 
-**5. Build `zoo_metadata.csv`.**
+**5. Build `zoo_metadata.csv`.** — DONE
 
 Emit one row per executable case, not one row per raw kind. This file should be
 the stable join target for plots and downstream summaries.
@@ -183,7 +183,7 @@ For ordinary cases, metadata comes from the executable registry in
 If `lib/partitions.json` is still kept around after step 1, it should be
 exported from the same Sage-side registry so this metadata table cannot drift.
 
-**6. Validate the scrambles against the implementation they actually use.**
+**6. Validate the scrambles against the implementation they actually use.** — DONE
 
 Do **not** use "scrambling uniform reproduces uniform_x" as the control. The
 current `scramble_x` implementation is geometric-width-specific, not a generic
@@ -200,7 +200,7 @@ Instead validate:
 
 These are the controls that match the current construction.
 
-**7. Spot-check against existing results.**
+**7. Spot-check against existing results.** — DONE
 
 Compare overlapping raw cases against existing artifacts:
 
@@ -215,7 +215,7 @@ separate depth-4 smoke pass.
 
 Any discrepancy beyond floating-point tolerance is a zoo-pipeline bug.
 
-**8. Produce a summary figure set, not a single rank plot.**
+**8. Produce a summary figure set, not a single rank plot.** — DONE
 
 The zoo summary should include at least four compact views:
 

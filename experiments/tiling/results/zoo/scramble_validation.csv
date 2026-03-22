@@ -1,0 +1,9 @@
+scramble_mode,depth,width_max_diff,boundaries_ok,endpoint_lo_ok,endpoint_hi_ok,rho_peak,pass
+peak_swap,5,1.942890293094024e-16,True,True,True,-0.9933931315932493,True
+peak_swap,6,2.0816681711721685e-16,True,True,True,-0.9896892676364092,True
+peak_swap,7,2.0296264668928643e-16,True,True,True,-0.9916475534615968,True
+peak_swap,8,2.1250362580715887e-16,True,True,True,-0.9906993523050979,True
+peak_avoid,5,1.942890293094024e-16,True,True,True,0.9909367072283709,True
+peak_avoid,6,2.0816681711721685e-16,True,True,True,0.9929690276986554,True
+peak_avoid,7,2.0296264668928643e-16,True,True,True,0.9920542012795311,True
+peak_avoid,8,2.1250362580715887e-16,True,True,True,0.9925280652147238,True

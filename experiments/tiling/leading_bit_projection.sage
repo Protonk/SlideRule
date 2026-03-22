@@ -1,8 +1,12 @@
 """
-leading_bit_projection.sage — Leading-bit projection and displacement field.
+leading_bit_projection.sage — Leading-bit projection, displacement field,
+and ε helpers.
 
 Provides:
 - delta_L(m): representation displacement field Δ^L = m - log₂(1+m)
+- eps_val(m), eps_prime(m), eps_pp(m): ε and its derivatives
+- eps_antideriv(m), mean_cell_eps(a, b): cell-average of ε
+- cell_eps_moment1(a, b), cell_eps_moment2(a, b): centered moments
 - pi0_inf(f, halves): best piecewise-constant fit under L∞
 - pi0_l2(f, halves): best piecewise-constant fit under L2
 - R0(f, halves, norm): residual f - Π0(f)
@@ -12,8 +16,60 @@ Provides:
 Not intended to be run directly.
 """
 
-from math import log2
+from math import log, log2
 import numpy as np
+
+LN2 = log(2.0)
+MSTAR = 1.0 / LN2 - 1.0  # ≈ 0.4427
+
+
+# ── ε and its derivatives ────────────────────────────────────────────
+
+def eps_val(m):
+    """Pseudo-log error: ε(m) = log₂(1+m) − m."""
+    if m <= 0: return 0.0
+    if m >= 1: return 0.0
+    return log2(1.0 + m) - m
+
+def eps_prime(m):
+    """ε'(m) = 1/((1+m) ln 2) − 1."""
+    return 1.0 / ((1.0 + m) * LN2) - 1.0
+
+def eps_pp(m):
+    """ε''(m) = −1/((1+m)² ln 2)."""
+    return -1.0 / ((1.0 + m)**2 * LN2)
+
+def eps_antideriv(m):
+    """Antiderivative of ε(m). ∫₀¹ ε dm = 3/2 − 1/ln2 ≈ 0.0573."""
+    if m <= 0: return -1.0 / LN2
+    return (1.0 / LN2) * ((1.0 + m) * log(1.0 + m) - (1.0 + m)) - m * m / 2.0
+
+def mean_cell_eps(a, b):
+    """Cell-average of ε over [a, b] in mantissa coordinates."""
+    if b - a < 1e-15: return eps_val((a + b) / 2.0)
+    return (eps_antideriv(b) - eps_antideriv(a)) / (b - a)
+
+def cell_eps_moment1(a, b):
+    """Centered first moment: ∫(m − m_mid)·ε(m)dm / (b−a), numerical."""
+    mid = (a + b) / 2.0
+    n = 32
+    h = (b - a) / n
+    total = 0.0
+    for i in range(n):
+        m = a + (i + 0.5) * h
+        total += (m - mid) * eps_val(m)
+    return total * h / (b - a)
+
+def cell_eps_moment2(a, b):
+    """Centered second moment: ∫(m − m_mid)²·ε(m)dm / (b−a), numerical."""
+    mid = (a + b) / 2.0
+    n = 32
+    h = (b - a) / n
+    total = 0.0
+    for i in range(n):
+        m = a + (i + 0.5) * h
+        total += (m - mid)**2 * eps_val(m)
+    return total * h / (b - a)
 
 
 def delta_L(m):

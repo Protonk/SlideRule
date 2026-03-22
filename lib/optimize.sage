@@ -10,7 +10,8 @@ Partition-aware: when partition_kind is specified, uses the arbitrary-cell
 evaluator with the given geometry.  When partition_kind is None (default),
 uses the legacy exact evaluator for backward compatibility.
 
-Depends on: lib/paths.sage, lib/day.sage, lib/partitions.sage (must be loaded first).
+Depends on: lib/paths.sage, lib/day.sage, lib/partitions.sage, lib/policies.sage
+(must be loaded first).
 """
 
 from scipy.optimize import minimize as scipy_minimize
