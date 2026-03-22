@@ -17,7 +17,7 @@ load(pathing('lib', 'day.sage'))
 load(pathing('lib', 'partitions.sage'))
 load(pathing('lib', 'policies.sage'))
 load(pathing('lib', 'optimize.sage'))
-load(pathing('experiments', 'tiling', 'leading_bit_projection.sage'))
+load(pathing('lib', 'displacement.sage'))
 
 import numpy as np
 
@@ -42,54 +42,29 @@ def compute_case_observables(case, depth):
     # Free intercepts
     free = free_intercepts_from_partition(partition, P_NUM, Q_DEN)
     c_star = np.array(free['c_star'])
+    x_start = float(partition[0]['x_lo'])
+    x_width = float(partition[-1]['x_hi']) - x_start
 
     # Leading-bit projection
     left = leading_bit_halves(partition)
     g_inf = R0(c_star, left, 'inf')
-    g_l2 = R0(c_star, left, 'l2')
 
     # Displacement field
     dL = delta_L_field(partition)
-    r0_dL_inf = R0(dL, left, 'inf')
-    r0_dL_l2 = R0(dL, left, 'l2')
-
-    # Stage A metrics
-    def safe_corr(a, b):
-        if np.std(a) < 1e-15 or np.std(b) < 1e-15:
-            return float('nan')
-        return float(np.corrcoef(a, b)[0, 1])
-
-    corr_inf = safe_corr(g_inf, r0_dL_inf)
-    corr_l2 = safe_corr(g_l2, r0_dL_l2)
-    nrmse_inf = nrmse(g_inf, r0_dL_inf)
-    nrmse_l2 = nrmse(g_l2, r0_dL_l2)
-    residual_norm_inf = float(np.max(np.abs(g_inf)))
-    residual_norm_2 = float(np.linalg.norm(g_inf))
-
-    # Coupling diagnostics
+    stage_a = stage_a_metrics(partition, c_star)
+    coupling = coupling_diagnostics(partition)
     widths = np.array([float(partition[j]['x_hi'] - partition[j]['x_lo'])
                        for j in range(N)])
-    m_mids = np.array([float((partition[j]['x_lo'] + partition[j]['x_hi']) / 2) - 1.0
-                        for j in range(N)])
-    peak_dists = np.array([-abs(m - MSTAR) for m in m_mids])
-
-    if np.std(widths) > 1e-15 and np.std(peak_dists) > 1e-15:
-        rho_peak = float(np.corrcoef(widths, peak_dists)[0, 1])
-    else:
-        rho_peak = float('nan')
-
-    eps_at_mids = np.array([eps_val(m) for m in m_mids])
-    eps_sum = np.sum(eps_at_mids)
-    if eps_sum > 1e-15:
-        mean_width_eps = float(np.sum(widths * eps_at_mids) / eps_sum)
-    else:
-        mean_width_eps = float('nan')
+    m_mids = np.array([
+        (float((partition[j]['x_lo'] + partition[j]['x_hi']) / 2) - x_start) / x_width
+        for j in range(N)
+    ])
 
     # Per-cell rows
     cell_rows = []
     for j in range(N):
-        a_m = float(partition[j]['x_lo']) - 1.0
-        b_m = float(partition[j]['x_hi']) - 1.0
+        a_m = (float(partition[j]['x_lo']) - x_start) / x_width
+        b_m = (float(partition[j]['x_hi']) - x_start) / x_width
         m_mid = m_mids[j]
 
         cell_rows.append({
@@ -125,14 +100,14 @@ def compute_case_observables(case, depth):
         'scramble_mode': case['scramble_mode'],
         'depth': depth,
         'n_cells': N,
-        'corr_inf': corr_inf,
-        'corr_l2': corr_l2,
-        'nrmse_inf': nrmse_inf,
-        'nrmse_l2': nrmse_l2,
-        'residual_norm_inf': residual_norm_inf,
-        'residual_norm_2': residual_norm_2,
-        'rho_peak': rho_peak,
-        'mean_width_eps': mean_width_eps,
+        'corr_inf': stage_a['corr_inf'],
+        'corr_l2': stage_a['corr_l2'],
+        'nrmse_inf': stage_a['nrmse_inf'],
+        'nrmse_l2': stage_a['nrmse_l2'],
+        'residual_norm_inf': stage_a['residual_norm_inf'],
+        'residual_norm_2': stage_a['residual_norm_2'],
+        'rho_peak': coupling['rho_peak'],
+        'mean_width_eps': coupling['mean_width_eps'],
         'worst_abs': free['worst_abs'],
         'time': elapsed,
     }

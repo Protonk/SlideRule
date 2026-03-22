@@ -62,7 +62,8 @@ responds to a representation-level forcing function.
 [`TILING.md`](tiling/TILING.md) contains the framework.
 
 Scripts: `displacement_field_test`, `leading_bit_projection`,
-`basis_identification`, `basis_overlay`, `t3_summary_plot`.
+`basis_identification`, `basis_overlay`, `t3_summary_plot`,
+`zoo_sweep`, `zoo_summary_plots`.
 
 Tests: T1, T2, T3
 

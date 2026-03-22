@@ -11,11 +11,11 @@ Run:  ./sagew experiments/tiling/basis_identification.sage
 import csv
 import os
 import sys
-from math import log, log2, sqrt
+from math import log
 
 from helpers import pathing
 load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
-load(pathing('experiments', 'tiling', 'leading_bit_projection.sage'))
+load(pathing('lib', 'displacement.sage'))
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -24,8 +24,6 @@ from numpy.linalg import lstsq
 # ── Configuration ────────────────────────────────────────────────────
 
 P_NUM, Q_DEN = 1, 2
-LN2 = log(2.0)
-MSTAR = 1.0 / LN2 - 1.0  # ≈ 0.4427
 
 BASELINE_KINDS = ['uniform_x', 'geometric_x', 'harmonic_x', 'mirror_harmonic_x']
 ADVERSARY_KINDS = ['half_geometric_x', 'eps_density_x', 'midpoint_dense_x']
@@ -40,51 +38,6 @@ DEPTH_TEST = [7, 8]
 OUT_DIR = pathing('experiments', 'tiling', 'results', 'basis_identification')
 
 
-# ── ε helpers ────────────────────────────────────────────────────────
-
-def eps_val(m):
-    if m <= 0: return 0.0
-    if m >= 1: return 0.0
-    return log2(1.0 + m) - m
-
-def eps_prime(m):
-    return 1.0 / ((1.0 + m) * LN2) - 1.0
-
-def eps_pp(m):
-    return -1.0 / ((1.0 + m)**2 * LN2)
-
-def eps_antideriv(m):
-    if m <= 0: return -1.0 / LN2
-    return (1.0 / LN2) * ((1.0 + m) * log(1.0 + m) - (1.0 + m)) - m * m / 2.0
-
-def mean_cell_eps(a, b):
-    """Cell-average of ε over [a, b] in mantissa coordinates."""
-    if b - a < 1e-15: return eps_val((a + b) / 2.0)
-    return (eps_antideriv(b) - eps_antideriv(a)) / (b - a)
-
-def cell_eps_moment1(a, b):
-    """Centered first moment: ∫(m - m_mid)*ε(m)dm / (b-a), numerical."""
-    mid = (a + b) / 2.0
-    n = 32
-    h = (b - a) / n
-    total = 0.0
-    for i in range(n):
-        m = a + (i + 0.5) * h
-        total += (m - mid) * eps_val(m)
-    return total * h / (b - a)
-
-def cell_eps_moment2(a, b):
-    """Centered second moment: ∫(m - m_mid)²*ε(m)dm / (b-a), numerical."""
-    mid = (a + b) / 2.0
-    n = 32
-    h = (b - a) / n
-    total = 0.0
-    for i in range(n):
-        m = a + (i + 0.5) * h
-        total += (m - mid)**2 * eps_val(m)
-    return total * h / (b - a)
-
-
 # ── Build observable table ───────────────────────────────────────────
 
 def build_observables(kind, depth):
@@ -92,6 +45,8 @@ def build_observables(kind, depth):
     partition = build_partition(depth, kind=kind)
     free = free_per_cell_metrics(depth, P_NUM, Q_DEN, partition_kind=kind)
     free_by_bits = {fr['bits']: fr for fr in free['rows']}
+    x_start = float(partition[0]['x_lo'])
+    x_width = float(partition[-1]['x_hi']) - x_start
 
     c_star = np.array([float(free_by_bits[row['bits']]['c_opt'])
                        for row in partition])
@@ -101,12 +56,12 @@ def build_observables(kind, depth):
     # Affine detrend for geometric diagnostic
     x_mids = np.array([float((row['x_lo'] + row['x_hi']) / 2)
                         for row in partition])
-    m_mids = x_mids - 1.0
+    m_mids = (x_mids - x_start) / x_width
 
     rows = []
     for j, row in enumerate(partition):
-        a_m = float(row['x_lo']) - 1.0  # mantissa lo
-        b_m = float(row['x_hi']) - 1.0  # mantissa hi
+        a_m = (float(row['x_lo']) - x_start) / x_width
+        b_m = (float(row['x_hi']) - x_start) / x_width
         m_mid = m_mids[j]
         w_x = float(row['x_hi'] - row['x_lo'])
         w_log = float(log(float(row['x_hi'])) - log(float(row['x_lo'])))

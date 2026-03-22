@@ -14,6 +14,7 @@ The Sage modules are meant to be loaded in this order:
 load('lib/paths.sage')
 load('lib/day.sage')
 load('lib/partitions.sage')
+load('lib/displacement.sage')
 load('lib/policies.sage')
 load('lib/jukna.sage')
 load('lib/optimize.sage')
@@ -79,6 +80,21 @@ Companion metadata:
 
 - `partitions.json`: machine-readable partition metadata and curated preset
   grid layouts for the stepstone fractal renderers.
+
+### `displacement.sage`
+
+Representation displacement field `Δ^L = -ε`, leading-bit projection, and
+Stage A diagnostics.
+
+Primary entry points:
+
+- `delta_L(m)` / `delta_L_field(partition)`: representation displacement field
+  on normalized mantissa coordinates.
+- `leading_bit_halves(partition)`, `pi0_inf(...)`, `pi0_l2(...)`, `R0(...)`:
+  the leading-bit projection and residual operators.
+- `stage_a_metrics(partition, c_star)`: correlation / NRMSE / residual-norm
+  bundle comparing `R0(c*)` with `R0(Δ^L)`.
+- `coupling_diagnostics(partition)`: width-to-peak coupling summary.
 
 ### `policies.sage`
 
@@ -194,6 +210,7 @@ families, and is useful for quick exploratory work without Sage.
 ## Extension Notes
 
 - New partition geometries belong in `partitions.sage`.
+- New displacement-field helpers and leading-bit diagnostics belong in `displacement.sage`.
 - New policy families belong in `policies.sage`.
 - New per-cell or global Day metrics belong in `day.sage`.
 - New additive invariants or certified subset routines belong in `jukna.sage`.

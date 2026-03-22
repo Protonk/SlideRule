@@ -9,11 +9,10 @@ Run:  ./sagew experiments/tiling/t3_summary_plot.sage
 """
 
 import os
-from math import log, log2
 
 from helpers import pathing
 load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
-load(pathing('experiments', 'tiling', 'leading_bit_projection.sage'))
+load(pathing('lib', 'displacement.sage'))
 
 import matplotlib
 matplotlib.use('Agg')
@@ -60,22 +59,18 @@ COLORS = {
 def compute_transported_residual(kind, depth, grid, **kwargs):
     """Compute R0(c*) and transport to common grid."""
     partition = build_partition(depth, kind=kind, **kwargs)
-
-    # Free intercepts — use optimal_cell_intercept_arb directly
-    # to handle scramble_x which free_per_cell_metrics can't
-    c_star = []
-    for row in partition:
-        plog_lo = QQ(row['plog_lo'])
-        plog_hi = QQ(row['plog_hi'])
-        c_opt, _ = optimal_cell_intercept_arb(plog_lo, plog_hi, P_NUM, Q_DEN)
-        c_star.append(float(c_opt))
-    c_star = np.array(c_star)
+    free = free_intercepts_from_partition(partition, P_NUM, Q_DEN)
+    c_star = np.array(free['c_star'])
+    x_start = float(partition[0]['x_lo'])
+    x_width = float(partition[-1]['x_hi']) - x_start
 
     left = leading_bit_halves(partition)
     g = R0(c_star, left, 'inf')
 
-    m_mids = np.array([float((row['x_lo'] + row['x_hi']) / 2) - 1.0
-                        for row in partition])
+    m_mids = np.array([
+        (float((row['x_lo'] + row['x_hi']) / 2) - x_start) / x_width
+        for row in partition
+    ])
 
     # Transport to common grid
     g_transported = np.interp(grid, m_mids, g)

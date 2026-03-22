@@ -18,7 +18,7 @@ import time
 
 from helpers import pathing
 load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
-load(pathing('experiments', 'tiling', 'leading_bit_projection.sage'))
+load(pathing('lib', 'displacement.sage'))
 
 import matplotlib
 matplotlib.use('Agg')
@@ -58,6 +58,7 @@ def run_stage_a(kind, depth):
     free_by_bits = {fr['bits']: fr for fr in free['rows']}
     c_star = np.array([float(free_by_bits[row['bits']]['c_opt'])
                        for row in partition])
+    metrics = stage_a_metrics(partition, c_star)
 
     # Representation displacement field
     dL = delta_L_field(partition)
@@ -73,20 +74,14 @@ def run_stage_a(kind, depth):
     r0_cstar_l2 = R0(c_star, left, 'l2')
     r0_dL_l2 = R0(dL, left, 'l2')
 
-    # Metrics
-    corr_inf = float(np.corrcoef(r0_cstar_inf, r0_dL_inf)[0, 1])
-    corr_l2 = float(np.corrcoef(r0_cstar_l2, r0_dL_l2)[0, 1])
-    nrmse_inf = nrmse(r0_cstar_inf, r0_dL_inf)
-    nrmse_l2 = nrmse(r0_cstar_l2, r0_dL_l2)
-    res_norm_inf = float(np.max(np.abs(r0_cstar_inf)))
-    res_norm_2 = float(np.linalg.norm(r0_cstar_inf))
-
     return {
         'kind': kind, 'depth': depth,
-        'corr_inf': corr_inf, 'corr_l2': corr_l2,
-        'nrmse_inf': nrmse_inf, 'nrmse_l2': nrmse_l2,
-        'residual_norm_inf': res_norm_inf,
-        'residual_norm_2': res_norm_2,
+        'corr_inf': metrics['corr_inf'],
+        'corr_l2': metrics['corr_l2'],
+        'nrmse_inf': metrics['nrmse_inf'],
+        'nrmse_l2': metrics['nrmse_l2'],
+        'residual_norm_inf': metrics['residual_norm_inf'],
+        'residual_norm_2': metrics['residual_norm_2'],
         # For plots
         '_r0_cstar': r0_cstar_l2,
         '_r0_dL': r0_dL_l2,

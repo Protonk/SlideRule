@@ -11,6 +11,7 @@ load(pathing('lib', 'partitions.sage'))
 load(pathing('lib', 'policies.sage'))
 load(pathing('lib', 'jukna.sage'))
 load(pathing('lib', 'optimize.sage'))
+load(pathing('lib', 'displacement.sage'))
 
 
 def assert_true(condition, message):
@@ -225,6 +226,27 @@ def test_layer_dependent_above_free_bound():
         f"layer-dependent ({opt['worst_err']:.8f}) should be >= "
         f"free-per-cell bound ({free_worst:.8f})",
     )
+
+
+def test_displacement_library_smoke():
+    assert_true(eps_val(0.0) == 0.0, "eps_val should vanish at m=0")
+    assert_true(eps_val(MSTAR) > 0.0, "eps_val should be positive at m*")
+    assert_true(eps_val(1.0) == 0.0, "eps_val should vanish at m=1")
+
+    for m in [0.0, 0.125, float(MSTAR), 0.5, 0.875, 1.0]:
+        assert_close(delta_L(m), -eps_val(m), 1e-12,
+                     f"delta_L should equal -eps_val at m={m}")
+
+    partition = build_partition(6, kind='geometric_x')
+    free = free_intercepts_from_partition(partition, 1, 2)
+    metrics = stage_a_metrics(partition, free['c_star'])
+    assert_close(metrics['corr_inf'], 0.850, 0.01,
+                 "geometric_x Stage A corr_inf drifted")
+
+    uniform = build_partition(6, kind='uniform_x')
+    coupling = coupling_diagnostics(uniform)
+    assert_true(coupling['rho_peak'] != coupling['rho_peak'],
+                "uniform_x rho_peak should be NaN when widths are constant")
 
 
 def test_bits_index_roundtrip():
@@ -2366,6 +2388,7 @@ def main():
         ("layer_dependent_smoke", test_layer_dependent_smoke),
         ("layer_dependent_beats_invariant", test_layer_dependent_beats_invariant),
         ("layer_dependent_above_free_bound", test_layer_dependent_above_free_bound),
+        ("displacement_library_smoke", test_displacement_library_smoke),
         ("nondefault_domain_partition", test_nondefault_domain_partition),
         ("nondefault_domain_evaluator", test_nondefault_domain_evaluator),
         ("nondefault_domain_minimax", test_nondefault_domain_minimax),
