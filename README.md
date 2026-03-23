@@ -16,7 +16,7 @@ reckoning/            The intellectual reckoning — charts, doubts, and horizon
   ABYSSAL-DOUBT.md      Three doubts that shadow the program
   HERE-BE-DRAGONS.md    Six speculative ideas from the pentagonal variant
   BINADE-WHITECAPS.md   Coordinate scaffold: ε as accumulated density defect
-  PARTITIONS.md         Partition family classification (25 kinds)
+  PARTITIONS.md         Partition family classification
   GLOSSARY.md           Project terminology
   REFERENCES.md         Literature (Day 2023, Mitchell 1962, and lineage)
 experiments/          Runnable sweeps, visualizations, and analysis

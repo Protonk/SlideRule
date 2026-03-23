@@ -21,7 +21,7 @@ Mathematical source: Dolbilin & Frettlöh, "Properties of Böröczky
 tilings in high-dimensional hyperbolic spaces," *European Journal of
 Combinatorics* 31(4), 2010.
 
-Connection to project: TILING.md identifies the binary (uniform)
+Connection to project: POINCARE-CURRENTS.md identifies the binary (uniform)
 partition as the horocyclic slicing and the geometric partition as the
 geodesic slicing of the same hyperbolic structure. The pentagonal
 variant makes this duality a fact of tiling theory rather than an
@@ -160,8 +160,8 @@ controlled skepticism, rather than drifting as ambient enthusiasm.
 
 ## Reading outward
 
-- [`TILING.md`](../experiments/tiling/TILING.md): the established
-  displacement field framework these dragons extend.
+- [`POINCARE-CURRENTS.md`](POINCARE-CURRENTS.md): the displacement
+  field framework these dragons extend.
 - [`ABYSSAL-DOUBT.md`](ABYSSAL-DOUBT.md): the doubt about whether
   the wall measures the problem or the architecture.
 - [`DISTANT-SHORES.md`](DISTANT-SHORES.md): Steps 5–6 that Dragons

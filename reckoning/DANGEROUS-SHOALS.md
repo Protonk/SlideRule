@@ -10,8 +10,8 @@ do not mistake proximity for arrival.
 
 ## The problem
 
-Step 5 establishes a forcing function and measures how one architecture
-absorbs it. Step 6 asks whether the absorption ordering is
+Step 3 establishes the forcing function. Step 4 predicts the exchange
+rate. Steps 5–6 ask whether the absorption ordering is
 architecture-invariant. The current resolution path is empirical:
 implement a second binary-representation architecture, compare curves.
 That gives two data points in architecture space. Arguing universality
@@ -32,12 +32,10 @@ difference between a result and a narrative.
 
 ---
 
-## Step 5: open work
+## Step 4: open work
 
-The forcing function Δ^L = −ε and its properties (closed form, bounded,
-partition-independent at first order, structured) are established. The
-staircase prediction and spectral structure are derived. See
-[TRAVERSE](TRAVERSE.md) Step 5 for the science. What remains:
+The forcing (Step 3) and the staircase prediction (Step 4) are
+derived. See [TRAVERSE](TRAVERSE.md). What remains:
 
 1. **Measure the (C, gap) curve.** Vary q at fixed depth and partition.
    Check whether the binding cell migrates in the order predicted by
@@ -57,7 +55,7 @@ staircase prediction and spectral structure are derived. See
    via the Day candidate structure. If c₀(m) is a functional of ε, the
    forcing is proved, not just correlated. This requires new mathematics.
 
-## Step 6: what the crossing requires
+## Steps 5–7: what the crossing requires
 
 For d_comp(τ) to be a property of the approximation problem rather
 than the implementation, two things are needed:
@@ -71,7 +69,7 @@ than the implementation, two things are needed:
 
 A weaker but potentially sufficient version: stair *locations* (which
 cells bind when) are set by Δ^L and should be architecture-invariant,
-even if stair *heights* differ. Step 6 then requires only that
+even if stair *heights* differ. The crossing then requires only that
 different architectures respect the same binding-cell ordering.
 
 A second binary-representation architecture — shared-coefficient
@@ -90,12 +88,13 @@ game. See [COVERING-GAME](COVERING-GAME.md).
 - [AGENTS](AGENTS.md): epistemological rules for working on the
   reckoning (MENEHUNE discipline, proof standards, outcome levels).
 
-- [TRAVERSE](TRAVERSE.md): the six-step spine.
+- [TRAVERSE](TRAVERSE.md): the seven-step spine.
 - [DISTANT-SHORES](DISTANT-SHORES.md): the destination (d_comp).
 - [COVERING-GAME](COVERING-GAME.md): the mathematical program for
   architecture-invariance.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): the doubt about whether the wall
   measures the problem or the architecture.
-- [TILING](../experiments/tiling/TILING.md): the displacement field.
+- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): displacement field,
+  staircase prediction.
 - [KEYSTONE](../experiments/keystone/KEYSTONE.md) §4: the compatibility
   argument the crossing would complete.

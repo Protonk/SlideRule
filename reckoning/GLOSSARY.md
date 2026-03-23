@@ -33,17 +33,29 @@ fingerprint of the wall. See
 
 ## automaton coupling
 
-The third and finest source of the wall. Even in the layer-dependent
-model, multiple leaves share parameters through the `(layer, state, bit)`
-triple; the layer-dependent model has `1 + 2q × depth` parameters for
-`2^depth` leaves, so parameters are still reused. The residual gap
-`opt_err(layer-dependent) − free_err` is attributed to this coupling.
+In the FSM's wall decomposition, the finest sharing constraint. Even in
+the layer-dependent model, multiple leaves share parameters through the
+`(layer, state, bit)` triple; the layer-dependent model has
+`1 + 2q × depth` parameters for `2^depth` leaves, so parameters are
+still reused. The residual gap `opt_err(layer-dependent) − free_err`
+is attributed to this coupling.
 
 The displacement analysis (2026-03-21) showed that this coupling does
 not operate through residue-state assignment (all final states have
 similar displacement statistics). It operates through the path algebra:
 the accumulation of shared delta entries along binary paths imposes a
 global distortion pattern.
+
+This is a property of the FSM's sharing topology, not of the
+approximation problem. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4.
+
+## binade
+
+The interval `[2^k, 2^{k+1})` for integer k. Within one binade, the
+mantissa `m = x/2^k − 1` ranges over `[0, 1)` and the pseudo-log is
+affine. Binade boundaries are the integer lattice of log₂ — the seam
+points of the log₂/mod-1 coordinate circle. See
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §1.
 
 ## beta (β)
 
@@ -125,6 +137,24 @@ intercept + 2q delta entries for q states × 2 bit values). In the
 **layer-dependent** model, each depth level has its own table, giving
 `1 + 2q × depth` parameters.
 
+## d_comp(τ) (computational ruler)
+
+    d_comp(τ) = min { C(M) : M produces |APPROX_M − log₂| ≤ τ }
+
+The minimum structural cost to achieve tolerance τ in departure from L,
+where the minimum is over correction machinery M and C is a cost measure.
+This is the project's destination. Whether d_comp is a property of the
+approximation problem or the architecture is [MENEHUNE]. See
+[DISTANT-SHORES](DISTANT-SHORES.md).
+
+## delta* (δ*)
+
+The vector of free-per-cell optimal corrections:
+`δ* = (δ*_1, …, δ*_{2^d})`, where each δ*_j minimises worst-case error
+on cell j with no sharing constraint. The target that any shared
+correction architecture is trying to approximate. Related to the free
+intercept field c* but expressed as corrections rather than intercepts.
+
 ## depth (d)
 
 The number of levels in the binary refinement tree. Any depth-`d`
@@ -157,7 +187,7 @@ that processes binary significand bits must absorb this field.
 
 The tiling framework identifies Δ^L as the forcing function that
 organises the wall's coarse structure. See
-[`experiments/tiling/TILING.md`](../experiments/tiling/TILING.md).
+[`POINCARE-CURRENTS.md`](POINCARE-CURRENTS.md).
 
 ## dyadic
 
@@ -189,26 +219,36 @@ one binade. It is concave, zero at both endpoints (`ε(0) = 0`,
 `ε(1) = 0`), with maximum at `m* = 1/ln 2 − 1 ≈ 0.4427`. Its second
 derivative is `ε''(m) = −1/((1+m)² ln 2)`.
 
-ε is the central function of the project. It appears in three roles:
+ε is the central function of the project. It has three identities under
+the log₂/mod-1 coordinate system:
 - The surrogate error (KEYSTONE §2): the cost of using L instead of log₂.
-- The representation displacement field: Δ^L = −ε (TILING.md).
-- The first-order organiser of c*: the free intercept field's nonlinear
-  variation tracks ε across all tested partition families (T3).
+- The representation displacement field: Δ^L = −ε (POINCARE-CURRENTS.md).
+- The accumulated departure from the reciprocal density in log-binade
+  coordinates: E(t) = ∫₀ᵗ (2^w ln 2 − 1) dw = −ε(φ(t)), where
+  φ(t) = 2^t − 1. See [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §6–§7.
+
+These three identities are forced by the coordinate theory, not by any
+property of the correction architecture.
+
+ε also serves as the first-order organiser of c*: the free intercept
+field's nonlinear variation tracks ε across tested partition families (T3).
 
 The tilt decomposition writes each per-cell chord error as `ε(m) − δ(m)`
 where δ is the affine tilt.
 
 ## fan-out (early-layer)
 
-The mechanism by which layer 0's single delta pair must serve all 2^d
-cells, imposing a systematic positional displacement that cascades
-through subsequent layers. Identified as the dominant source of the
+The mechanism by which the FSM's layer 0 single delta pair must serve
+all 2^d cells, imposing a systematic positional displacement that
+cascades through subsequent layers. The dominant source of the FSM's
 wall. Under LI, the displacement correlates with cell position
 (r ≈ 0.4–0.6); under LD, later layers partially repair the
 distortion, cutting the displacement range roughly in half.
 
 The fan-out cost stabilises with depth (bounded allocation problem,
-not structurally growing). See
+not structurally growing). Whether this cost is FSM-specific or
+representation-intrinsic is the subject of
+[ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §1. See
 [`experiments/wall/WALL.md`](../experiments/wall/WALL.md).
 
 ## foreign-chord error matrix, E[j, k]
@@ -223,6 +263,13 @@ when using cell j's free-optimal intercept instead of its own:
 `F[j,k] = err(c_free_j on cell k) − err(c_free_k on cell k)`. The
 diagonal is zero by construction. F is commensurate with wall excess
 (both are excesses over the free baseline); E is not.
+
+## [MENEHUNE]
+
+Project markup for claims that are not yet established. Applied to step
+labels, section headers, and inline assertions. An unmarked claim is
+treated as load-bearing; a [MENEHUNE] claim is not. See
+[AGENTS](AGENTS.md).
 
 ## free-per-cell lower bound (free_err)
 
@@ -283,8 +330,9 @@ Synonym for the wall when expressed as a number: `gap = opt_err − free_err`.
 
 The partition with equal log-width cells: cell j spans
 `[x_start · r^j, x_start · r^(j+1))` where `r = (x_width / x_start + 1)^(1/N)`.
-It is the unique partition invariant under multiplication by the grid
-ratio. In the keystone program it is the preferred scale-equivariant
+On one binade at depth d, the grid points are `g_k = 2^{k/2^d}`,
+k = 0, …, 2^d. It is the unique partition invariant under multiplication
+by the grid ratio. In the keystone program it is the preferred scale-equivariant
 curve-agnostic geometry. In current repo terminology it is a geometry
 name, distinct from the cell's binary address. See
 [`KEYSTONE.md`](../experiments/keystone/KEYSTONE.md) and
@@ -355,9 +403,11 @@ constrained shared mode.
 
 ## layer sharing
 
-The second of three wall sources. The layer-invariant model forces one
-correction law to serve all depth levels, conflating coarse and fine
-positional effects.
+In the FSM's wall decomposition, the middle sharing constraint. The
+layer-invariant model forces one correction law to serve all depth
+levels, conflating coarse and fine positional effects. This is a
+property of the FSM's parameterisation, not of the approximation
+problem.
 
 ## KEYSTONE
 
@@ -384,16 +434,18 @@ the number compared against `free_err` to compute the wall and against
 
 ## parameter budget
 
-The first of three wall sources. The layer-invariant model has `1 + 2q`
-parameters for `2^d` cells; the layer-dependent model has `1 + 2q × d`.
-At larger depth, cell count growth (`2^d`) outruns both parameterisations.
+In the FSM's wall decomposition, the coarsest sharing constraint. The
+layer-invariant model has `1 + 2q` parameters for `2^d` cells; the
+layer-dependent model has `1 + 2q × d`. At larger depth, cell count
+growth (`2^d`) outruns both parameterisations. This is a property of
+the FSM's parameterisation, not of the approximation problem.
 
 ## partition zoo
 
 The collection of partition kinds implemented in `lib/partitions.sage`,
 organised into labelled subgroups by construction method (elementary
 geometric, number-theoretic, fractal, tiling adversaries, etc.). The
-zoo is open-ended — the current count is 26. Subgroup definitions and per-kind
+zoo is open-ended. Subgroup definitions and per-kind
 metadata are in [`PARTITIONS.md`](PARTITIONS.md) and serialised in
 [`lib/partitions.json`](../lib/partitions.json).
 
@@ -461,6 +513,19 @@ error depends only on ρ and the polynomial degree, not on `z_min` and
 `z_max` separately. The degree-0 (constant correction) minimax relative
 error is `(√ρ − 1) / (√ρ + 1)`.
 
+## S (achievable subspace)
+
+The set of correction vectors achievable by a given correction
+architecture. For the FSM with q states processing d bits, S is the
+image of a linear map from the parameter space (dim O(q)
+layer-invariant, dim O(qd) layer-dependent) into ℝ^{2^d}. The wall
+is dist(δ*, S) in the minimax norm.
+
+S is architecture-specific. A different correction architecture produces
+a different S. A full lookup table gives S = ℝ^{2^d} and there is no
+wall. The dimension tells you S is thin; it does not tell you which
+directions it spans. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4.
+
 ## SageMath / Sage
 
 The computational environment used for all `.sage` files in the project.
@@ -515,7 +580,8 @@ piecewise-linear interpolant of ε at the partition points. See
 ## uniform partition (uniform_x)
 
 The partition with equal additive-width cells on the `x` axis. On `[1,2)`
-at depth `d`, cell `j` is `[1 + j/2^d, 1 + (j+1)/2^d)`. This is the
+at depth `d`, cell `j` is `[1 + j/2^d, 1 + (j+1)/2^d)`. Grid points are
+`b_k = 1 + k/2^d`, k = 0, …, 2^d. This is the
 legacy exact baseline geometry and the meaning intended when older project
 notes say "dyadic partition" in the cell-geometry sense.
 

@@ -137,7 +137,7 @@ they lead to very different versions of steps 5 and 6.
 ## 2. The forcing-residual gap
 
 Δ^L = −ε organises c* — the *target* the shared optimizer is aiming
-at. T3 confirms this across 25 partition families. But the wall is not
+at. T3 confirms this across the partition zoo. But the wall is not
 the target. The wall is `dist(δ*, S)`: the distance from the target to
 the achievable subspace. That distance depends on two things — the
 target and the subspace — and the forcing function only tells you
@@ -201,18 +201,20 @@ and whether it has one.
 
 ## 4. The subspace is chosen, not discovered
 
-Step 3 introduces the FSM and immediately derives a subspace S from its sharing topology. S is not a fact about the approximation problem. It is a fact about the FSM. A different correction architecture — a lookup table, a polynomial evaluator, a neural network reading bit prefixes — produces a different subspace. A full lookup table produces S = ℝ^{2^d} and there is no wall at all. The wall as we describe it is not the cost of correcting ε. It is the cost of correcting ε while sharing parameters in the specific way the FSM shares them.
+Step 3 derives an achievable set (S) from a chosen finite correction model. (S) is therefore not a fact about the approximation problem alone. It is a fact about the model together with its access pattern to the input and its rule for reusing parameters. Change the model, and (S) changes.
 
-### 4a. The subspace has no characterisation beyond its dimension
+The wall, as defined, is then not the cost of correcting (\varepsilon) in the abstract. It is the cost of correcting (\varepsilon) under one particular sharing discipline.
 
-Step 3 proves that S is the image of a linear map and that its dimension is O(q) or O(qd). This is the parameter count restated in linear algebra. It says nothing about which directions S spans. Two subspaces of the same dimension can have completely different distances to δ\*, and Step 3 provides no basis for distinguishing them.
+### 4a. The description of (S) does not yet match the burden placed on it
 
-The wall decomposition in Step 4 names three nested subspaces (S\_LI ⊂ S\_LD ⊂ ℝ^{2^d}) and attributes the wall to their nesting structure. But these inclusions describe the FSM's layer architecture — which parameters are shared across which cells. They do not characterise S as a geometric object in ℝ^{2^d}: how it is oriented relative to δ\*, which components of δ\* it can absorb, or why the components it misses are the ones it misses. The geometric content of Steps 3–4 is read off the LP solution, not derived from the subspace description.
+Step 3 shows that (S) is the image of a linear map and gives its size in terms of the model parameters. That identifies a budget and a sharing pattern. It does not characterise (S) geometrically in the sense needed here: which directions it contains, which it excludes, and why those exclusions line up with the observed wall.
 
-### 4b. The forcing correlation does not distinguish target structure from wall structure
+This matters because equal dimension does not imply equal approximation power, and nesting does not explain orientation. Two achievable sets can have the same parameter count and very different distances to (\delta^*).
 
-The forcing function Δ^L = −ε organises δ\* across 25 partition families (Step 5). The wall is dist(δ\*, S). The wall therefore correlates with the structure of ε, because δ\* correlates with the structure of ε, and the distance from any fixed subspace to a structured target will reflect the target's structure.
+One can see this with an ideal lookup-table. At fixed depth (d), a full table yields (S=\mathbb{R}^{2^d}), so the wall relative to that discretisation is zero. This does not remove the computational burden but it **neatly** removes sharing by assigning one degree of freedom to each cell, making the present description of (S) too thin for the conclusion being drawn from it. It tells us how one model shares. It does not yet tell us what class of finite realisers the problem belongs to, nor which computational features of those realisers govern the gap.
 
-This correlation does not establish that the wall measures a cost intrinsic to correcting ε. It establishes that the wall measures the distance from S to a target that is organised by ε. The first reading says ε controls the wall. The second says ε controls the target, S controls the wall, and the wall inherits ε-structure only as a shadow of the target's structure projected onto an architectural constraint. In the second reading, replacing S with a different subspace of the same dimension but different orientation changes the wall while leaving the forcing and its correlation with δ\* untouched.
+### 4b. The forcing correlation may be only a target correlation
 
-The distinction is testable in principle: rotate S while holding δ\* fixed and see whether the wall's correlation with ε degrades. If the correlation is robust to the orientation of S, it is target-driven and the wall is a shadow. If it is fragile, the FSM's S has a specific orientation that matters, and 4a becomes the operative question: what determines that orientation?
+(\Delta^L=-\varepsilon) organises the target (\delta^*). The wall is (\mathrm{dist}(\delta^*,S)). A correlation between the wall and (\varepsilon) therefore does not by itself show that (\varepsilon) governs the wall. It may show only that (\varepsilon) governs the target, while the chosen achievable set (S) governs what part of that target can be reached.
+
+On that reading, the wall inherits (\varepsilon)-structure because a structured target is being measured against a particular finite model. The forcing organises the demand. The model determines what can be supplied. These are not the same claim.

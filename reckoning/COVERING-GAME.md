@@ -141,7 +141,7 @@ game can prove.
   its hazards.
 - [DISTANT-SHORES](DISTANT-SHORES.md): the destination (d_comp).
 - [TRAVERSE](TRAVERSE.md) Steps 5–6: the scientific context.
-- [TILING](../experiments/tiling/TILING.md): the displacement field
+- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement field
   the covering game operates on.
 - [KEYSTONE](../experiments/keystone/KEYSTONE.md) §4: the
   compatibility argument the crossing would complete.
