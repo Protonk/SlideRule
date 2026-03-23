@@ -1,263 +1,545 @@
 # SVG Copy Plan: Binary Tiling Dual
 
-Purpose: produce a SageMath/matplotlib rendering of the Eppstein binary
-tiling dual SVG (`exterior/eppstein/binary/Binary-tiling-dual.svg.png`)
-that is visually indistinguishable from the original.
+## 0. Frame
 
-Reference image: `exterior/eppstein/binary/Binary-tiling-dual.svg.png`
-Reference description: "A binary tiling (red outline) and its dual
-tiling (yellow curved triangles and blue and green curved
-quadrilaterals)."
+This effort is not primarily about manufacturing a reusable renderer,
+and it is not a proof that some universal test suite works for all
+hyperbolic diagrams. The main deliverable is an audited reconstruction
+of one specific image:
+`exterior/eppstein/binary/Binary-tiling-dual.svg.png`.
+
+We want two outputs:
+
+1. A SageMath/matplotlib rendering that can be judged against the
+   reference image.
+2. A readable case record of how the reconstruction converged:
+   which out-of-band expectations we imposed, which tests were active
+   or withheld at each stage, which attempts failed, and which checks
+   actually ruled out wrong constructions.
+
+The target knowledge is case-specific:
+
+> For this geometry, on this diagram, these were the checks and
+> instructions that bit.
+
+If there is a tradeoff between generality and auditability, prefer
+auditability.
 
 ---
 
-## 1. Coordinate system (decoded from the SVG)
+## 1. Deliverables
 
-The SVG maps the Poincaré half-plane to pixel coordinates via:
+### Primary deliverable
 
-```
+An audited reconstruction record consisting of:
+
+- an assumption ledger
+- preserved failed attempts
+- a short postmortem for each attempt
+- a record of which tests were withheld and why
+- a record of which checks actually discriminated between plausible
+  and implausible constructions
+
+### Secondary deliverable
+
+A revised
+`experiments/elementals/poincare/E3_binary_tiling_dual.sage`
+that renders an image matching the reference closely enough to support
+the reconstruction claims.
+
+### Non-goals
+
+- building a generic "diagram factory"
+- proving that this workflow transfers cleanly to other tilings
+- compressing the work into a single final clean argument and discarding
+  the dead ends
+
+---
+
+## 2. Audit Discipline
+
+Every meaningful iteration should leave behind an argument record, not
+just an image.
+
+### 2.1 Assumption ledger
+
+Maintain a ledger of out-of-band expectations, instructions, and
+constraints. Each entry should include:
+
+- `ID`
+- `Type`: fact, derived claim, heuristic instruction, or deliberate
+  workflow constraint
+- `Statement`
+- `Source`: SVG extraction, geometric derivation, visual judgment, or
+  operator choice
+- `Confidence`
+- `Status`: active, revised, rejected, or confirmed
+- `Why it matters`
+
+Examples of entries:
+
+- "Cell centers use arithmetic mean in `y_hyp`, not geometric mean."
+- "Do not use full-image overlay until topology checks pass."
+- "Treat green/blue coloring rule as unsettled until explicitly pinned."
+
+### 2.2 Attempt records
+
+Do not overwrite failed reasoning. Preserve attempts in a dedicated
+results area, for example:
+
+- `experiments/elementals/poincare/results/E3_binary_tiling_dual_attempts/`
+
+Suggested naming:
+
+- `A01_grid_only`
+- `A02_wrong_center_rule`
+- `A03_bad_quad_ordering`
+- `A04_color_parity_candidate`
+
+Each attempt should preserve, as applicable:
+
+- rendered output
+- overlay or crop comparisons
+- short notes
+- the active assumption set
+- the active and withheld tests
+
+### 2.3 Postmortem rule
+
+Every failed attempt gets a short postmortem answering:
+
+- What did this attempt believe?
+- Why was that belief plausible?
+- What specific check killed it?
+- Which later attempts should inherit or avoid its choices?
+
+### 2.4 "Test bite" rule
+
+After each attempt, explicitly record which check actually bit.
+
+Examples:
+
+- "Vertex counts killed the construction before any overlay was needed."
+- "Overlay exposed a curvature error that topology checks could not see."
+- "Holding back color validation prevented premature tuning."
+
+The point is not just to say whether a test passed. The point is to say
+whether the test carried information that changed the search.
+
+---
+
+## 3. Working Geometric Record
+
+These are the current working claims needed to execute the
+reconstruction. They belong in the audit trail because they are not all
+of the same epistemic kind.
+
+### 3.1 Coordinate transform
+
+Current decoded map from Poincare half-plane coordinates to SVG pixels:
+
+```text
 y_SVG = A - B / y_hyp
 x_SVG = x_hyp * B + x_offset
 ```
 
-where:
-- `A = 1070.6` (the asymptotic boundary in SVG y-space)
-- `B = 647.2` (scale factor)
-- `y_hyp` is the half-plane height (y_hyp → ∞ maps to y_SVG → A from below)
-- SVG y increases downward; the ideal boundary is at the bottom
+with:
 
-The level boundaries in hyperbolic coordinates are:
+- `A = 1070.6`
+- `B = 647.2`
+- SVG `y` increasing downward
+- the ideal boundary asymptotic to `y_SVG = 1070.6`
 
-| Level boundary | y_hyp | y_SVG  |
-|---------------|-------|--------|
-| top of level 0 | 0.5  | -224.6 |
-| 0/1 boundary  | 1.0  | 423.4  |
-| 1/2 boundary  | 2.0  | 747.0  |
-| 2/3 boundary  | 4.0  | 909.0  |
-| 3/4 boundary  | 8.0  | 989.9  |
-| 4/5 boundary  | 16.0 | 1030.4 |
-| 5/6 boundary  | 32.0 | 1050.6 |
+Working level boundaries:
 
-Level d has boundaries at `y_hyp = 2^d` and `y_hyp = 2^(d+1)`.
-Height per level halves in SVG space: 648, 324, 162, 81, 40.5, 20.2.
+| Boundary | `y_hyp` | `y_SVG` |
+|----------|---------|---------|
+| top of level -1 | 0.5 | -224.6 |
+| 0/1 | 1.0 | 423.4 |
+| 1/2 | 2.0 | 747.0 |
+| 2/3 | 4.0 | 909.0 |
+| 3/4 | 8.0 | 989.9 |
+| 4/5 | 16.0 | 1030.4 |
+| 5/6 | 32.0 | 1050.6 |
 
-Full visible x-range: `[-272.3, 1777.6]` (2049.9 SVG units = 2 coarse
-cells of width 1024.95 each).
+Visible x-range:
 
-**Important:** Cell centers use the **arithmetic** mean of their
-`y_hyp` boundaries, not the geometric (hyperbolic midpoint) mean.
-Verified: level-1 cell center at `y_hyp = (1+2)/2 = 1.5` gives
-`y_SVG = 1070.6 - 647.2/1.5 = 639.1`, matching the SVG exactly.
+- `[-272.3, 1777.6]` in SVG coordinates
+- total width `2049.9`, corresponding to two coarse cells
 
----
+### 3.2 Cell structure
 
-## 2. Tiling structure
+Working visible tiling data:
 
-The binary tiling in the visible window:
+| Level | Cells | Width (SVG) | Height (SVG) | `y_hyp` range |
+|-------|-------|-------------|--------------|---------------|
+| 0 | 2 | 1025.0 | 648 | `[1, 2]` |
+| 1 | 4 | 512.5 | 324 | `[2, 4]` |
+| 2 | 8 | 256.25 | 162 | `[4, 8]` |
+| 3 | 16 | 128.1 | 81 | `[8, 16]` |
+| 4 | 32 | 64.0 | 40.5 | `[16, 32]` |
+| 5 | 64 | 32.0 | 20.2 | `[32, 64]` |
 
-| Level | Cells | Cell width (SVG) | Cell height (SVG) | y_hyp range |
-|-------|-------|------------------|-------------------|-------------|
-| 0     | 2     | 1025.0           | 648               | [1, 2]      |
-| 1     | 4     | 512.5            | 324               | [2, 4]      |
-| 2     | 8     | 256.25           | 162               | [4, 8]      |
-| 3     | 16    | 128.1            | 81                | [8, 16]     |
-| 4     | 32    | 64.0             | 40.5              | [16, 32]    |
-| 5     | 64    | 32.0             | 20.2              | [32, 64]    |
+One partial level `-1` cell above the viewport is needed for topmost
+dual faces.
 
-There is also a partial level -1 (1 cell, `y_hyp ∈ [0.5, 1]`, above
-the viewport) whose center is needed for the topmost dual faces.
+### 3.3 Cell-center rule
 
-Cell center at level d, position k:
-- `x_center = x_left_edge + cell_width / 2`
-- `y_center_hyp = (y_hyp_lo + y_hyp_hi) / 2` (arithmetic mean)
+Current working claim:
 
----
+- Cell centers use the arithmetic mean of the `y_hyp` boundaries:
+  `y_center_hyp = (y_lo + y_hi) / 2`
 
-## 3. Dual face construction
+This is a high-value claim because it changes the geometry materially
+and should be treated as an auditable assumption, not a casual detail.
 
-The dual has one face per interior tiling vertex. Each tiling vertex is
-at the intersection of a horocyclic boundary and a geodesic (vertical)
-boundary.
+### 3.4 Dual-face types
 
-### Vertex types
+Working classification:
 
-**Split vertex (valence 3, "T-junction"):** at a point where a
-level-d cell splits into two level-(d+1) children. Three cells meet:
-the parent above and two children below. The dual face is a **curved
-triangle** connecting the three cell centers with geodesic arcs.
+- Split vertices (valence 3) produce curved triangles.
+- Continuing vertices (valence 4) produce curved quadrilaterals.
 
-**Continuing vertex (valence 4):** at a geodesic boundary that persists
-from level d to level d+1. Four cells meet: two above, two below. The
-dual face is a **curved quadrilateral** connecting the four cell centers.
+### 3.5 Geodesic boundaries
 
-### Geodesic arcs
+Between cell centers `(x1, y1)` and `(x2, y2)` in the half-plane:
 
-The dual face boundaries are hyperbolic geodesics between cell centers.
-In the half-plane model, the geodesic between `(x1, y1)` and `(x2, y2)`:
+- if `x1 = x2`, use a vertical segment
+- otherwise use the circle centered at `(cx, 0)` with
 
-- If `x1 = x2`: vertical segment.
-- Otherwise: arc of the circle centered at `(cx, 0)` where
-  `cx = ((x1² + y1²) - (x2² + y2²)) / (2(x1 - x2))`, radius
-  `r = sqrt((x1-cx)² + y1²)`.
+```text
+cx = ((x1^2 + y1^2) - (x2^2 + y2^2)) / (2(x1 - x2))
+r  = sqrt((x1 - cx)^2 + y1^2)
+```
 
-For rendering, these arcs must be mapped through the SVG coordinate
-transform `(x_hyp, y_hyp) → (x_SVG, y_SVG)` after computation.
+Render after computing in hyperbolic coordinates, then map sampled
+points to SVG/output coordinates.
 
-**Rendering approach:** compute the geodesic in hyperbolic coordinates,
-sample ~30-50 points along the arc, then map each point to the output
-coordinate system. Use `matplotlib.patches.Polygon` with the sampled
-points to fill each dual face.
+### 3.6 Coloring
 
-### Vertex ordering
+Current candidate rule:
 
-For each vertex, the adjacent cell centers must be ordered
-(counter-clockwise or clockwise) before connecting them with arcs.
-Sort by angle from the vertex using `atan2(y_c - y_v, x_c - x_v)`.
+- yellow for split-vertex triangles
+- green/blue for continuing quadrilaterals by depth parity
+
+Status:
+
+- unsettled until checked directly against the reference
+
+Do not quietly "tune until it looks right" without recording what was
+tried and what evidence ruled a candidate in or out.
 
 ---
 
-## 4. Coloring
+## 4. Discriminative Test Ladder
 
-The SVG uses three colors:
+Tests should not be treated as a flat checklist. They should be ordered
+by how much structure they constrain and by when they become useful.
 
-| Color   | Hex       | Count | Applied to |
-|---------|-----------|-------|------------|
-| Yellow  | `#ffe07f` | ~128 subpaths | Curved triangles (valence-3 split vertices) |
-| Green   | `#7fc8a2` | ~41 subpaths  | Curved quadrilaterals at some depths |
-| Blue    | `#7fc0e6` | ~82 subpaths  | Curved quadrilaterals at other depths |
+### Tier 1: cheap structural checks
 
-The coloring rule (to be verified during implementation):
-- **Yellow:** all split (valence-3) dual faces.
-- **Green:** continuing (valence-4) dual faces where the boundary
-  depth d is even.
-- **Blue:** continuing (valence-4) dual faces where the boundary
-  depth d is odd.
+Use early. These should kill bad constructions before visual matching.
 
-If the green/blue assignment doesn't match the reference after a first
-pass, try: coloring by `(depth + horizontal_position) % 2`, or by the
-parity of the cell index. The exact rule can be extracted by comparing
-specific face positions in the SVG with the generated output.
+- level-boundary positions match decoded values
+- cell-center placement agrees with chosen center rule
+- vertex counts per boundary:
+  - boundary 0/1: `1 continuing + 2 split = 3`
+  - boundary 1/2: `3 continuing + 4 split = 7`
+  - boundary 2/3: `7 continuing + 8 split = 15`
+  - boundary 3/4: `15 continuing + 16 split = 31`
+  - boundary 4/5: `31 continuing + 32 split = 63`
+- adjacency/cardinality of cells around each vertex
 
-### Tiling grid
+### Tier 2: local geometric checks
 
-The red grid (`#bc1e46`, stroke width 2) is drawn over the dual faces.
-It consists of the rectangular cell boundaries: horizontal horocyclic
-lines and vertical geodesic lines at each level.
+Use after topology is credible.
 
----
+- representative geodesic arcs pass through expected endpoints
+- local face orientation matches the reference
+- sampled polygons close without gaps at shared boundaries
+- a known petal or quad crop matches the reference qualitatively
 
-## 5. Implementation steps
+### Tier 3: color and compositing checks
 
-### Step 1: Coordinate system
+Use after geometry is credible.
 
-Set up the half-plane coordinate system and the mapping to output
-coordinates. The matplotlib figure should have:
-- `figsize` chosen so the aspect ratio matches the SVG (1505.3 × 1053.9,
-  roughly 1.43:1).
-- `ax.set_xlim` and `ax.set_ylim` matching the SVG viewport:
-  x ∈ [0, 1505.3], y ∈ [0, 1053.9], or equivalently work in
-  hyperbolic coordinates and transform at render time.
+- yellow faces correspond to split vertices
+- green/blue rule matches selected reference locations
+- grid overlay order is correct
+- stroke color and thickness read correctly
 
-**Test:** render just the level boundaries as horizontal lines and
-verify their y-positions match the SVG values (423.4, 747.0, 909.0, ...).
+### Tier 4: global visual checks
 
-### Step 2: Tiling grid
+Use late. These are valuable, but they are also easy to misuse if they
+become the first tool.
 
-Draw the rectangular grid in red. At each level d, draw horizontal
-lines at the top and bottom boundaries, and vertical lines at each
-cell edge.
+- 50% opacity overlay against the reference
+- crop-by-crop comparison at high-curvature regions
+- edge-of-viewport clipping behavior
+- overall seamlessness of the tiling
 
-**Test:** overlay the red grid on the reference PNG and check alignment.
+### Withheld-test rule
 
-### Step 3: Cell centers
+Each attempt should state which tests are being withheld on purpose.
 
-Compute all cell centers using arithmetic y-mean. Include one parent
-level above the viewport for the topmost dual faces.
+Examples:
 
-**Test:** plot cell centers as dots and verify they sit at the visual
-center of each rectangular cell.
+- hold back full-image overlay until vertex counts and representative
+  arcs pass
+- hold back color checks while geometry is still moving
+- hold back pixel-diff style judgments while sampling density is under
+  active revision
 
-### Step 4: Vertex enumeration
-
-Find all interior vertices and classify as split (valence 3) or
-continuing (valence 4). For each, record the adjacent cell IDs.
-
-**Test:** count vertices per level boundary and verify:
-- boundary 0/1: 1 continuing + 2 split = 3
-- boundary 1/2: 3 continuing + 4 split = 7
-- boundary 2/3: 7 continuing + 8 split = 15
-- boundary 3/4: 15 continuing + 16 split = 31
-- boundary 4/5: 31 continuing + 32 split = 63
-
-### Step 5: Geodesic arcs
-
-Implement the geodesic arc computation. Test by drawing one arc
-between two known cell centers and verifying it matches the
-corresponding curve in the SVG.
-
-**Test:** extract the first yellow petal's bezier control points from
-the SVG and compare with the geodesic-arc polygon at the same vertex.
-The petal at `x_hyp ≈ -16.1/B + offset`, `y_hyp = 2.0` has vertices at
-cell centers `(-16, 639.1)`, `(-144.1, 855.0)`, and `(112.1, 855.0)`
-in SVG coordinates.
-
-### Step 6: Dual faces
-
-Build and fill all dual face polygons. Apply the 3-color scheme.
-
-**Test:** visual comparison with the reference PNG at each color
-separately. Count faces per color and compare with SVG subpath counts.
-
-### Step 7: Compositing
-
-Layer the elements: dual faces (bottom), then red grid (top).
-Remove axes and borders. Set background to white.
-
-**Test:** overlay at 50% opacity on the reference PNG. All major
-features (petal tips, grid intersections, color boundaries) should
-align within ~2px.
-
-### Step 8: Edge cases
-
-Handle:
-- Faces at the viewport boundary (clip rather than omit).
-- The topmost face (extends above viewport — use the parent cell center).
-- The bottommost faces (may be too small to render — stop at level 5).
-- Left/right edges (faces at x = 0 and x = 2×cell_width are partial).
+This matters because later we want to know not just which tests exist,
+but whether delaying a test improved convergence.
 
 ---
 
-## 6. Verification checklist
+## 5. Attempt Workflow
 
-After implementation, check each of these against the reference:
+Each meaningful attempt should be small enough to reason about and rich
+enough to falsify.
 
-- [ ] Aspect ratio matches (≈ 1.43:1)
-- [ ] Red grid lines align at all 6 level boundaries
-- [ ] Red grid vertical lines align at each cell edge
-- [ ] Yellow petals have the correct pointed-tip-up orientation
-- [ ] Yellow petals touch adjacent petals without gaps or overlaps
-- [ ] Green and blue quads fill the remaining space between yellow petals
-- [ ] No white gaps between adjacent dual faces (complete tiling)
-- [ ] The topmost face (large green quad) fills the top of the frame
-- [ ] Color assignment matches: yellow = triangles, green/blue = quads
-- [ ] Grid line color is `#bc1e46` (dark rose)
-- [ ] Dual face edge strokes are black and thin (~0.5pt)
-- [ ] The image reads as a seamless hyperbolic tiling, not a collection
-  of isolated shapes
+### Step 1: State the attempt
+
+Before running anything, record:
+
+- attempt ID and short name
+- exact hypothesis
+- active assumptions
+- deliberate workflow constraints
+- active tests
+- withheld tests
+- expected failure mode, if any
+
+### Step 2: Produce an artifact
+
+Generate one focused output:
+
+- grid only
+- centers only
+- one representative face family
+- one color rule candidate
+- full composite
+
+Avoid mixing too many moving parts in a single attempt unless the point
+of the attempt is the interaction itself.
+
+### Step 3: Compare at the right resolution
+
+Use only the tests chosen for the attempt. If an early structural check
+already kills the construction, stop there and record that fact rather
+than layering on lower-value comparisons.
+
+### Step 4: Write the verdict
+
+For each attempt, record:
+
+- pass, fail, or inconclusive
+- what bit
+- what survived
+- what changed in the next attempt
 
 ---
 
-## 7. Files
+## 6. Recommended Attempt Sequence
+
+This sequence is deliberately shaped to produce informative failures.
+
+### A. Coordinate and grid baseline
+
+Goal:
+
+- verify the viewport, level boundaries, and rectangular tiling grid
+
+Active tests:
+
+- boundary y-positions
+- cell widths
+- vertical line alignment
+
+Withhold:
+
+- full overlay
+- color checks
+
+Reason:
+
+- if the rectangular scaffold is wrong, later curved geometry is not
+  worth interpreting
+
+### B. Center-rule confirmation
+
+Goal:
+
+- test arithmetic-mean centers against plausible alternatives
+
+Active tests:
+
+- center dots at representative cells
+- local comparison against visibly centered placements
+
+Withhold:
+
+- full dual-face rendering
+
+Reason:
+
+- this is a high-leverage assumption and should earn its place
+
+### C. Vertex topology
+
+Goal:
+
+- enumerate interior vertices and classify them correctly
+
+Active tests:
+
+- per-boundary vertex counts
+- correct valence labels
+- neighbor-cell identity checks
+
+Withhold:
+
+- overlay
+- color checks
+
+Reason:
+
+- topology should kill bad enumerations quickly
+
+### D. Representative geodesics
+
+Goal:
+
+- validate the curve construction on a few known faces before building
+  all faces
+
+Active tests:
+
+- endpoint correctness
+- curve shape at selected petals/quads
+- shared-boundary consistency
+
+Withhold:
+
+- full-scene aesthetic judgment
+
+### E. Face assembly
+
+Goal:
+
+- assemble all dual faces without gaps or overlaps
+
+Active tests:
+
+- local seam checks
+- crop comparisons
+- topmost and edge-face handling
+
+Withhold:
+
+- exact color verdict if geometry is still unstable
+
+### F. Color rule
+
+Goal:
+
+- determine the actual green/blue assignment rule from evidence
+
+Active tests:
+
+- sampled location truth table against the reference
+- consistency by depth and/or horizontal parity
+
+Do not accept:
+
+- a rule justified only by "it looks close overall"
+
+### G. Final compositing
+
+Goal:
+
+- confirm that the fully assembled image reads like the reference
+
+Active tests:
+
+- overlay
+- edge clipping
+- stroke order
+- overall no-gap visual read
+
+---
+
+## 7. Attempt Record Template
+
+Each attempt note should be short and standardized.
+
+```text
+Attempt ID:
+Name:
+
+Hypothesis:
+
+Active assumptions:
+- ...
+
+Deliberate workflow constraints:
+- ...
+
+Active tests:
+- ...
+
+Withheld tests:
+- ...
+
+Artifacts:
+- output image(s)
+- comparison crop(s)
+
+Verdict:
+
+What bit:
+
+What survived:
+
+Next change:
+```
+
+---
+
+## 8. Success Criteria
+
+Success is not only "the final PNG looks right." Success means the
+resulting record lets a later reader answer:
+
+- Which assumptions were injected from outside the image?
+- Which of those assumptions survived contact with the diagram?
+- Which failed attempts were plausible, and why did they fail?
+- Which tests actually constrained the search?
+- Which tests were more useful when delayed?
+- What should a later reconstruction effort try sooner, later, or not
+  at all for this kind of geometry?
+
+The rendering endpoint still matters. The final image should support the
+claim that the reconstruction is faithful. But the more durable output
+is the scrutinized argument trail that explains how the reconstruction
+became credible.
+
+---
+
+## 9. Files
 
 | File | Role |
 |------|------|
 | `exterior/eppstein/binary/Binary-tiling-dual.svg` | Source SVG |
 | `exterior/eppstein/binary/Binary-tiling-dual.svg.png` | Reference PNG |
-| `experiments/elementals/poincare/E3_binary_tiling_dual.sage` | Existing prototype (current version) |
-| `experiments/elementals/poincare/results/E3_binary_tiling_dual.png` | Output |
-| This file | Plan |
+| `experiments/elementals/poincare/E3_binary_tiling_dual.sage` | Renderer under revision |
+| `experiments/elementals/poincare/results/E3_binary_tiling_dual.png` | Current/final output |
+| `experiments/elementals/poincare/results/E3_binary_tiling_dual_attempts/` | Preserved attempt artifacts and notes |
+| This file | Reconstruction and audit plan |
 
-The existing `E3_binary_tiling_dual.sage` should be revised in place.
-The current prototype has the correct tiling structure but uses the
-wrong y-centering (geometric mean instead of arithmetic), doesn't match
-the SVG viewport framing, and has gaps between dual faces.
+The existing `E3_binary_tiling_dual.sage` should be revised in place,
+but the reasoning history should not be collapsed into a single clean
+story. Preserve the path, especially where a withheld test or a failed
+assumption turned out to matter.

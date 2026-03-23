@@ -160,7 +160,7 @@ controlled skepticism, rather than drifting as ambient enthusiasm.
 
 ## Reading outward
 
-- [`TILING.md`](experiments/tiling/TILING.md): the established
+- [`TILING.md`](../experiments/tiling/TILING.md): the established
   displacement field framework these dragons extend.
 - [`ABYSSAL-DOUBT.md`](ABYSSAL-DOUBT.md): the doubt about whether
   the wall measures the problem or the architecture.

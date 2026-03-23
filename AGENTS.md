@@ -1,6 +1,6 @@
 # How to work on SlideRule
 
-> Logistical guidance lives here, see `DISTANT-SHORES.md` for mathematical direction
+> Logistical guidance lives here, see `reckoning/DISTANT-SHORES.md` for mathematical direction
 
 ## Library re-use
 

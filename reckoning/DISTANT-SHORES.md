@@ -1,92 +1,9 @@
 # Distant Shores
 
-Purpose: sketch a transformation from the triangle inequality to a computable
-measure of computational cost of departure from a log-linear surrogate.
-This is a roadmap, not a proof. Six steps.
-
-Reading inward: depends on [`KEYSTONE.md`](experiments/keystone/KEYSTONE.md) for the
-scale-symmetry thesis and [`WALL.md`](experiments/wall/WALL.md) for the wall decomposition.
+The destination: a computable measure of the structural cost of departing
+from a log-linear surrogate. 
 
 ---
-
-## Step 1. Computable reference triangle
-
-Let L(x) be the affine pseudo-log, APPROX(x) any piecewise approximation to
-log₂(x), and ε(m) = log₂(1+m) − m the departure of truth from surrogate on
-the unit mantissa interval.
-
-The triangle inequality gives
-
-    |APPROX − log₂| ≤ |APPROX − L| + |L − log₂|
-
-where:
-
-- The first term is computable: both APPROX and L are available.
-- The second term is known: it is ε(m), a fixed smooth function on [0,1),
-  independent of the approximation.
-
-This decomposes the inaccessible comparison (APPROX vs. truth) into a
-computable comparison (APPROX vs. surrogate) plus a known budget (surrogate
-vs. truth). Nothing here is new. What matters is that the decomposition is
-*exact*, not itself an approximation — the two terms share no degrees of
-freedom.
-
-## Step 2. The geometric grid is the zero-cost baseline
-
-L(x) is exact at every integer power of 2. These are the points where the
-surrogate touches truth, and they are the boundaries of the dyadic partition.
-Equivalently: a geometric grid in x-space (equal log-width cells) is the
-unique partition whose boundaries lie on the exactness lattice of L.
-
-Between grid points, ε(m) is the cost of using L instead of log₂. This cost
-is paid by the representation itself — it requires no machinery, no
-parameters, no state. It is what you get for free from scale symmetry and a
-number format designed to be neutral under the reciprocal measure.
-
-Any correction that reduces ε must be assembled from something that ε does not
-provide. The question is what that something costs.
-
-## Step 3. Corrections under shared structure live in a low-rank subspace
-
-Partition [1,2) into 2^d cells. Each cell wants a correction δ_j that brings
-the local chord closer to log₂ than L's chord provides. The vector of ideal
-corrections δ* = (δ*_1, ..., δ*_{2^d}) is the free-per-cell optimum — one
-free parameter per cell, no sharing.
-
-An FSM with q states, processing d bits, generates a correction vector δ by
-accumulating shared delta-table entries along each cell's bit path. The set of
-achievable δ vectors is the image of a linear map from the parameter space
-(dimension O(q) layer-invariant, O(qd) layer-dependent) into ℝ^{2^d}. Call
-this image S — a low-dimensional subspace when the parameter count is much
-less than the cell count.
-
-The achievable corrections are exactly the points of S. The best shared
-correction is the point in S closest to δ* under the minimax norm. This is
-what the LP already computes.
-
-## Step 4. The wall is a projection distance; the decomposition indexes nested subspaces
-
-The wall = opt_err − free_err is the distance from δ* to the nearest point in
-S, measured in the minimax norm on cell errors. It is a projection distance: a
-geometric quantity determined by the angle between the target and the
-achievable subspace.
-
-The three wall sources correspond to three nested subspace inclusions:
-
-    S_LI ⊂ S_LD ⊂ ℝ^{2^d}
-
-where S_LI is the layer-invariant subspace (dim O(q)), S_LD is the
-layer-dependent subspace (dim O(qd)), and ℝ^{2^d} is the free-per-cell space.
-
-- Parameter budget: dim(S) ≪ 2^d. The subspace is thin.
-- Layer sharing: S_LI ⊂ S_LD is a proper inclusion. The layer-invariant
-  subspace is unnecessarily constrained.
-- Automaton coupling: S_LD ⊂ ℝ^{2^d} is a proper inclusion. Even
-  layer-dependent parameters are coupled by the state-transition graph.
-
-Each inclusion adds distance from the target. The wall decomposition measures
-how much distance each inclusion contributes. This is what the current
-experiments quantify.
 
 ## Step 5. [MENEHUNE] The projection distance scales predictably with structural cost
 
@@ -171,6 +88,23 @@ parameters cover the cluster.
   empirical term structure. If c₀(m) = (functional of ε), the forcing is
   proven, not just correlated. This is the cleanest resolution of Step 5
   but requires new mathematics.
+
+### Spectral structure of the forcing
+
+The forcing function has a Fourier decomposition. The accumulated
+representation-native density defect E(t) = ∫₀ᵗ (2ʷ ln 2 − 1) dw satisfies
+E(t) = −ε(φ(t)), and its Fourier coefficients relate to the density defect
+by Ê(n) = δ̂(n)/(j2πn). This decomposes the forcing into frequency
+components on the binade circle.
+
+The spectral view may inform the staircase prediction: if a correction
+architecture absorbs low-frequency displacement components before
+high-frequency ones, the stair locations correspond to frequency thresholds
+rather than spatial cell clusters. The binding-cell ordering (which cells
+are absorbed when) might have a cleaner characterisation in frequency space
+than in cell space.
+
+See [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §7–§8.
 
 ## Step 6. [MENEHUNE] The cost measure is a property of the problem, not the architecture
 

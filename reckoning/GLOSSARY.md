@@ -29,7 +29,7 @@ integer, unlike the project's alpha which is a rational in (0, 1).
 The sequence of signs `{+, −}^N` across the N = 2^depth cells, derived from
 the displacement: `sign_j = sgn(displacement_j)`. This is the spatial
 fingerprint of the wall. See
-[`experiments/alternation/ALTERNATION.md`](experiments/alternation/ALTERNATION.md).
+[`experiments/alternation/ALTERNATION.md`](../experiments/alternation/ALTERNATION.md).
 
 ## automaton coupling
 
@@ -157,7 +157,7 @@ that processes binary significand bits must absorb this field.
 
 The tiling framework identifies Δ^L as the forcing function that
 organises the wall's coarse structure. See
-[`experiments/tiling/TILING.md`](experiments/tiling/TILING.md).
+[`experiments/tiling/TILING.md`](../experiments/tiling/TILING.md).
 
 ## dyadic
 
@@ -209,7 +209,7 @@ distortion, cutting the displacement range roughly in half.
 
 The fan-out cost stabilises with depth (bounded allocation problem,
 not structurally growing). See
-[`experiments/wall/WALL.md`](experiments/wall/WALL.md).
+[`experiments/wall/WALL.md`](../experiments/wall/WALL.md).
 
 ## foreign-chord error matrix, E[j, k]
 
@@ -287,8 +287,8 @@ It is the unique partition invariant under multiplication by the grid
 ratio. In the keystone program it is the preferred scale-equivariant
 curve-agnostic geometry. In current repo terminology it is a geometry
 name, distinct from the cell's binary address. See
-[`KEYSTONE.md`](experiments/keystone/KEYSTONE.md) and
-[`EXPERIMENTS.md`](experiments/EXPERIMENTS.md) for the status of the
+[`KEYSTONE.md`](../experiments/keystone/KEYSTONE.md) and
+[`EXPERIMENTS.md`](../experiments/EXPERIMENTS.md) for the status of the
 partition-comparison claims.
 
 ## candidate families (H, V, D)
@@ -306,7 +306,7 @@ are expressed through the zeta function `ζ(r, k, c)`.
 ## hypothesis series
 
 The project maintains four hypothesis series in
-[`EXPERIMENTS.md`](experiments/EXPERIMENTS.md):
+[`EXPERIMENTS.md`](../experiments/EXPERIMENTS.md):
 
 - **K1–K3**: keystone scale-symmetry thesis and partition comparisons.
 - **H1–H4**: supporting baseline observations on `uniform_x`.
@@ -395,7 +395,7 @@ organised into labelled subgroups by construction method (elementary
 geometric, number-theoretic, fractal, tiling adversaries, etc.). The
 zoo is open-ended — the current count is 26. Subgroup definitions and per-kind
 metadata are in [`PARTITIONS.md`](PARTITIONS.md) and serialised in
-[`lib/partitions.json`](lib/partitions.json).
+[`lib/partitions.json`](../lib/partitions.json).
 
 ## partition kind
 
@@ -510,7 +510,7 @@ tilt — an affine function of m with slope `(σ − 1)`, σ being the
 per-cell chord slope. The second derivative is preserved:
 `E'' = ε'' = −1/(m² ln 2)`. The tilt segments across all cells form the
 piecewise-linear interpolant of ε at the partition points. See
-[`experiments/stepstone/TILT.md`](experiments/stepstone/TILT.md).
+[`experiments/stepstone/TILT.md`](../experiments/stepstone/TILT.md).
 
 ## uniform partition (uniform_x)
 
@@ -533,7 +533,7 @@ displacement field analysis shows it is driven by the mismatch between
 binary fan-out and logarithmic self-similarity. It is a cost of the
 binary representation, not a proven lower bound on shared-structure
 approximation in general. The forcing stabilises with depth (bounded
-allocation problem). See [`WALL.md`](experiments/wall/WALL.md) and
+allocation problem). See [`WALL.md`](../experiments/wall/WALL.md) and
 [`ABYSSAL-DOUBT.md`](ABYSSAL-DOUBT.md).
 
 ## wall excess

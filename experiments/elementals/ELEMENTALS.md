@@ -3,7 +3,7 @@
 Purpose: canonical home for non-data-driven figures that illustrate
 steps in the DISTANT-SHORES argument chain.
 
-Reading inward: depends on [`DISTANT-SHORES.md`](../../DISTANT-SHORES.md)
+Reading inward: depends on [`DISTANT-SHORES.md`](../../reckoning/DISTANT-SHORES.md)
 for the roadmap, [`TILING.md`](../tiling/TILING.md) for the hyperbolic
 framing, and [`KEYSTONE.md`](../keystone/KEYSTONE.md) for the
 scale-symmetry thesis.

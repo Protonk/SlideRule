@@ -210,7 +210,7 @@ are this close to shore.
   crossing must deliver.
 - [`ABYSSAL-DOUBT.md`](ABYSSAL-DOUBT.md): the doubt about whether
   the wall measures the problem or the architecture.
-- [`TILING.md`](experiments/tiling/TILING.md): the displacement
+- [`TILING.md`](../experiments/tiling/TILING.md): the displacement
   field that the covering game would operate on.
-- [`KEYSTONE.md`](experiments/keystone/KEYSTONE.md) §4: the
+- [`KEYSTONE.md`](../experiments/keystone/KEYSTONE.md) §4: the
   compatibility argument that the crossing would complete.

@@ -37,3 +37,11 @@ piecewise-polynomial hardware function evaluation with exact or
 faithful rounding. *IEEE Transactions on Circuits and Systems I:
 Regular Papers*, 64(5), 1187–1200.
 https://doi.org/10.1109/TCSI.2016.2629850
+
+## Binade Whitecaps
+
+Lacroix, A., & Hartwig, F. (1992). Distribution densities of the mantissa and exponent of floating point numbers. In *Proc. IEEE International Symposium on Circuits and Systems*, 1792–1795.
+
+Miller, S. J., & Nigrini, M. J. (2007). The modulo 1 central limit theorem and Benford's law for products. arXiv:math/0607686v2.
+
+Sripad, A. B., & Snyder, D. L. (1978). Quantization errors in floating-point arithmetic. *IEEE Trans. Acoustics, Speech, and Signal Processing*, ASSP-26(5), 456–463.

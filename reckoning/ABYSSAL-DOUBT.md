@@ -131,3 +131,88 @@ they lead to very different versions of steps 5 and 6.
    in principle absorb it. The wall would be a finite allocation
    problem. If it grows, the cost is structural and permanent.
    This is testable now.
+
+---
+
+## 2. The forcing-residual gap
+
+Δ^L = −ε organises c* — the *target* the shared optimizer is aiming
+at. T3 confirms this across 25 partition families. But the wall is not
+the target. The wall is `dist(δ*, S)`: the distance from the target to
+the achievable subspace. That distance depends on two things — the
+target and the subspace — and the forcing function only tells you
+about one of them.
+
+ε tells you where you're going. It does not tell you how far it is
+from where you are. "Where you are" is determined by the
+architecture's sharing topology — the subspace S. Two architectures
+aiming at the same δ* from different subspaces will have different
+walls, and the difference has nothing to do with ε.
+
+This is nastier than it looks. Step 5 says the (C, gap) curve should
+be a staircase whose stair *locations* are set by Δ^L. But the stair
+locations are set by which cells bind the minimax — which cells sit at
+the frontier of the absorbed region. That frontier depends on the
+angle between δ* and S, not on δ* alone. ε could perfectly organise
+the target and still have zero predictive power over the wall, if the
+wall is dominated by the geometry of S. The 33% partition-dependent
+variance in the tiling analysis is an early signal: it's exactly the
+part of the wall that ε doesn't explain.
+
+The forcing organises the landscape. The wall measures the distance
+across it. These are not the same thing.
+
+---
+
+## 3. The exactness trap
+
+Step 1 of DISTANT-SHORES presents the triangle inequality as the
+foundation: `|APPROX − log₂| ≤ |APPROX − L| + |L − log₂|`. The
+decomposition is exact. The two terms share no degrees of freedom.
+This seems like bedrock.
+
+But examine what the experimental program actually does. Steps 3–6
+compute walls by LP optimization, measuring `opt_err − free_err`
+directly. The LP never references the triangle inequality. It doesn't
+decompose error into "computable part plus known budget" — it solves
+for the best shared correction and reports the gap. The wall
+decomposition (parameter budget / layer sharing / automaton coupling)
+comes from comparing LP solutions at different sharing levels. None of
+this passes through Step 1.
+
+Step 1 provides a *conceptual frame*: "ε is the budget, corrections
+are withdrawals against it." But the actual measurements don't use
+this accounting. The triangle inequality is tight only when APPROX is
+worse than L everywhere — i.e., when the correction makes things worse
+at every point. Any correction that works at all produces partial
+cancellation between the terms, making the bound loose. The better the
+approximation, the looser the inequality. The foundation is most exact
+when it is least useful.
+
+If you removed Step 1 from DISTANT-SHORES, Steps 2–6 would proceed
+unchanged. The geometric baseline, the subspace story, the wall, the
+exchange rate — none depend on the triangle decomposition. The
+"exactness" is real but may be load-bearing nothing. And if the
+conceptual foundation of the program is decorative rather than
+structural, the question is what the program's actual foundation is —
+and whether it has one.
+
+---
+
+## 4. The subspace is chosen, not discovered
+
+Step 3 introduces the FSM and immediately derives a subspace S from its sharing topology. S is not a fact about the approximation problem. It is a fact about the FSM. A different correction architecture — a lookup table, a polynomial evaluator, a neural network reading bit prefixes — produces a different subspace. A full lookup table produces S = ℝ^{2^d} and there is no wall at all. The wall as we describe it is not the cost of correcting ε. It is the cost of correcting ε while sharing parameters in the specific way the FSM shares them.
+
+### 4a. The subspace has no characterisation beyond its dimension
+
+Step 3 proves that S is the image of a linear map and that its dimension is O(q) or O(qd). This is the parameter count restated in linear algebra. It says nothing about which directions S spans. Two subspaces of the same dimension can have completely different distances to δ\*, and Step 3 provides no basis for distinguishing them.
+
+The wall decomposition in Step 4 names three nested subspaces (S\_LI ⊂ S\_LD ⊂ ℝ^{2^d}) and attributes the wall to their nesting structure. But these inclusions describe the FSM's layer architecture — which parameters are shared across which cells. They do not characterise S as a geometric object in ℝ^{2^d}: how it is oriented relative to δ\*, which components of δ\* it can absorb, or why the components it misses are the ones it misses. The geometric content of Steps 3–4 is read off the LP solution, not derived from the subspace description.
+
+### 4b. The forcing correlation does not distinguish target structure from wall structure
+
+The forcing function Δ^L = −ε organises δ\* across 25 partition families (Step 5). The wall is dist(δ\*, S). The wall therefore correlates with the structure of ε, because δ\* correlates with the structure of ε, and the distance from any fixed subspace to a structured target will reflect the target's structure.
+
+This correlation does not establish that the wall measures a cost intrinsic to correcting ε. It establishes that the wall measures the distance from S to a target that is organised by ε. The first reading says ε controls the wall. The second says ε controls the target, S controls the wall, and the wall inherits ε-structure only as a shadow of the target's structure projected onto an architectural constraint. In the second reading, replacing S with a different subspace of the same dimension but different orientation changes the wall while leaving the forcing and its correlation with δ\* untouched.
+
+The distinction is testable in principle: rotate S while holding δ\* fixed and see whether the wall's correlation with ε degrades. If the correlation is robust to the orientation of S, it is target-driven and the wall is a shadow. If it is fragile, the FSM's S has a specific orientation that matters, and 4a becomes the operative question: what determines that orientation?
