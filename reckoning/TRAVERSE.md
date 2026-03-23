@@ -6,9 +6,8 @@ architectures that read binary digits and share parameters across
 cells. The structure of the gap ε governs the cost of closing it, in
 a way that appears to be independent of the correction method.
 
-This document is the six-step technical spine. Steps 1–4 are
-established. Steps 5–6 are open. Doubts and navigational hazards are
-in [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) and
+This document is the six-step technical spine. Doubts are in
+[ABYSSAL-DOUBT](ABYSSAL-DOUBT.md); the open frontier is in
 [DANGEROUS-SHOALS](DANGEROUS-SHOALS.md).
 
 ---
@@ -88,7 +87,7 @@ of the correction architecture.
 
 See [KEYSTONE](KEYSTONE.md) §1–§2 for the scale-symmetry argument.
 
-## Step 3. Corrections under shared structure live in a low-rank subspace — Done
+## Step 3. The FSM's achievable corrections form a low-rank subspace [MENEHUNE]
 
 Partition [1, 2) into 2^d cells. The FSM with q states processing d
 bits generates correction vectors in the image S of a linear map from
@@ -96,10 +95,17 @@ the parameter space (dim O(q) layer-invariant, dim O(qd)
 layer-dependent) into ℝ^{2^d}. When the parameter count is much less
 than the cell count, S is a low-dimensional subspace.
 
+S is the FSM's subspace. A different correction architecture — a
+lookup table, a polynomial evaluator, anything with a different sharing
+topology — produces a different S. A full lookup table gives
+S = ℝ^{2^d} and there is no wall. The dimension tells you S is thin;
+it does not tell you which directions it spans or how it is oriented
+relative to δ*.
+
 The best shared correction is the point in S closest to δ* under the
 minimax norm. This is what the LP computes.
 
-## Step 4. The wall is a projection distance — Done
+## Step 4. The wall is a projection distance from δ* to S [MENEHUNE]
 
 The wall is dist(δ*, S) in the minimax norm. Three nested subspace
 inclusions give the wall decomposition:
@@ -115,12 +121,19 @@ layer-dependent subspace, and ℝ^{2^d} is the free-per-cell space.
 - **Automaton coupling.** S_LD ⊂ ℝ^{2^d} is proper. Even
   layer-dependent parameters are coupled by the state-transition graph.
 
-Each inclusion adds distance from the target. The wall decomposition
-measures the contribution of each. The dominant source is the earliest
-sharing constraint: the leading bit splits the domain at its midpoint
-(additive), while the logarithm's natural split is the geometric mean
-(multiplicative). Every correction architecture that reads binary
-digits inherits this.
+The nesting describes the FSM's layer architecture. The wall
+decomposition measures how much distance each sharing layer
+contributes — but this is a decomposition of an FSM-specific
+quantity. Which components of δ* are captured and which are lost
+is read from LP solutions, not derived from the nesting description.
+
+The dominant source of the wall is the earliest sharing constraint:
+the leading bit splits the domain at its midpoint (additive), while
+the logarithm's natural split is the geometric mean (multiplicative).
+This mismatch is representation-intrinsic — every architecture that
+reads binary digits faces it. Whether the *cost* of the mismatch is
+also representation-intrinsic is exactly what Steps 5–6 need to
+establish. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4.
 
 See [TILING](TILING.md) for the displacement analysis.
 
@@ -245,8 +258,8 @@ arguing universality from two data points.
 |------|--------|---------|
 | 1 | Done | Triangle inequality; APPROX−L computable, ε known |
 | 2 | Done | Geometric grid = zero-cost baseline; ε triple identity |
-| 3 | Done | Shared corrections ∈ low-rank subspace S |
-| 4 | Done | Wall = dist(δ*, S); decomposition = nested subspaces |
+| 3 | [MENEHUNE] | FSM corrections ∈ low-rank subspace S (architecture-specific) |
+| 4 | [MENEHUNE] | Wall = dist(δ*, S); decomposition describes FSM sharing |
 | 5 | Forcing known; rate [MENEHUNE] | (C, gap) curve governed by Δ^L = −ε |
 | 6 | [MENEHUNE] | d_comp(τ) architecture-invariant → computational ruler |
 
