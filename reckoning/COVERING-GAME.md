@@ -2,8 +2,8 @@
 
 The mathematical program for proving that the computational ruler is
 architecture-invariant. This document describes the proof strategy.
-The hazards of the passage are in
-[DANGEROUS-SHOALS](DANGEROUS-SHOALS.md).
+The complexity question is in
+[COMPLEXITY-REEF](COMPLEXITY-REEF.md).
 
 ---
 
@@ -137,11 +137,8 @@ game can prove.
 
 ## Reading outward
 
-- [DANGEROUS-SHOALS](DANGEROUS-SHOALS.md): the broader passage and
-  its hazards.
+- [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the complexity question.
 - [DISTANT-SHORES](DISTANT-SHORES.md): the destination (d_comp).
 - [TRAVERSE](TRAVERSE.md) Steps 5–6: the scientific context.
 - [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement field
   the covering game operates on.
-- [DEPARTURE-POINT](DEPARTURE-POINT.md) §9: the
-  compatibility argument the crossing would complete.

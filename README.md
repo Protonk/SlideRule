@@ -19,8 +19,8 @@ reckoning/            The intellectual reckoning
   TRAVERSE.md           Seven-step spine: lattice to ruler
   DEPARTURE-POINT.md    Day's framework and the scale-symmetry thesis
   DISTANT-SHORES.md     The destination: d_comp(τ)
-  DANGEROUS-SHOALS.md   Open frontier: Steps 4–7
   COVERING-GAME.md      Proof program for architecture-invariance
+  COMPLEXITY-REEF.md    The complexity question: cost models and lower bounds
   ABYSSAL-DOUBT.md      Four doubts that shadow the program
   HERE-BE-DRAGONS.md    Speculative extensions (pentagonal tiling, duality)
   BINADE-WHITECAPS.md   Coordinate scaffold: ε triple identity

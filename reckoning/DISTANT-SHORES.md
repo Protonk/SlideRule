@@ -13,8 +13,8 @@ measure. If d_comp is a property of the approximation problem rather
 than the implementation, the ruler's tick marks are intrinsic to the
 gap between additive and multiplicative coordinates.
 
-The passage to this shore is mapped in [DANGEROUS-SHOALS](DANGEROUS-SHOALS.md).
-The full argument is in [TRAVERSE](TRAVERSE.md).
+The full argument is in [TRAVERSE](TRAVERSE.md). The complexity
+question is in [COMPLEXITY-REEF](COMPLEXITY-REEF.md).
 
 ## What the ruler enables
 
@@ -38,5 +38,4 @@ A machine that could close the gap with finite resources could provide a counter
 
 ---
 
-See [TRAVERSE](TRAVERSE.md) for the spine,
-[DANGEROUS-SHOALS](DANGEROUS-SHOALS.md) for the open frontier.
+See [TRAVERSE](TRAVERSE.md) for the spine.

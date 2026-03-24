@@ -158,8 +158,8 @@ See [DISTANT-SHORES](DISTANT-SHORES.md).
   spectral structure.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): doubts about the wall,
   the forcing-residual gap, the subspace.
-- [DANGEROUS-SHOALS](DANGEROUS-SHOALS.md): open work for
-  Steps 4–7.
-- [COVERING-GAME](COVERING-GAME.md): proof program for Steps 5–6.
+- [COVERING-GAME](COVERING-GAME.md): proof program for Step 5.
+- [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the complexity question
+  for Steps 6–7.
 - [HERE-BE-DRAGONS](HERE-BE-DRAGONS.md): speculative extensions.
 - [DISTANT-SHORES](DISTANT-SHORES.md): the destination.

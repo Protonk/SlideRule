@@ -166,5 +166,4 @@ controlled skepticism, rather than drifting as ambient enthusiasm.
   the wall measures the problem or the architecture.
 - [`DISTANT-SHORES.md`](DISTANT-SHORES.md): Steps 5–6 that Dragons
   4 and 6 gesture toward.
-- [`DANGEROUS-SHOALS.md`](DANGEROUS-SHOALS.md): navigational rules
-  for not running aground on premature claims.
+- [`AGENTS.md`](AGENTS.md): epistemological rules for the reckoning.
