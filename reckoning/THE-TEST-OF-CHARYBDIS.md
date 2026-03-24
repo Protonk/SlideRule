@@ -406,13 +406,23 @@ of the L∞ wall.
 
 ### Circle-Fourier decomposition of the residual
 
-The Walsh-Hadamard analysis (§2) diagonalises the additive/binary
-structure — what the machine sees. The Fourier analysis on the
+The Walsh-Hadamard analysis (§2) diagonalises the additive/Boolean
+structure induced by binary addressing. The Fourier analysis on the
 binade circle ([BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–8)
-diagonalises the multiplicative/logarithmic structure — what the
-function is. Decomposing the residual in both bases and comparing
-which modes are missed would clarify the relationship between the
-two spectral theories. That relationship is open.
+diagonalises the multiplicative/logarithmic structure native to the
+underlying function. The point of comparing them is not just
+"machine side" versus "function side": it is to ask how
+multiplicative regularity or singularity is transported, under
+binary addressing, into additive bit interactions.
+
+A residual that is spectrally simple in the circle-Fourier basis but
+diffuse or high-order in Walsh would indicate representation-induced
+complexity: a function that is simple in its natural geometry but
+complicated in the binary product structure. Conversely, concentration
+in low Walsh levels despite nontrivial Fourier content would suggest
+that the binary architecture captures a compressed additive shadow of
+the multiplicative structure. The relationship between the two
+spectral theories remains open.
 
 ---
 
