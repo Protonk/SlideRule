@@ -18,14 +18,15 @@ question is in [COMPLEXITY-REEF](COMPLEXITY-REEF.md).
 
 ## What the ruler enables
 
-If d_comp exists, the triangle inequality
+Let L(x) be the affine pseudo-log, APPROX(x) any piecewise approximation to
+log₂(x), and ε(m) = log₂(1+m) − m the departure of truth from surrogate on
+the unit mantissa interval. If d_comp exists, the triangle inequality gives
 
     |APPROX − log₂| ≤ |APPROX − L| + ε
 
-gives a computable error bound whose second term has a known structural
-cost via d_comp. The decomposition is exact: the two terms share no
-degrees of freedom. The first is computable (both APPROX and L are
-available); the second is ε, known in closed form. The ruler tells you
+This decomposes the inaccessible comparison (APPROX vs. truth) into a comparison (APPROX vs. surrogate) with a computable error bound whose second term has a known structural cost via d_comp.
+
+The decomposition is exact: the two terms share no degrees of freedom. The first is computable (both APPROX and L are available); the second is ε, known in closed form. The ruler tells you
 what it costs to close any fraction of ε.
 
 ## Why

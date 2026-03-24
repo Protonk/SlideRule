@@ -11,10 +11,7 @@ This note records the mathematical starting point of the project: Day's FRGR fra
 7. the pseudo-log as the boundary-aligned surrogate;
 8. the base-2 significance space as the free representation;
 
-Sections 1–5 follow Day (2023), arXiv:2307.15600. Section 8 uses the
-significance space formalization of Matula (1970). Sections 6 & 7 are
-ours. See [`experiments/keystone/KEYSTONE.md`](../experiments/keystone/KEYSTONE.md)
-for exhibits and partial experimental support.
+Sections 1–5 follow Day (2023). Sections 6 & 7 are ours. Section 8 uses the significance space formalization of Matula (1970).  See [`experiments/keystone/KEYSTONE.md`](../experiments/keystone/KEYSTONE.md) for exhibits and partial experimental support.
 
 ---
 
