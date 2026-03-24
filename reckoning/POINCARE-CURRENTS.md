@@ -80,16 +80,16 @@ The minimax objective makes the optimised error equal to the worst
 cell's error. As parameters are added, the identity of the binding
 cell changes discretely.
 
-Δ^L is zero at the domain boundaries (m = 0 and m = 1), maximal
+ε is zero at the domain boundaries (m = 0 and m = 1), maximal
 near m* ≈ 0.44, and concave. A low-capacity corrector absorbs
-displacement where Δ^L is small (near boundaries) before where it
-is large (near the peak). As capacity increases, the absorbed region
-expands toward the peak.
+cells where ε is small (near boundaries) before where it is large
+(near the peak). As capacity increases, the absorbed region expands
+toward the peak.
 
 The binding cell — the worst unabsorbed cell — advances in discrete
 jumps. This predicts a staircase in the (C, gap) curve:
 
-- **Stair locations** are set by Δ^L: which cells have similar
+- **Stair locations** are set by ε: which cells have similar
   displacement and must be absorbed simultaneously.
 - **Stair heights** are set by the architecture's absorptive
   efficiency per parameter.

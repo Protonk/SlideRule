@@ -37,3 +37,50 @@ working copy after the fixes.
 - `§9` — `(c)` asserted without support. Direct experimental support exists only for the discretization layer; coordinate and representation are structural arguments, and the surrogate bullet is presently rhetorical. Mark [reckoning/DEPARTURE-POINT.md:205](/Users/achyland/Desktop/Math/smale/reckoning/DEPARTURE-POINT.md#L205) through [reckoning/DEPARTURE-POINT.md:228](/Users/achyland/Desktop/Math/smale/reckoning/DEPARTURE-POINT.md#L228) `[MENEHUNE]`.
 
 For the four degradation bullets in `§9`: direct experimental support is only for “wrong discretisation”; “wrong coordinate” is a structural argument with an illustrative exhibit; “wrong representation” is structural or illustrative only; “wrong surrogate” is asserted without a matching correction experiment.
+
+---
+
+## POINCARE-CURRENTS Review
+
+Adversarial review of
+[`reckoning/POINCARE-CURRENTS.md`](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md)
+against
+[`reckoning/AGENTS.md`](/Users/achyland/Desktop/Math/smale/reckoning/AGENTS.md),
+[`reckoning/BINADE-WHITECAPS.md`](/Users/achyland/Desktop/Math/smale/reckoning/BINADE-WHITECAPS.md),
+[`reckoning/DEPARTURE-POINT.md`](/Users/achyland/Desktop/Math/smale/reckoning/DEPARTURE-POINT.md),
+[`reckoning/TRAVERSE.md`](/Users/achyland/Desktop/Math/smale/reckoning/TRAVERSE.md),
+and
+[`reckoning/COMPLEXITY-REEF.md`](/Users/achyland/Desktop/Math/smale/reckoning/COMPLEXITY-REEF.md).
+
+Scope: theoretical content only, `§§1–6`. The experimental section is
+not reviewed here.
+
+### Findings
+
+- High: [reckoning/POINCARE-CURRENTS.md:47](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L47), [reckoning/POINCARE-CURRENTS.md:72](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L72), [reckoning/POINCARE-CURRENTS.md:83](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L83), and [reckoning/POINCARE-CURRENTS.md:115](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L115) use incompatible sign conventions. The note defines `Δ^L_k = k/2^d - log₂(1 + k/2^d) = -ε(k/2^d)`, but later describes `Δ^L` as zero at the endpoints, concave, and maximal near `m*`. Those shape claims are true for `ε = |Δ^L|`, not for signed `Δ^L`. As written, the file silently switches from the signed field to its magnitude.
+- High: [reckoning/POINCARE-CURRENTS.md:79](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L79), [reckoning/POINCARE-CURRENTS.md:89](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L89), and [reckoning/POINCARE-CURRENTS.md:115](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L115) present the staircase and binding-cell-order claims as theory, but they are not proved here and are not treated elsewhere in the reckoning as settled. [reckoning/TRAVERSE.md:91](/Users/achyland/Desktop/Math/smale/reckoning/TRAVERSE.md#L91) already marks the corresponding step `[MENEHUNE]`. Under [reckoning/AGENTS.md:7](/Users/achyland/Desktop/Math/smale/reckoning/AGENTS.md#L7), `§§4–6` should either be marked `[MENEHUNE]` or rewritten into explicit conditional statements.
+- Medium: [reckoning/POINCARE-CURRENTS.md:138](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L138) overstates the spectral claim. [reckoning/BINADE-WHITECAPS.md:177](/Users/achyland/Desktop/Math/smale/reckoning/BINADE-WHITECAPS.md#L177) through [reckoning/BINADE-WHITECAPS.md:221](/Users/achyland/Desktop/Math/smale/reckoning/BINADE-WHITECAPS.md#L221) give the exact Fourier bridge, but “if absorption proceeds by frequency band” is a conditional heuristic, not a theorem, and “the spectral and spatial views ... are dual descriptions of the same absorption ordering” states the hoped-for conclusion too strongly. [reckoning/COMPLEXITY-REEF.md:135](/Users/achyland/Desktop/Math/smale/reckoning/COMPLEXITY-REEF.md#L135) already records this as a prediction rather than an established result.
+- Medium: [reckoning/POINCARE-CURRENTS.md:25](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L25) says the binary and geometric partitions “are two coordinate views of the same structure”. That may be good geometric intuition, but in this note it is not stated as a precise theorem with a construction or citation. Under the reckoning rules, either make the structure precise or mark the statement `[MENEHUNE]`.
+- Medium: [reckoning/POINCARE-CURRENTS.md:52](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L52) overreaches from an exact representation identity to a computational conclusion. What `§2` proves is that `Δ^L` is representation-determined. “Any architecture that processes binary significand bits must absorb this field” is stronger: it is a claim about admissible correctors, not a theorem established here.
+- Low: [reckoning/POINCARE-CURRENTS.md:131](/Users/achyland/Desktop/Math/smale/reckoning/POINCARE-CURRENTS.md#L131) compresses away the coordinate change that matters. The exact relation from [reckoning/BINADE-WHITECAPS.md:190](/Users/achyland/Desktop/Math/smale/reckoning/BINADE-WHITECAPS.md#L190) is `E(t) = -ε(φ(t))`, equivalently `E(ψ(m)) = -ε(m)`, not that `E` is simply the accumulated form of “the same function” on the same variable.
+
+### Section Verdicts
+
+- `§1` — `(b)` supported as geometric context, but not proved as a project theorem in its current form.
+- `§2` — `(a)` proved by the existing reckoning. The identity `Δ^L_k = -ε(k/2^d)` is exact.
+- `§3` — `(b)` supported but internally inconsistent as written because the distance formula is exact while the shape description uses the wrong sign convention.
+- `§4` — `(c)` asserted without support. This is currently a conjectural architecture story, not a theorem.
+- `§5` — `(c)` asserted without support. “Ordering invariance” is exactly the kind of computational-language claim that should be marked `[MENEHUNE]` unless proved.
+- `§6` — `(b)` supported in part. The exact bridge to the density defect is established in [reckoning/BINADE-WHITECAPS.md](/Users/achyland/Desktop/Math/smale/reckoning/BINADE-WHITECAPS.md), but the absorption-ordering interpretation is conjectural.
+
+### Recommendations
+
+- Fix the sign discipline once and keep it fixed. Either:
+  use signed `Δ^L = -ε`, in which case it is negative on `(0,1)`, zero at the endpoints, and has a minimum near `m*`; or
+  redefine the staircase driver as `D = |Δ^L| = ε`, and say explicitly that the architecture discussion uses the unsigned magnitude.
+- Mark `§§4–6` `[MENEHUNE]` unless the note is cut back to conditional language. A safe narrow replacement is: “If a machine class pays cost in proportion to unresolved displacement magnitude, then `ε` predicts where regime changes are likely to occur.”
+- Demote `§1` to clearly labeled geometric context unless a precise theorem is added. The horocyclic/geodesic language is useful, but it is not yet an established project theorem in the present text.
+- Replace “must absorb this field” in `§2` with a narrower exact statement, such as: “Any architecture using the same binary representation confronts correction targets indexed by this displacement profile.”
+- Rewrite the first sentence of `§6` to preserve the coordinate maps explicitly:
+  `E(t) = φ(t) - t = -ε(φ(t))`, hence `E(ψ(m)) = -ε(m)`.
+- Keep the spectral paragraph conditional and local. It can say the Fourier bridge provides a possible spectral organization of the same defect, but it should not claim an absorption ordering theorem without a complexity argument.

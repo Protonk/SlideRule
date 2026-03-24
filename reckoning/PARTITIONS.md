@@ -175,7 +175,7 @@ Stage A residual correlation test between R0(c*) and R0(Δ^L).
 
 **half_geometric** makes each leading-bit half internally geometric,
 designed to kill the within-half R0(c*) signal. **eps_density**
-concentrates cells where Δ^L is largest, designed to pre-absorb the
+concentrates cells where ε is largest, designed to pre-absorb the
 forcing geometrically. **midpoint_dense** concentrates cells at the
 leading-bit split, designed to put R0(c*) and R0(Δ^L) out of phase.
 

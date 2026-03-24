@@ -156,8 +156,8 @@ forcing field for this FSM family.
 
 The minimax objective makes the optimized error equal to the worst cell's
 error. As parameters are added, the identity of the binding cell changes
-discretely. Because `Δ^L` is zero at the boundaries, maximal near
-`k/2^d ≈ 0.44`, and flat-topped near its peak, a low-capacity corrector
+discretely. Because `ε` is zero at the boundaries, maximal near
+`m ≈ 0.44`, and flat-topped near its peak, a low-capacity corrector
 absorbs easy boundary cells first and harder peak cells in clusters.
 
 That predicts a staircase in the `(C, gap)` curve: narrow early stairs near the

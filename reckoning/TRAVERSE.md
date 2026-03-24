@@ -91,14 +91,14 @@ The shape of the gap governs the cost of closing it. See
 ## Step 4. The exchange rate [MENEHUNE]
 
 The forcing's shape predicts a staircase in the (C, gap) curve.
-Δ^L is zero at domain boundaries, maximal near m* ≈ 0.44, and
-concave. A correction architecture absorbs displacement where Δ^L is
+ε is zero at domain boundaries, maximal near m* ≈ 0.44, and
+concave. A correction architecture absorbs cells where ε is
 small (near boundaries) before where it is large (near the peak).
 The binding cell advances in discrete jumps.
 
 Near the ε peak, many cells cluster at similar displacement. These
 must be absorbed roughly simultaneously, predicting a wide plateau
-followed by a cliff. Stair locations are set by Δ^L; stair heights
+followed by a cliff. Stair locations are set by ε; stair heights
 by the architecture's absorptive efficiency per parameter.
 
 The Fourier decomposition of the density defect (Ê(n) = δ̂(n)/(j2πn))
