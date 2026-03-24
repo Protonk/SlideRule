@@ -334,6 +334,18 @@ of r via the fast Hadamard transform (O(n log n)). If the L∞
 minimizer is non-unique, use the L2 tie-breaker from §2 before
 computing ξ\_n and the Walsh transform.
 
+Normalization matters. With the convention from §2,
+
+    r̂(S) = 2^{−d} Σ_x r(x) χ_S(x),
+
+Parseval gives
+
+    Σ_S r̂(S)^2 = 2^{−d} Σ_x r(x)^2.
+
+So the level weights W^k sum to the mean squared residual, not the
+total squared residual. An implementation using an unnormalized
+Hadamard transform must divide by 2^d before forming W^k.
+
 The ensemble should be large enough to estimate quantiles of both
 wall\_rand and ξ\_rand, as well as reference bands for the Walsh
 level weights W^k. A few hundred draws should suffice at d = 5–7.
