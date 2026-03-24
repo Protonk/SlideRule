@@ -8,6 +8,24 @@ finite machines that does not name the FSM.
 
 ---
 
+## Bearing under Radin §3
+
+Radin's discussion of the Böröczky paradox shows that the binary
+tiling does not support per-tile bookkeeping that is invariant under
+hyperbolic isometries. That constraint matters here because this note
+uses the binary tiling as geometric scaffolding.
+
+The discipline is simple. Binade-local and per-tile objects are safe:
+finite fields such as `Δ^L`, per-tile bulge areas `A(k, d)`, and
+function analysis of `ε` on `[0,1]`. The danger begins only when
+those local objects are promoted to global claims about the tiling.
+In particular, sums, averages, densities, "total curvature", and
+aggregate bulge areas must not be treated as invariant geometric
+quantities of the binary tiling. If Dragon 1 succeeds, the conclusion
+is only that `ε` has a per-tile geometric derivation.
+
+---
+
 ## Part I. Three partitions and a divergence schedule (Dragon 6)
 
 ### 1. The three partitions

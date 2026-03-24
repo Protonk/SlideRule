@@ -56,3 +56,9 @@ Lacroix, A., & Hartwig, F. (1992). Distribution densities of the mantissa and ex
 Miller, S. J., & Nigrini, M. J. (2007). The modulo 1 central limit theorem and Benford's law for products. arXiv:math/0607686v2.
 
 Sripad, A. B., & Snyder, D. L. (1978). Quantization errors in floating-point arithmetic. *IEEE Trans. Acoustics, Speech, and Signal Processing*, ASSP-26(5), 456–463.
+
+## Binary tiling
+
+Radin, C. "[Orbits of Orbs: Sphere Packing Meets Penrose Tilings](sources/radin-sphere-packing.pdf)." Amer. Math. Monthly 111 (2004), 137–149. Especially §3 (pp. 144–146): the Böröczky paradox and the non-existence of invariant measures on binary tiling packings.
+
+Böröczky, K. "Gömbkitöltések állandó görbületű terekben I." Mat. Lapok 25 (1974), 265–306. The disk-doubling construction.
