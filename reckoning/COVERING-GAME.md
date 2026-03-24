@@ -143,5 +143,5 @@ game can prove.
 - [TRAVERSE](TRAVERSE.md) Steps 5–6: the scientific context.
 - [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement field
   the covering game operates on.
-- [KEYSTONE](../experiments/keystone/KEYSTONE.md) §4: the
+- [DEPARTURE-POINT](DEPARTURE-POINT.md) §9: the
   compatibility argument the crossing would complete.

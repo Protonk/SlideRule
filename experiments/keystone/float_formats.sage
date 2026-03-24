@@ -1,11 +1,12 @@
 """
 float_formats.sage — Exhibit Keystone §3: the representation claim.
 
-Any number format that expresses values in binary scientific notation gets
-the affine pseudo-log for free. The significand field m = x / b^k within
-each binade [b^k, b^{k+1}) is piecewise-linear in log_b(x). For binary
-(b=2), the teeth of this sawtooth are exactly the geometric grid cells,
-and the residual vanishes at each tooth boundary (the §2 result).
+Normal radix-2 scientific notation gives the binary affine pseudo-log for
+free. More generally, a radix-b significand yields a radix-b analogue:
+the normalized significand m = x / b^k within each binade [b^k, b^{k+1})
+is piecewise-linear in log_b(x). For binary (b=2), the teeth of this
+sawtooth are exactly the geometric grid cells, and the residual vanishes
+at each tooth boundary (the §2 result).
 
 This script defines three toy float formats (binary, hex, base-3), plots
 the significand-as-pseudo-log sawtooth for each across several binades,

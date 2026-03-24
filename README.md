@@ -17,6 +17,7 @@ See [`GLOSSARY.md`](reckoning/GLOSSARY.md).
 ```
 reckoning/            The intellectual reckoning
   TRAVERSE.md           Seven-step spine: lattice to ruler
+  DEPARTURE-POINT.md    Day's framework and the scale-symmetry thesis
   DISTANT-SHORES.md     The destination: d_comp(τ)
   DANGEROUS-SHOALS.md   Open frontier: Steps 4–7
   COVERING-GAME.md      Proof program for architecture-invariance

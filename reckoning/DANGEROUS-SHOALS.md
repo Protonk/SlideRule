@@ -96,5 +96,5 @@ game. See [COVERING-GAME](COVERING-GAME.md).
   measures the problem or the architecture.
 - [POINCARE-CURRENTS](POINCARE-CURRENTS.md): displacement field,
   staircase prediction.
-- [KEYSTONE](../experiments/keystone/KEYSTONE.md) §4: the compatibility
+- [DEPARTURE-POINT](DEPARTURE-POINT.md) §9: the compatibility
   argument the crossing would complete.

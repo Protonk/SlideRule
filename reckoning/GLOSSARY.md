@@ -221,7 +221,7 @@ derivative is `ε''(m) = −1/((1+m)² ln 2)`.
 
 ε is the central function of the project. It has three identities under
 the log₂/mod-1 coordinate system:
-- The surrogate error (KEYSTONE §2): the cost of using L instead of log₂.
+- The surrogate error (DEPARTURE-POINT §7): the cost of using L instead of log₂.
 - The representation displacement field: Δ^L = −ε (POINCARE-CURRENTS.md).
 - The accumulated departure from the reciprocal density in log-binade
   coordinates: E(t) = ∫₀ᵗ (2^w ln 2 − 1) dw = −ε(φ(t)), where
@@ -335,7 +335,7 @@ k = 0, …, 2^d. It is the unique partition invariant under multiplication
 by the grid ratio. In the keystone program it is the preferred scale-equivariant
 curve-agnostic geometry. In current repo terminology it is a geometry
 name, distinct from the cell's binary address. See
-[`KEYSTONE.md`](../experiments/keystone/KEYSTONE.md) and
+[`DEPARTURE-POINT.md`](DEPARTURE-POINT.md) and
 [`EXPERIMENTS.md`](../experiments/EXPERIMENTS.md) for the status of the
 partition-comparison claims.
 
@@ -411,12 +411,10 @@ problem.
 
 ## KEYSTONE
 
-The project document (`experiments/keystone/KEYSTONE.md`) that states the overarching
-scale-symmetry thesis: the logarithm is the canonical coordinate for
-approximation on R_{>0} under scaling, the affine pseudo-log is its
-coarse surrogate, and geometric grids are the natural compatible
-discretization. Contains the K1–K3 hypothesis statements and the
-Hamming/Knuth/Coonen lineage.
+The experimental document (`experiments/keystone/KEYSTONE.md`) that
+tests the scale-symmetry thesis via partition comparison sweeps (K1–K3
+hypotheses). The theoretical content of the thesis is now in
+[`DEPARTURE-POINT.md`](DEPARTURE-POINT.md).
 
 ## minimax objective
 
@@ -488,7 +486,7 @@ Its inverse is `L⁻¹(X) = 2^(floor(X)) · (1 + X − floor(X))`. The
 pseudo-log is the mathematical abstraction of the IEEE 754 bit-pattern
 reinterpretation. Within each binade, it is affine in x with slope
 `2^(−E_x)`. The gap `log₂(m) − (m − 1)` is the error function ε(m).
-The KEYSTONE thesis identifies the pseudo-log as a coarse affine
+The scale-symmetry thesis identifies the pseudo-log as a coarse affine
 surrogate for the logarithmic coordinate that linearises scaling on R_{>0}.
 
 ## plog_lo, plog_hi
@@ -542,7 +540,7 @@ Sage's preparsing step before execution as Python.
 The governing symmetry of the problem: `x → λx` for λ > 0. The
 logarithm is (up to affine transformation) the unique coordinate that
 turns this multiplicative symmetry into additive translation. The
-KEYSTONE thesis argues that approximation schemes for power-law targets
+The scale-symmetry thesis argues that approximation schemes for power-law targets
 should be organised in this coordinate, and that the pseudo-log and
 geometric grids are the coarse implementations of that principle.
 

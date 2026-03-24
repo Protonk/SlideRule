@@ -1,6 +1,6 @@
 # Distant Shores
 
-The destination: a computational ruler of the exponential.
+The destination: a computational ruler of the exponential that rules out algebraicity. 
 
 ---
 
@@ -28,19 +28,15 @@ degrees of freedom. The first is computable (both APPROX and L are
 available); the second is ε, known in closed form. The ruler tells you
 what it costs to close any fraction of ε.
 
+## Why
+
+[Schanuel's conjecture](https://en.wikipedia.org/wiki/Schanuel%27s_conjecture) is open. Schanuel says the exponential is as algebraically independent from the rationals as it could possibly be. Full stop, maximally independent.
+
+ε(m) = log₂(1+m) − m is the displacement between the additive and multiplicative structures of ℝ_{>0}, sampled on the dyadic grid. If the rate-distortion curve for binary approximation of x^{p/q} shows that the cost of closing the gap never terminates — that every finite resource budget leaves a residual controlled by ε, and ε cannot be annihilated by any finite algebraic process on the bits — that is a statement about the algebraic independence of the exponential, arrived at through computation rather than through algebraic number theory.
+
+A machine that could close the gap with finite resources could provide a counterexample. The geometry obtains the structure of the tiling. The measure theory defines ε as a canonical object. Computational complexity proves the impossibility.
+
 ---
-
-## Summary
-
-| Step | Status | Content |
-|------|--------|---------|
-| 1 | Done | Day's framework; geometric grid; ε triple identity |
-| 2 | [MENEHUNE] | Wall = dist(δ*, S); FSM-specific |
-| 3 | Done | Forcing Δ^L = −ε organises c*; architecture-free |
-| 4 | [MENEHUNE] | (C, gap) staircase; spectral structure |
-| 5 | [MENEHUNE] | Covering game: does structure control cost? |
-| 6 | [MENEHUNE] | Coordinate change: geometric ↔ computational |
-| 7 | [MENEHUNE] | d_comp(τ): the computational ruler |
 
 See [TRAVERSE](TRAVERSE.md) for the spine,
 [DANGEROUS-SHOALS](DANGEROUS-SHOALS.md) for the open frontier.

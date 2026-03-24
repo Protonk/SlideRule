@@ -12,29 +12,45 @@ Seven steps from the lattice to the ruler. Terminology: see
 
 ## Step 1. The lattice — Done
 
-Day's pseudo-log L(x) = floor(log₂ x) + x·2^{−floor(log₂ x)} − 1
-gives a coarse approximation to log₂ for free from any binary
-scientific notation format. The quality metric z(x) = x·y² measures
-deviation from y = x^{−1/2}; z is periodic in pseudo-log space, its
-extrema occur at a finite candidate set, and the optimal intercept c*
-follows analytically. See [KEYSTONE](KEYSTONE.md) §§1–3.
+Day defines the pseudo-log
 
-The geometric grid at depth d places its boundaries at g_k = 2^{k/2^d}
-— refinements of the binade lattice, the points where the residual
-ε(m) = log₂(1+m) − m vanishes. Between them, ε is the cost of using L
-instead of log₂. This cost is paid by the representation. It requires
-no machinery.
+    L(x) = floor(log₂ x) + x·2^{−floor(log₂ x)} − 1
 
-ε has three identities under the log₂/mod-1 coordinate system:
+and shows that, for the power-law target `x^{−a/b}`, the coarse stage
 
-1. The approximation error of L as a surrogate for log₂.
-2. The displacement −Δ^L between the binary and geometric grids.
-3. The accumulated departure from the reciprocal density in
-   log-binade coordinates.
+    y = L⁻¹((c − aL(x)) / b)
 
-These are forced by the coordinate theory, not by any property of the
-correction architecture. See [BINADE-WHITECAPS](BINADE-WHITECAPS.md)
-§§6–7.
+has quality metric `z(x) = x^a y(x)^b`. In the reciprocal-square-root
+case `a = 1`, `b = 2`, this is `z = x·y²`. `z` is periodic in
+pseudo-log space, its extrema lie in a finite candidate set, and the
+optimal intercept `c*` follows analytically. See
+[DEPARTURE-POINT](DEPARTURE-POINT.md) §§1–5.
+
+Separately, Matula's base-2 significance space gives the intra-binade
+coordinate
+
+    m = x·2^{−j} − 1,    x ∈ [2^j, 2^{j+1}).
+
+On one binade the true logarithmic coordinate is `t = log₂(1+m)`,
+while the affine pseudo-log uses `m` itself. The residual
+
+    ε(m) = log₂(1+m) − m
+
+is therefore the exact discrepancy between the logarithmic and linear
+intra-binade coordinates. The binade lattice `2^j` are its zeros; the
+depth-`d` geometric grid `g_k = 2^{k/2^d}` refines that lattice, and
+its interior points generally sample nonzero `ε`. See
+[DEPARTURE-POINT](DEPARTURE-POINT.md) §§6–8 and
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§4–6.
+
+At this level `ε` has three exact identities:
+
+1. surrogate residual: `ε(m) = ψ(m) − m`;
+2. sampled grid displacement: `Δ^L_k = L(g_k) − k/2^d = −ε(k/2^d)`;
+3. accumulated representation-native defect: `E(t) = −ε(φ(t))`.
+
+These are coordinate facts, prior to any correction architecture. See
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§4–7.
 
 ## Step 2. The wall [MENEHUNE]
 
@@ -132,23 +148,10 @@ See [DISTANT-SHORES](DISTANT-SHORES.md).
 
 ---
 
-## Summary
-
-| Step | Status | Content |
-|------|--------|---------|
-| 1 | Done | Day's framework; geometric grid; ε triple identity |
-| 2 | [MENEHUNE] | Wall = dist(δ*, S); FSM-specific |
-| 3 | Done | Forcing Δ^L = −ε organises c*; architecture-free |
-| 4 | [MENEHUNE] | (C, gap) staircase; spectral structure |
-| 5 | [MENEHUNE] | Covering game: does structure control cost? |
-| 6 | [MENEHUNE] | Coordinate change: geometric ↔ computational |
-| 7 | [MENEHUNE] | d_comp(τ): the computational ruler |
-
----
-
 ## Reading outward
 
-- [KEYSTONE](KEYSTONE.md): scale-symmetry thesis.
+- [DEPARTURE-POINT](DEPARTURE-POINT.md): Day's framework,
+  scale-symmetry thesis, four-layer compatibility.
 - [POINCARE-CURRENTS](POINCARE-CURRENTS.md): displacement field,
   staircase prediction, spectral structure.
 - [BINADE-WHITECAPS](BINADE-WHITECAPS.md): coordinate theory,

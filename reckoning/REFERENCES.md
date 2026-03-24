@@ -38,6 +38,11 @@ faithful rounding. *IEEE Transactions on Circuits and Systems I:
 Regular Papers*, 64(5), 1187–1200.
 https://doi.org/10.1109/TCSI.2016.2629850
 
+## Departure Point
+
+Matula, D. W. (1970). A formalization of floating-point numeric base
+conversion. *IEEE Transactions on Computers*, C-19(8), 681–692.
+
 ## Binade Whitecaps
 
 Lacroix, A., & Hartwig, F. (1992). Distribution densities of the mantissa and exponent of floating point numbers. In *Proc. IEEE International Symposium on Circuits and Systems*, 1792–1795.
