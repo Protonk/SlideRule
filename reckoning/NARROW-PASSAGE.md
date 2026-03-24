@@ -205,12 +205,19 @@ subspace S plays the role of a "connection budget," not a gauge
 orbit.
 
 **The curvature field may not determine the residual.** The wall
-is dist(Δ^L, S). Even if Δ^L is intrinsic to the representation,
+is dist(Δ^L, S). Even if Δ^L is fixed by the representation,
 S is not. Different architectures produce different S, hence
 different walls, hence different residuals — all for the same
 curvature field. The connection language reformulates the wall
 cleanly but does not by itself show that the residual is
 controlled by the curvature alone.
+
+**The analogy stops before global aggregation.** `Δ^L` is a
+well-defined finite field at fixed depth `d`. Calling it
+"curvature" is useful only at that level. Nothing here licenses
+summing, averaging, or integrating that field across rows of
+tiles and treating the result as an isometry-invariant quantity
+of the binary tiling.
 
 ### 8. What the connection language might buy
 
@@ -226,6 +233,11 @@ of the Fourier series of Δ^L — a statement about the smoothness
 of ε, not about the machine. This would make the residual a
 function of (Δ^L, q), not of (Δ^L, S), collapsing the
 architecture-dependence to a single parameter.
+
+If this route is real, it must be proved as compact-domain
+Fourier analysis of `ε` and as a rank or approximation statement
+about `S`. The hyperbolic picture is scaffolding for the route,
+not part of its proof.
 
 This is the most promising route because it converts the question
 "which directions does S span?" into "how many modes can q states
@@ -281,12 +293,12 @@ They are connected by two paths:
 These two paths bound a region — the "bulge" — with a definite
 hyperbolic area. Dragon 1 asks: does this area equal ε(k/2^d)?
 
-If it does, then ε is not an analytic quantity at all. It is a
-geometric quantity: the area between two notions of straightness
-in a space of constant negative curvature. The Taylor series of
-log₂(1+m) − m is just how that area looks in one coordinate
-system. The area itself comes from the metric, not from the
-logarithm.
+If it does, then ε admits a per-tile geometric derivation. The
+area between two notions of straightness in a space of constant
+negative curvature reproduces the same local quantity that appears
+analytically as `log₂(1+m) - m`. That would identify a geometric
+source for ε at the tile level. It would not, by itself, make ε a
+global invariant of the binary tiling.
 
 ### 11. What the calculation requires
 
@@ -351,12 +363,13 @@ parameters are: tile width w_k (Euclidean), tile height h_k,
 both determined by the binade structure. Express the result
 in terms of k and d. Compare with ε(k/2^d).
 
-If they match: ε has a geometric identity independent of its
-analytic form. The correction cost in Part II is then a
-functional of a hyperbolic area, and the computational ruler
-measures the cost of flattening curvature by finite-state
-means. The logarithm enters only as the coordinate in which
-the curvature has the form it has.
+If they match: ε has a per-tile geometric derivation independent
+of its analytic presentation. The correction cost in Part II may
+then be read as the cost of reducing a finite residual field whose
+entries come from hyperbolic tile geometry. The logarithm remains
+the coordinate in which that local field takes the form `ε`; this
+does not make the binary tiling itself carry a well-defined global
+curvature or invariant aggregate bulge area.
 
 If they do not match: determine whether the discrepancy is a
 monotone reparametrization (in which case the qualitative picture
