@@ -166,36 +166,38 @@ across it. These are not the same thing.
 
 ## 3. The exactness trap
 
-Step 1 of DISTANT-SHORES presents the triangle inequality as the
-foundation: `|APPROX − log₂| ≤ |APPROX − L| + |L − log₂|`. The
-decomposition is exact. The two terms share no degrees of freedom.
-This seems like bedrock.
+The project has exact identities at the coordinate level:
+`log₂(1+m) = m + ε(m)`, `Δ^L = -ε`, and the corresponding
+density-defect identities.
 
-But examine what the experimental program actually does. Steps 3–6
-compute walls by LP optimization, measuring `opt_err − free_err`
-directly. The LP never references the triangle inequality. It doesn't
-decompose error into "computable part plus known budget" — it solves
-for the best shared correction and reports the gap. The wall
-decomposition (parameter budget / layer sharing / automaton coupling)
-comes from comparing LP solutions at different sharing levels. None of
-this passes through Step 1.
+The trap is to let that exactness migrate upward and treat the
+correction problem as if it were exactly: "spend structure to
+cancel ε." But *the computational object is not ε itself*. Even in
+the free-per-cell regime, the optimal correction field `δ*` is
+produced by a minimax optimization against the target. In the
+shared regime, the wall is `dist(δ*, S)` for a model-dependent
+subspace `S`. Those steps are not identities.
 
-Step 1 provides a *conceptual frame*: "ε is the budget, corrections
-are withdrawals against it." But the actual measurements don't use
-this accounting. The triangle inequality is tight only when APPROX is
-worse than L everywhere — i.e., when the correction makes things worse
-at every point. Any correction that works at all produces partial
-cancellation between the terms, making the bound loose. The better the
-approximation, the looser the inequality. The foundation is most exact
-when it is least useful.
+So the doubt is about where exactness stops. Exact representation
+facts may explain why ε keeps reappearing, but they do not by
+themselves imply that computational cost is exact bookkeeping
+against an ε-budget. In particular, they do not yet justify claims
+such as:
 
-If you removed Step 1 from DISTANT-SHORES, Steps 2–6 would proceed
-unchanged. The geometric baseline, the subspace story, the wall, the
-exchange rate — none depend on the triangle decomposition. The
-"exactness" is real but may be load-bearing nothing. And if the
-conceptual foundation of the program is decorative rather than
-structural, the question is what the program's actual foundation is —
-and whether it has one.
+- the residual is literally the leftover part of ε after the machine
+  absorbs what it can;
+- each unit of structure removes a definite amount of ε;
+- the staircase or bind order is fixed by ε alone.
+
+Those statements may be approximately true, empirically stable, or
+true within a restricted family. But they are not inherited for
+free from the exact coordinate identities.
+
+The question is whether there is a theorem carrying exact structure
+from ε through the free optimum `δ*` and into the shared
+approximation problem, or whether we only have a chain of strong
+correlations and stable numerics. If the latter, then exactness
+explains recurrence, not cost. 
 
 ---
 
@@ -218,3 +220,25 @@ One can see this with an ideal lookup-table. At fixed depth (d), a full table yi
 (\Delta^L=-\varepsilon) organises the target (\delta^*). The wall is (\mathrm{dist}(\delta^*,S)). A correlation between the wall and (\varepsilon) therefore does not by itself show that (\varepsilon) governs the wall. It may show only that (\varepsilon) governs the target, while the chosen achievable set (S) governs what part of that target can be reached.
 
 On that reading, the wall inherits (\varepsilon)-structure because a structured target is being measured against a particular finite model. The forcing organises the demand. The model determines what can be supplied. These are not the same claim.
+
+---
+
+## 5. The non-factoring conversion
+
+Böröczky and later Radin show the binary tiling does not support a `PSL(2,R)`-invariant probability measure on the space of packings. Per-tile bookkeeping in this tiling is not preserved by hyperbolic isometries: a rigid motion can double the number of disks per tile without changing the geometry of the packing. Any argument that requires such sums or comparisons to be invariant under hyperbolic isometries is blocked.
+
+The project's geometric language — displacement field as curvature, delta table as connection, wall as curvature residual — is binade-local and survives this constraint tile by tile. The computational language — branching program width, parameter count, Fourier modes absorbed — is also safe on its own. The doubt is whether the geometric cost profile from `ε` and the machine-side coverage/combinatorics can be proved separately and then composed, or whether they must be analyzed jointly on the binary tiling.
+
+The computational ruler requires an exchange rate between structural cost (parameters, states) and approximation quality (error reduced). This doubt assumes the project's operating picture: one parameter spent near the `ε` peak buys more error reduction than one spent near the binade boundary, because the target is more curved there. Here "position" means the intra-binade coordinate `m`, equivalently a cell location in `[1,2)` or a tile location along a fixed row. The conversion factor — "how much quality does one unit of structure buy at position `m`?" — is therefore a local profile, determined by the shape of `ε` but realized through the machine's combinatorics.
+
+Establishing that local profile at a single depth `d` is a finite computation and is safe. The ruler requires the relevant depth-indexed conversion data to stabilize as `d` varies. The natural argument for stabilization passes through the tiling's refinement self-similarity: tiles at depth `d+1` refine those at depth `d`, and this is represented geometrically by the dyadic scaling `z ↦ 2z`. If stabilization requires that refinement to preserve per-tile costs in a way that is invariant under the geometric scaling, then the argument asks per-tile bookkeeping to be invariant under a hyperbolic isometry. Böröczky says it is not.
+
+There is a candidate escape: work entirely in function space. The Fourier coefficients of `ε` do not depend on `d`. Then stabilization would come from the analytic structure of a fixed function on `[0,1]`, not from self-similar bookkeeping in the tiling. The covering game would operate on `ε` as a function, not on counts or densities in the binary tiling. Whether this escape is available — whether the bound is tight without making the geometric and combinatorial parts jointly in the tiling language — is the doubt.
+
+If the problem factors, the proof should have three safe steps:
+
+1. derive a local cost profile from `ε`;
+2. derive a separate machine-side coverage or sharing bound;
+3. combine them without any global bookkeeping argument on the binary tiling.
+
+If it does not factor — if the tight bound requires knowing simultaneously which cells the machine visits and what the local cost is at each one, coupling path-combinatorics to position-weight along a row of tiles — then the proof needs exactly the kind of global bookkeeping on the binary tiling that Böröczky forbids.
