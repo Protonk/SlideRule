@@ -21,6 +21,7 @@ reckoning/            The intellectual reckoning
   DISTANT-SHORES.md     The destination: d_comp(τ)
   COVERING-GAME.md      Proof program for architecture-invariance
   COMPLEXITY-REEF.md    The complexity question: cost models and lower bounds
+  THE-TEST-OF-CHARYBDIS.md  Rotation check: is the wall target-driven or subspace-driven?
   ABYSSAL-DOUBT.md      Four doubts that shadow the program
   HERE-BE-DRAGONS.md    Speculative extensions (pentagonal tiling, duality)
   BINADE-WHITECAPS.md   Coordinate scaffold: ε triple identity

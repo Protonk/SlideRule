@@ -1,6 +1,9 @@
 # References
 
-## Pivot
+## Departure Point
+
+Matula, D. W. (1970). A formalization of floating-point numeric base
+conversion. *IEEE Transactions on Computers*, C-19(8), 681–692.
 
 Day, M. (2023). Generalising the fast reciprocal square root algorithm.
 arXiv:2307.15600. https://arxiv.org/abs/2307.15600
@@ -38,10 +41,13 @@ faithful rounding. *IEEE Transactions on Circuits and Systems I:
 Regular Papers*, 64(5), 1187–1200.
 https://doi.org/10.1109/TCSI.2016.2629850
 
-## Departure Point
+## Test of Charybdis
 
-Matula, D. W. (1970). A formalization of floating-point numeric base
-conversion. *IEEE Transactions on Computers*, C-19(8), 681–692.
+O'Donnell, R. (2014). *Analysis of Boolean Functions*. Cambridge
+University Press.
+
+Vershynin, R. (2026). *High-Dimensional Probability: An Introduction
+with Applications in Data Science*. 2nd ed. Cambridge University Press.
 
 ## Binade Whitecaps
 

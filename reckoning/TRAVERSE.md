@@ -70,7 +70,8 @@ the first bit splits the domain at its midpoint (additive), while the
 logarithm's natural split is the geometric mean (multiplicative).
 This mismatch is representation-intrinsic. Whether the *cost* of the
 mismatch is also representation-intrinsic is what Steps 5–6 must
-establish. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4.
+establish. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4 and
+[THE-TEST-OF-CHARYBDIS](THE-TEST-OF-CHARYBDIS.md).
 
 ## Step 3. The forcing — Done
 
