@@ -381,6 +381,42 @@ depends on partition geometry, which would itself be informative.
 
 ---
 
+## 5b. Current results (2026-03-24)
+
+The rotation check has been run. Results are in
+[`experiments/rotation/ROTATION.md`](../experiments/rotation/ROTATION.md)
+(main sweep + adversary sweep) and
+[`experiments/rotation/spectral/`](../experiments/rotation/spectral/)
+(Walsh spectral experiment).
+
+**Wall magnitude.** The FSM is atypical (quantile 0.000) in all 84
+tested configurations: 72 baseline (depths 5–8 × q 2,3,4 × 3
+partition kinds × LI/LD) plus 12 adversary (6 partitions × depths 7,8
+× q=3 × LI). No adversary partition eroded the advantage. Stern-Brocot
+— the partition with the most intricate sharing structure — gave the
+FSM its *largest* relative advantage (wall\_z = −15,062 at d=8).
+
+**ξ\_n.** The FSM is atypical in most configurations at depth ≥ 7,
+but the sign depends on partition geometry, q, and depth in a
+structured way. The sign is not a single-direction story.
+
+**Walsh shape.** The FSM's normalised Walsh profile is qualitatively
+different from random subspaces (JSD quantile = 1.000 in all 57
+spectral configurations at d=9). The spectral experiment established
+that this shape is *induced* by the shared minimax projection: the
+upstream spectra P(ε) and P(δ\*) are concentrated at level 0, while
+the residual spectrum P(r\_FSM) is spread across multiple interaction
+orders. The shared approximation creates bit-interaction structure
+that was not present in the target.
+
+The outcome is "multiple atypical" (§4): wall, ξ\_n, and Walsh
+profile are all atypical, in different ways. The next question —
+what determines the FSM's spectral fingerprint — is addressed by
+the structured null families (§6) and the spectral experiment's
+geometry-vs-placement analysis.
+
+---
+
 ## 6. Structured null families
 
 The Grassmannian ensemble tests the FSM against subspaces with

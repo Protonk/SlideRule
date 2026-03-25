@@ -74,6 +74,15 @@ mismatch is also representation-intrinsic is what Steps 5–6 must
 establish. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4 and
 [THE-TEST-OF-CHARYBDIS](THE-TEST-OF-CHARYBDIS.md).
 
+The Charybdis rotation check (2026-03-24) established that the FSM's
+wall is not a generic consequence of subspace dimension: random
+subspaces of the same dimension produce much larger walls (quantile
+0.000 in 84 configurations including adversary partitions). The FSM's
+subspace orientation is special. The Walsh spectral experiment further
+showed that the shared minimax projection induces bit-interaction
+structure not present in the target. See
+[ROTATION.md](../experiments/rotation/ROTATION.md).
+
 ## Step 3. The forcing — Done
 
 Δ^L(m) = m − log₂(1+m) = −ε(m) organises the free-per-cell intercept

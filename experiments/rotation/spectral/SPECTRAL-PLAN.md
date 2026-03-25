@@ -23,9 +23,9 @@ Benchmarked on this machine (2026-03-24):
 | 10 | 1024 | 5.5 | 0.019 | 15 |
 
 All five Phase A partitions extract successfully at d=9.
-Estimated Phase A runtime: 25 configs × ~9s = ~4 minutes.
+Estimated Phase A runtime: 30 configs × ~9s = ~5 minutes.
 Estimated Phase B runtime: 15 configs × ~18s (1000 draws) = ~5 minutes.
-Estimated Phase C runtime: 10 new LD configs × ~9s = ~2 minutes.
+Estimated Phase C runtime: 12 new LD configs × ~9s = ~2 minutes.
 
 No infrastructure changes are needed.
 
@@ -44,8 +44,14 @@ No infrastructure changes are needed.
   - `harmonic_x`
   - `reverse_geometric_x`
   - `bitrev_geometric_x`
+  - `stern_brocot_x`
 
-`25` configurations.
+`30` configurations.
+
+`stern_brocot_x` was added after the adversary sweep found it produces
+an anomalous Walsh profile at d=8 q=3 LI: energy at levels 5 and 7
+(P5=0.249, P7=0.306), unlike any other tested partition. This needs
+to be checked at d=9 and across q values.
 
 ### Phase B: Ensemble tightening
 
@@ -68,16 +74,16 @@ rather than at a deeper depth.
 - Depth: `9`
 - q: `3, 4`
 - Modes: `LI`, `LD`
-- Partitions: same five as Phase A
+- Partitions: same six as Phase A
 
-`20` configurations. Of these, 10 (the LI half) overlap with Phase A.
-If Phase A has already run, Phase C adds only the 10 LD configurations.
+`24` configurations. Of these, 12 (the LI half) overlap with Phase A.
+If Phase A has already run, Phase C adds only the 12 LD configurations.
 
 q=3 is the anomalous case; q=4 is the comparison because the d=8
 sweep showed it has intermediate tail mass (between q=2's zero and
 q=3's maximum).
 
-Total unique configurations if all phases run: `50` (`60` minus `10`
+Total unique configurations if all phases run: `57` (`69` minus `12`
 Phase A/C overlap).
 
 ---
@@ -87,7 +93,8 @@ Phase A/C overlap).
 Use:
 
 - `500` draws for Phase A;
-- `400` draws for Phases B and C unless runtime forces a reduction.
+- `1000` draws for Phase B (the point of Phase B is a tighter null);
+- `500` draws for Phase C.
 
 For this experiment, spend budget on the ensemble rather than on a
 larger partition zoo.
@@ -293,12 +300,10 @@ design is actually answering the intended question.
 After Phase A, check:
 
 1. Does q=3 still show anomalous tail mass at d=9?  If not, the
-   depth-8 finding may be a finite-depth artifact and Phase B is
-   essential.
+   depth-8 finding may be a finite-depth artifact.
 2. Do `reverse_geometric_x` and `bitrev_geometric_x` separate?
    If their profiles are indistinguishable, geometry-vs-placement
-   is not the right axis and Phase B's partition choice may need
-   revision.
+   is not the right axis and Phase B should focus elsewhere.
 3. Is the shape statistic (JSD or cosine) discriminating?  If the
    FSM's JSD is within the bulk of the null, per-level quantiles
    may be telling the whole story and the shape machinery adds

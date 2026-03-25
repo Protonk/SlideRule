@@ -51,6 +51,8 @@ automatic "typical/atypical" labels.
 |--------|-------------|
 | `charybdis_check.sage` | Extraction layer + projection + statistics + validation tests |
 | `charybdis_sweep.sage` | Multi-configuration ensemble sweep |
+| `adversary_sweep.sage` | Adversary partition sweep (6 partitions × d=7,8) |
+| `charybdis_plots.sage` | Wall scaling and ξ\_n sign map plots |
 
 Run any with `./sagew experiments/rotation/<script>`.
 
@@ -73,7 +75,10 @@ load(pathing('experiments', 'rotation', 'charybdis_sweep.sage'))
 
 ```
 results/
-  charybdis_sweep.csv   72 configurations × 300 random draws
+  charybdis_sweep.csv       72 configurations × 300 random draws
+  adversary_sweep.csv       12 adversary configurations × 300 draws
+  wall_zscore_scaling.png   Wall z-score vs depth (LI/LD facets)
+  xi_signmap_d8.png         ξ_n z-score heatmap at depth 8
 ```
 
 **CSV schema:**

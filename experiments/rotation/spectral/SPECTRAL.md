@@ -70,11 +70,12 @@ This is the discovery pass.
   - `harmonic_x`
   - `reverse_geometric_x`
   - `bitrev_geometric_x`
+  - `stern_brocot_x`
 
-This is `25` configurations.
+This is `30` configurations.
 
-These five partitions are chosen because they vary interpretable axes
-without importing the adversarial story:
+Five partitions vary interpretable axes without importing the
+adversarial story:
 
 - `geometric_x`: multiplicative/log baseline;
 - `uniform_x`: additive baseline;
@@ -82,11 +83,17 @@ without importing the adversarial story:
 - `reverse_geometric_x`: same geometric widths, different spatial placement;
 - `bitrev_geometric_x`: same geometric widths, different address placement.
 
-### Phase B: Depth confirmation
+`stern_brocot_x` is imported from the adversary sweep, where it
+produced an anomalous Walsh profile at d=8 (energy at levels 5 and 7).
+It is included to check whether that pattern persists at d=9 and
+across q values.
+
+### Phase B: Ensemble tightening
 
 This is the stability pass.
 
-- Depth: `d = 10`
+- Depth: `d = 9`
+- Draws: `1000` (double Phase A)
 - q: `2, 3, 4, 5, 6`
 - Mode: `LI` only
 - Partitions:
@@ -96,17 +103,18 @@ This is the stability pass.
 
 This is `15` configurations.
 
-Its purpose is not discovery. It checks whether the depth-9 Walsh
-patterns survive another depth on the cleanest geometry/placement axis.
+Its purpose is not discovery. It checks whether the Phase A shape
+findings are stable under a larger null sample, focused on the
+geometry/placement axis.
 
 ### Phase C: Sharing contrast
 
 This is the mechanism pass.
 
 - Depth: `d = 9`
-- q: `3, 5`
+- q: `3, 4`
 - Modes: `LI`, `LD`
-- Partitions: the same five as Phase A
+- Partitions: the same six as Phase A
 
 This is `20` configurations.
 

@@ -117,24 +117,82 @@ For each configuration, save:
 
 ### Baseline comparison
 
-Do not hard-code the baseline story into the plan. Before running the
-adversaries, copy the exact d=7 and d=8, q=3, LI rows from the current
-Charybdis sweep into a small reference table:
+From the main Charybdis sweep (d=7,8 q=3 LI):
 
-- `wall_fsm`, `wall_quantile`, `wall_zscore`;
-- `xi_fsm`, `xi_quantile`, `xi_zscore`;
-- fallback counts.
-
-The point is to compare adversaries to the actual current baselines,
-not to a remembered sign narrative.
+| Kind | d | wall\_z | xi\_z |
+|------|---|--------|-------|
+| geometric\_x | 7 | −595 | +16 |
+| uniform\_x | 7 | −695 | +52 |
+| harmonic\_x | 7 | −379 | −33 |
+| geometric\_x | 8 | −2149 | −113 |
+| uniform\_x | 8 | −2755 | −59 |
+| harmonic\_x | 8 | −1433 | −165 |
 
 ---
 
-## Summary: what to run
+## Results (2026-03-24)
+
+Output: `results/adversary_sweep.csv`.
+Script: `adversary_sweep.sage`. 12 configs × 300 draws, 39 seconds.
+
+| Kind | d | wall\_z | xi\_z | wall\_ratio |
+|------|---|--------|-------|------------|
+| farey\_rank\_x | 7 | −905 | +30 | 0.368 |
+| bitrev\_geometric\_x | 7 | −692 | +41 | 0.427 |
+| stern\_brocot\_x | 7 | −3527 | +17 | 0.286 |
+| scramble\_x | 7 | −779 | +37 | 0.421 |
+| random\_x | 7 | −942 | +1 | 0.451 |
+| cantor\_x | 7 | −244 | −12 | 0.454 |
+| farey\_rank\_x | 8 | −2819 | −44 | 0.404 |
+| bitrev\_geometric\_x | 8 | −2739 | −54 | 0.451 |
+| stern\_brocot\_x | 8 | −15062 | −87 | 0.319 |
+| scramble\_x | 8 | −3210 | −57 | 0.455 |
+| random\_x | 8 | −2793 | −59 | 0.446 |
+| cantor\_x | 8 | −825 | −47 | 0.475 |
+
+`wall_ratio` = wall\_fsm / median(wall\_rand).
+
+### Reading the results
+
+**Wall: no adversary came close.** All 12 configurations have
+wall quantile = 0.000. The FSM wins everywhere, including on the
+null partition (`random_x`). The wall advantage is intrinsic to the
+FSM's subspace orientation, not to partition-FSM alignment.
+
+Stern-Brocot is the strongest result, not the weakest: wall\_z =
+−15062 at d=8, the most extreme z-score in the entire project.
+Its wall\_ratio (0.319) means the FSM achieves only 32% of the
+median random wall. The partition with the most intricate sharing
+structure gives the FSM its largest relative advantage.
+
+Cantor is the weakest adversary (smallest |wall\_z|), but still
+massively atypical (z = −825 at d=8).
+
+**ξ\_n: sign flip between d=7 and d=8.** At d=7, most adversaries
+have positive ξ\_n z-scores (FSM residual more ε-structured than
+random). At d=8, all adversaries flip to strongly negative z-scores
+(FSM residual less ε-structured). This matches the baseline pattern:
+the d=7→d=8 sign flip is not partition-specific.
+
+The one exception at d=7 is cantor\_x (z = −12), which is already
+negative at d=7. Cantor's fractal structure may interact differently
+with the FSM's binary refinement.
+
+random\_x at d=7 is nearly typical (z = +0.77), the only
+configuration in the entire project where ξ\_n is not clearly
+atypical. At d=8 it becomes strongly atypical (z = −59).
+
+**Walsh at d=8, stern\_brocot\_x:** The Walsh profile is
+unusual — energy at levels 5 and 7 (P5 = 0.249, P7 = 0.306),
+unlike any baseline or other adversary. This may reflect the
+Stern-Brocot tree's interaction with the mod-3 automaton.
+
+---
+
+## Summary
 
 | Experiment | Configs | Draws | Purpose |
 |---|---|---|---|
-| Adversary sweep | 12 | 300 | Wall + ξ_n on nasty partitions |
+| Adversary sweep | 12 | 300 | Wall + ξ\_n on nasty partitions |
 
-Total new computation for this plan: `12` configurations × `300`
-draws each.
+Total computation: `12` configurations × `300` draws, `39` seconds.
