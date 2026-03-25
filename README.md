@@ -21,8 +21,8 @@ reckoning/            The intellectual reckoning
   ETAK.md               The far horizon: wall to algebraic independence
   INTERRUPTED-LOG.md    Step-5 zoo-surgery stress test
   COMPLEXITY-REEF.md    The complexity question: cost models and lower bounds
-  THE-TEST-OF-CHARYBDIS.md  Rotation check: is the wall target-driven or subspace-driven?
-  ABYSSAL-DOUBT.md      Four doubts that shadow the program
+  CHARYBDIS.md          Rotation check: is the wall target-driven or subspace-driven?
+  ABYSSAL-DOUBT.md      Doubts that shadow the program
   HERE-BE-DRAGONS.md    Speculative extensions (pentagonal tiling, duality)
   BINADE-WHITECAPS.md   Coordinate scaffold: ε triple identity
   POINCARE-CURRENTS.md  Displacement field and staircase prediction
@@ -40,7 +40,7 @@ experiments/          Runnable sweeps, visualizations, and analysis
   stepstone/            Chord error structure
   ripple/               Coastline area convergence
   rotation/             Charybdis rotation check (subspace typicality)
-  elementals/           Explanatory figures
+elementals/           Explanatory figures
 lib/                  Shared math modules (paths, day, partitions, ...)
 helpers/              Import helper (pathing.py)
 tests/                Test suite (run via ./sagew tests/run_tests.sage)

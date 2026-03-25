@@ -43,7 +43,7 @@ examples rather than renegotiating scope each time.
 
 - Subfolder paths are ASCII: `poincare/`, `subspace/`, `staircase/`
 - Display names use proper typography in docs and figure text (Poincaré)
-- Outputs live in `experiments/elementals/<subfolder>/results/`
+- Outputs live in `elementals/<subfolder>/results/`
 - Figure IDs are stable and appear in filenames
 
 ## How to add a figure
@@ -67,7 +67,7 @@ Every elemental script satisfies:
   drawn, and output path.
 - **Computation:** loads shared helpers via `helpers/pathing.py`, uses
   closed-form functions, does not reach into optimizer pipelines.
-- **Output:** writes to `experiments/elementals/<subfolder>/results/`.
+- **Output:** writes to `elementals/<subfolder>/results/`.
 - **Annotation:** if a quantity is scaled, normalized, or used only up to
   shape equivalence, the caption or docstring says so explicitly.
 - **Done when:** the script runs from repo root with `./sagew`, the

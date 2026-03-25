@@ -224,7 +224,7 @@ The most informative negative outcome would be:
 
 ## Reading Inward
 
-- [`THE-TEST-OF-CHARYBDIS.md`](../../../reckoning/THE-TEST-OF-CHARYBDIS.md):
+- [`CHARYBDIS.md`](../../../reckoning/CHARYBDIS.md):
   why Walsh entered the project at all.
 - [`ROTATION.md`](../ROTATION.md):
   the completed Charybdis sweep that motivates this follow-on.

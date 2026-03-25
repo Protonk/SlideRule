@@ -72,7 +72,7 @@ logarithm's natural split is the geometric mean (multiplicative).
 This mismatch is representation-intrinsic. Whether the *cost* of the
 mismatch is also representation-intrinsic is what Steps 5–6 must
 establish. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4 and
-[THE-TEST-OF-CHARYBDIS](THE-TEST-OF-CHARYBDIS.md).
+[CHARYBDIS](CHARYBDIS.md).
 
 The Charybdis rotation check (2026-03-24) established that the FSM's
 wall is not a generic consequence of subspace dimension: random

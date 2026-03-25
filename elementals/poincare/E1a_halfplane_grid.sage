@@ -13,9 +13,9 @@ Mathematical objects drawn:
     - Tiling cells formed by their intersections
     - Scaling arrow showing (x, y) -> (2x, 2y) isometry
 
-Output: experiments/elementals/poincare/results/E1a_halfplane_grid.png
+Output: elementals/poincare/results/E1a_halfplane_grid.png
 
-Run:  ./sagew experiments/elementals/poincare/E1a_halfplane_grid.sage
+Run:  ./sagew elementals/poincare/E1a_halfplane_grid.sage
 """
 
 import os
@@ -30,7 +30,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 
 
-OUT_PATH = pathing('experiments', 'elementals', 'poincare', 'results',
+OUT_PATH = pathing('elementals', 'poincare', 'results',
                     'E1a_halfplane_grid.png')
 
 # -- Colors ----------------------------------------------------------------

@@ -4,7 +4,7 @@ Purpose: test whether the FSM's wall is special relative to random
 subspaces of the same dimension — the Test of Charybdis.
 
 Reading inward: depends on
-[`THE-TEST-OF-CHARYBDIS.md`](../../reckoning/THE-TEST-OF-CHARYBDIS.md)
+[`CHARYBDIS.md`](../../reckoning/CHARYBDIS.md)
 for the experimental design and
 [`ABYSSAL-DOUBT.md`](../../reckoning/ABYSSAL-DOUBT.md) §4 for the doubt
 this experiment responds to.
@@ -161,7 +161,7 @@ was not observed.
 
 ## Reading outward
 
-- [`THE-TEST-OF-CHARYBDIS.md`](../../reckoning/THE-TEST-OF-CHARYBDIS.md):
+- [`CHARYBDIS.md`](../../reckoning/CHARYBDIS.md):
   the experimental design.
 - [`ABYSSAL-DOUBT.md`](../../reckoning/ABYSSAL-DOUBT.md) §4: the doubt
   this experiment addresses.

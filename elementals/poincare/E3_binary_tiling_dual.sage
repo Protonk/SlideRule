@@ -12,9 +12,9 @@ Mathematical objects drawn:
     - Geodesic arcs (semicircles centered on the x-axis) forming
       the dual cell boundaries
 
-Output: experiments/elementals/poincare/results/E3_binary_tiling_dual.png
+Output: elementals/poincare/results/E3_binary_tiling_dual.png
 
-Run:  ./sagew experiments/elementals/poincare/E3_binary_tiling_dual.sage
+Run:  ./sagew elementals/poincare/E3_binary_tiling_dual.sage
 """
 
 import os
@@ -29,7 +29,7 @@ from matplotlib.patches import Polygon
 import numpy as np
 
 
-OUT_PATH = pathing('experiments', 'elementals', 'poincare', 'results',
+OUT_PATH = pathing('elementals', 'poincare', 'results',
                     'E3_binary_tiling_dual.png')
 
 # -- Configuration --------------------------------------------------------

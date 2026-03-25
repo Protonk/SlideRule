@@ -43,7 +43,7 @@ An audited reconstruction record consisting of:
 ### Secondary deliverable
 
 A revised
-`experiments/elementals/poincare/E3_binary_tiling_dual.sage`
+`elementals/poincare/E3_binary_tiling_dual.sage`
 that renders an image matching the reference closely enough to support
 the reconstruction claims.
 
@@ -87,7 +87,7 @@ Examples of entries:
 Do not overwrite failed reasoning. Preserve attempts in a dedicated
 results area, for example:
 
-- `experiments/elementals/poincare/results/E3_binary_tiling_dual_attempts/`
+- `elementals/poincare/results/E3_binary_tiling_dual_attempts/`
 
 Suggested naming:
 
@@ -534,9 +534,9 @@ became credible.
 |------|------|
 | `exterior/eppstein/binary/Binary-tiling-dual.svg` | Source SVG |
 | `exterior/eppstein/binary/Binary-tiling-dual.svg.png` | Reference PNG |
-| `experiments/elementals/poincare/E3_binary_tiling_dual.sage` | Renderer under revision |
-| `experiments/elementals/poincare/results/E3_binary_tiling_dual.png` | Current/final output |
-| `experiments/elementals/poincare/results/E3_binary_tiling_dual_attempts/` | Preserved attempt artifacts and notes |
+| `elementals/poincare/E3_binary_tiling_dual.sage` | Renderer under revision |
+| `elementals/poincare/results/E3_binary_tiling_dual.png` | Current/final output |
+| `elementals/poincare/results/E3_binary_tiling_dual_attempts/` | Preserved attempt artifacts and notes |
 | This file | Reconstruction and audit plan |
 
 The existing `E3_binary_tiling_dual.sage` should be revised in place,

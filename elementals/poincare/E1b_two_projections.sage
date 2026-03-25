@@ -18,9 +18,9 @@ Mathematical objects drawn:
 No displacement magnitude, no epsilon overlay. Just the two readings
 of one grid.
 
-Output: experiments/elementals/poincare/results/E1b_two_projections.png
+Output: elementals/poincare/results/E1b_two_projections.png
 
-Run:  ./sagew experiments/elementals/poincare/E1b_two_projections.sage
+Run:  ./sagew elementals/poincare/E1b_two_projections.sage
 """
 
 import os
@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-OUT_PATH = pathing('experiments', 'elementals', 'poincare', 'results',
+OUT_PATH = pathing('elementals', 'poincare', 'results',
                     'E1b_two_projections.png')
 
 

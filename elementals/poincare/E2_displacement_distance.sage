@@ -15,9 +15,9 @@ Mathematical objects drawn:
     geometric height), connected by segments whose length is d_hyp.
     Bottom panel: d_hyp(m) as a curve, showing it has the epsilon shape.
 
-Output: experiments/elementals/poincare/results/E2_displacement_distance.png
+Output: elementals/poincare/results/E2_displacement_distance.png
 
-Run:  ./sagew experiments/elementals/poincare/E2_displacement_distance.sage
+Run:  ./sagew elementals/poincare/E2_displacement_distance.sage
 """
 
 import os
@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-OUT_PATH = pathing('experiments', 'elementals', 'poincare', 'results',
+OUT_PATH = pathing('elementals', 'poincare', 'results',
                     'E2_displacement_distance.png')
 
 
