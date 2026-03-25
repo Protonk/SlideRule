@@ -168,36 +168,63 @@ across it. These are not the same thing.
 
 The project has exact identities at the coordinate level:
 `log₂(1+m) = m + ε(m)`, `Δ^L = -ε`, and the corresponding
-density-defect identities.
+density-defect identities. This invites us to see the triangle 
+inequality as the foundation: 
+`|APPROX − log₂| ≤ |APPROX − L| + |L − log₂|`. An exact
+decomposition with two terms share no degrees of freedom.
+This seems like bedrock.
 
-The trap is to let that exactness migrate upward and treat the
-correction problem as if it were exactly: "spend structure to
-cancel ε." But *the computational object is not ε itself*. Even in
+But the project does not measure errors pointwise. The wall is an
+L∞ norm. The LP solves a minimax problem. The staircase is read off
+norm-level quantities. The moment you pass from the pointwise bound
+to a norm, the operative inequality is not the triangle inequality
+but Minkowski's:
+
+    ‖APPROX − log₂‖_p ≤ ‖APPROX − L‖_p + ‖ε‖_p
+
+Minkowski's inequality *is* the triangle inequality in Lp, but its
+equality conditions are not the pointwise conditions. For
+p ∈ [1, ∞), Minkowski is tight if and only if the two error
+components are positively linearly dependent as functions — one is a
+non-negative scalar multiple of the other.
+
+For p = ∞, the condition
+is different and more permissive: the sup of the sum must be
+achieved where both components attain their individual sups with the
+same sign. Neither condition is generically satisfied by a
+correction that is doing useful work. Any correction that reduces
+error in some cells while leaving others unchanged breaks positive
+linear dependence; any correction whose worst-case cell differs from
+ε's worst-case cell breaks the L∞ condition.
+
+Hölder's inequality is the companion fact. It governs the
+relationship between different Lp norms of the same function, and
+it is what controls the L¹/L∞ conversion that Dragon 4 requires.
+The two inequalities — Minkowski for the decomposition, Hölder for
+the norm comparison — are not incidental tools. They are the
+functional-analytic substrate that Step 1's pointwise split must
+pass through to reach the normed quantities the project actually
+measures.
+
+### 3a. Exactness migrates without permission
+
+Another trap is to let exactness migrate upward from the identities 
+and treat the correction problem as exact bookkeeping: 
+'spend structure to cancel ε' But *the computational object is not ε itself*. Even in
 the free-per-cell regime, the optimal correction field `δ*` is
 produced by a minimax optimization against the target. In the
 shared regime, the wall is `dist(δ*, S)` for a model-dependent
 subspace `S`. Those steps are not identities.
 
-So the doubt is about where exactness stops. Exact representation
-facts may explain why ε keeps reappearing, but they do not by
-themselves imply that computational cost is exact bookkeeping
-against an ε-budget. In particular, they do not yet justify claims
-such as:
+Exact representation facts may explain why ε keeps reappearing, 
+but they do not by themselves imply that computational 
+cost is exact bookkeeping against an ε-budget. 
+In particular, they do not yet justify claims such as:
 
 - the residual is literally the leftover part of ε after the machine
   absorbs what it can;
 - each unit of structure removes a definite amount of ε;
 - the staircase or bind order is fixed by ε alone.
-
-Those statements may be approximately true, empirically stable, or
-true within a restricted family. But they are not inherited for
-free from the exact coordinate identities.
-
-The question is whether there is a theorem carrying exact structure
-from ε through the free optimum `δ*` and into the shared
-approximation problem, or whether we only have a chain of strong
-correlations and stable numerics. If the latter, then exactness
-explains recurrence, not cost. 
 
 ---
 
