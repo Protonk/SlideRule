@@ -32,7 +32,7 @@ EXPONENT = '1/2'
 P_NUM = 1
 Q_DEN = 2
 
-PERCELL_PATH = pathing('experiments', 'keystone', 'results', RUN_TAG, 'percell.csv')
+PERCELL_PATH = pathing('experiments', 'aft', 'keystone', 'results', RUN_TAG, 'percell.csv')
 OUT_PATH = pathing('experiments', 'wall', 'results', 'wall_excess_ribbons.png')
 
 SHORT = {

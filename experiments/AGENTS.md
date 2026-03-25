@@ -1,5 +1,20 @@
 # Experiments subdirectory protocol
 
+## Directory tiers
+
+Experiments are sorted into three tiers:
+
+- **root** (`experiments/`): active experiments near the current TRAVERSE
+  step. New work goes here.
+- **`aft/`**: concluded experiments whose results are depended on but
+  that are not being extended. Archival, not dead.
+- **`fore/`**: experiments whose main articulation is ahead of us.
+  Written but not yet fully exploited.
+
+New experiments start at root. Move to `aft/` when the hypothesis is
+resolved and no further sweeps are planned. Move to `fore/` when the
+experiment exists but its primary use case is a future TRAVERSE step.
+
 ## When to create a new subdirectory
 
 Create a new subdirectory when a new line of investigation meets all of:
@@ -41,9 +56,9 @@ artifacts they describe — not in a central file. To find sweep evidence for a
 hypothesis:
 
 1. Look for a `README.md` inside dated run directories
-   (e.g. `keystone/results/keystone_2026-03-11/README.md`).
+   (e.g. `aft/keystone/results/keystone_2026-03-11/README.md`).
 2. Look for topic-level report files in `results/`
-   (e.g. `keystone/results/h1_report.md`).
+   (e.g. `aft/keystone/results/h1_report.md`).
 3. For runs whose artifacts exist only in git history, check
    `results/historical.md`.
 

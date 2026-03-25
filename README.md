@@ -32,14 +32,15 @@ reckoning/            The intellectual reckoning
   AGENTS.md             Epistemological guidance for the reckoning
 experiments/          Runnable sweeps, visualizations, and analysis
   EXPERIMENTS.md        Experiment areas + hypothesis registry
-  keystone/             Partition comparison (K1–K3) and thesis
-  wall/                 Wall obstruction model and diagnostics
-    damage/             Foreign-error analysis
-  tiling/               Displacement field tests and basis identification
-  alternation/          Sign-pattern analysis
-  stepstone/            Chord error structure
-  ripple/               Coastline area convergence
-  rotation/             Charybdis rotation check (subspace typicality)
+  wall/                 Wall obstruction model and diagnostics (active)
+  tiling/               Displacement field tests and basis identification (active)
+  aft/                  Concluded experiments (results depended on, not extending)
+    keystone/           Partition comparison (K1–K3) and thesis
+    rotation/           Charybdis rotation check (subspace typicality)
+    alternation/        Sign-pattern analysis
+    stepstone/          Chord error structure + coastline convergence
+  fore/                 Experiments whose main articulation is ahead
+    counterfactual/     Foreign-error / counterfactual chord sharing
 elementals/           Explanatory figures
 lib/                  Shared math modules (paths, day, partitions, ...)
 helpers/              Import helper (pathing.py)

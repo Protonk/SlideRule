@@ -22,7 +22,7 @@ Plan meaningful changes in temporary `PLAN.md` files, local to the activity bein
 >All commands from project root. 
 
 ```sh
-./sagew experiments/keystone/partition_sweep.sage   # run a sweep
+./sagew experiments/aft/keystone/partition_sweep.sage   # run a sweep
 ./sagew tests/run_tests.sage                        # run tests
 ./sagew                                             # bare Sage REPL
 ```

@@ -30,7 +30,7 @@ def _quad_coastline_area(depth, kind):
 
 # ── Load the production implementation ───────────────────────────────
 
-load(pathing('experiments', 'ripple', 'coastline.sage'))
+load(pathing('experiments', 'coastline_series.sage'))
 
 
 # ── Test helpers ─────────────────────────────────────────────────────

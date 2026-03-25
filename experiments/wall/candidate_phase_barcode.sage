@@ -26,7 +26,7 @@ KIND = 'geometric_x'
 Q = 3
 DEPTH = 6
 EXPONENT = '1/2'
-PERCELL_PATH = pathing('experiments', 'keystone', 'results', RUN_TAG, 'percell.csv')
+PERCELL_PATH = pathing('experiments', 'aft', 'keystone', 'results', RUN_TAG, 'percell.csv')
 OUT_PATH = pathing('experiments', 'wall', 'results', 'candidate_phase_barcode.png')
 
 TYPE_COLORS = {

@@ -81,7 +81,7 @@ subspaces of the same dimension produce much larger walls (quantile
 subspace orientation is special. The Walsh spectral experiment further
 showed that the shared minimax projection induces bit-interaction
 structure not present in the target. See
-[ROTATION.md](../experiments/rotation/ROTATION.md).
+[ROTATION.md](../experiments/aft/rotation/ROTATION.md).
 
 ## Step 3. The forcing — Done
 

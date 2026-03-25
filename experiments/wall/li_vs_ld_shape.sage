@@ -6,8 +6,7 @@ layer-dependent optima. H1d observes "LI concentrated, LD diffuse" —
 this script makes that visible.
 
 Uses existing joined_layer_modes.csv for gap reduction data, plus
-h1a_gap_vs_q.csv for sparsity trends. Optionally loads delta_tables
-output if available.
+h1a_gap_vs_q.csv for sparsity trends.
 
 Run:  ./sagew experiments/wall/li_vs_ld_shape.sage
 """
@@ -28,8 +27,8 @@ import numpy as np
 
 JOINED_PATH = pathing('experiments', 'wall', 'results',
                       'joined_layer_modes.csv')
-H1A_PATH = pathing('experiments', 'keystone', 'results', 'h1a_gap_vs_q.csv')
-H1C_PATH = pathing('experiments', 'keystone', 'results',
+H1A_PATH = pathing('experiments', 'aft', 'keystone', 'results', 'h1a_gap_vs_q.csv')
+H1C_PATH = pathing('experiments', 'aft', 'keystone', 'results',
                     'h1c_layer_dependent.csv')
 
 OUT_PATH = pathing('experiments', 'wall', 'results', 'li_vs_ld_shape.png')

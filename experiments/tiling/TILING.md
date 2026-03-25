@@ -275,5 +275,5 @@ analysis.
   this framework addresses.
 - [`WALL.md`](../wall/WALL.md): the wall decomposition and displacement
   analysis.
-- [`KEYSTONE.md`](../keystone/KEYSTONE.md) §2: the surrogate error `ε(m)` that
+- [`KEYSTONE.md`](../aft/keystone/KEYSTONE.md) §2: the surrogate error `ε(m)` that
   `Δ^L` turns out to equal.

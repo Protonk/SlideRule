@@ -204,7 +204,7 @@ This is a case-based decomposition, not yet a theorem.
 ## Reading outward
 
 - For the repo-level thesis and why partition choice matters, read
-  [`KEYSTONE.md`](../keystone/KEYSTONE.md).
+  [`KEYSTONE.md`](../aft/keystone/KEYSTONE.md).
 - For status labels and next tests, read [`EXPERIMENTS.md`](../EXPERIMENTS.md).
 - For the sweep tables and dated observations behind this decomposition, see
-  the run-level reports inside [`keystone/results/`](../keystone/results/).
+  the run-level reports inside [`keystone/results/`](../aft/keystone/results/).

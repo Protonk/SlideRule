@@ -18,8 +18,8 @@ from helpers import pathing
 # ── Configuration ────────────────────────────────────────────────────
 
 SUMMARY_SOURCES = [
-    pathing('experiments', 'keystone', 'results', 'wall_surface_2026-03-18', 'summary.csv'),
-    pathing('experiments', 'keystone', 'results', 'partition_2026-03-18', 'summary.csv'),
+    pathing('experiments', 'aft', 'keystone', 'results', 'wall_surface_2026-03-18', 'summary.csv'),
+    pathing('experiments', 'aft', 'keystone', 'results', 'partition_2026-03-18', 'summary.csv'),
 ]
 
 OUT_PATH = pathing('experiments', 'wall', 'results', 'enriched_summary.csv')

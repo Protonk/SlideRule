@@ -384,9 +384,9 @@ depends on partition geometry, which would itself be informative.
 ## 5b. Current results (2026-03-24)
 
 The rotation check has been run. Results are in
-[`experiments/rotation/ROTATION.md`](../experiments/rotation/ROTATION.md)
+[`experiments/aft/rotation/ROTATION.md`](../experiments/aft/rotation/ROTATION.md)
 (main sweep + adversary sweep) and
-[`experiments/rotation/spectral/`](../experiments/rotation/spectral/)
+[`experiments/aft/rotation/spectral/`](../experiments/aft/rotation/spectral/)
 (Walsh spectral experiment).
 
 **Wall magnitude.** The FSM is atypical (quantile 0.000) in all 84

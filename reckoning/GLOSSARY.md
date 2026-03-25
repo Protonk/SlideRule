@@ -29,7 +29,7 @@ integer, unlike the project's alpha which is a rational in (0, 1).
 The sequence of signs `{+, −}^N` across the N = 2^depth cells, derived from
 the displacement: `sign_j = sgn(displacement_j)`. This is the spatial
 fingerprint of the wall. See
-[`experiments/alternation/ALTERNATION.md`](../experiments/alternation/ALTERNATION.md).
+[`experiments/aft/alternation/ALTERNATION.md`](../experiments/aft/alternation/ALTERNATION.md).
 
 ## automaton coupling
 
@@ -411,7 +411,7 @@ problem.
 
 ## KEYSTONE
 
-The experimental document (`experiments/keystone/KEYSTONE.md`) that
+The experimental document (`experiments/aft/keystone/KEYSTONE.md`) that
 tests the scale-symmetry thesis via partition comparison sweeps (K1–K3
 hypotheses). The theoretical content of the thesis is now in
 [`DEPARTURE-POINT.md`](DEPARTURE-POINT.md).
@@ -573,7 +573,7 @@ tilt — an affine function of m with slope `(σ − 1)`, σ being the
 per-cell chord slope. The second derivative is preserved:
 `E'' = ε'' = −1/(m² ln 2)`. The tilt segments across all cells form the
 piecewise-linear interpolant of ε at the partition points. See
-[`experiments/stepstone/TILT.md`](../experiments/stepstone/TILT.md).
+[`experiments/aft/stepstone/STEPSTONE.md`](../experiments/aft/stepstone/STEPSTONE.md).
 
 ## uniform partition (uniform_x)
 

@@ -14,7 +14,7 @@ Run:  ./sagew experiments/tiling/layer_allocation.sage
 import os
 
 from helpers import pathing
-load(pathing('experiments', 'keystone', 'keystone_runner.sage'))
+load(pathing('experiments', 'aft', 'keystone', 'keystone_runner.sage'))
 load(pathing('experiments', 'tiling', 'leading_bit_projection.sage'))
 
 import matplotlib
