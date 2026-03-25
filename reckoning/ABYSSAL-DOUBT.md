@@ -184,9 +184,8 @@ but Minkowski's:
 
 Minkowski's inequality *is* the triangle inequality in Lp, but its
 equality conditions are not the pointwise conditions. For
-p ∈ [1, ∞), Minkowski is tight if and only if the two error
-components are positively linearly dependent as functions — one is a
-non-negative scalar multiple of the other.
+p ∈ [1, ∞), For 1 < p < ∞: equality holds in 
+‖f + g‖\_p = ‖f‖\_p + ‖g‖\_p iff g = λf a.e. for some λ ≥ 0.
 
 For p = ∞, the condition
 is different and more permissive: the sup of the sum must be
@@ -210,7 +209,8 @@ measures.
 
 Another trap is to let exactness migrate upward from the identities 
 and treat the correction problem as exact bookkeeping: 
-'spend structure to cancel ε' But *the computational object is not ε itself*. Even in
+'spend structure to cancel ε' *The 
+computational object is not ε itself*. Even in
 the free-per-cell regime, the optimal correction field `δ*` is
 produced by a minimax optimization against the target. In the
 shared regime, the wall is `dist(δ*, S)` for a model-dependent
