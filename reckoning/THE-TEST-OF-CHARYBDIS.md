@@ -40,13 +40,21 @@ than meaningful.
 ### Setup
 
 Fix depth d, partition kind, and FSM parameters (q, layer mode).
+
+**Canonical cell ordering.** All vectors (δ\*, B columns, ε values,
+Walsh input) are indexed by cell j = 0, …, 2^d − 1 in lexicographic
+bits order: cell j corresponds to `index_to_bits(j, depth)`, MSB
+first. The Walsh-Hadamard transform uses this same ordering as the
+Boolean cube coordinate.
+
 Compute:
 
-1. δ\* ∈ ℝ^{2^d}: the free-per-cell optimal correction vector
-   (from the LP).
+1. δ\* ∈ ℝ^{2^d}: the free intercept field c\* from the per-cell
+   LP (`free_per_cell_metrics`).
 2. S ⊂ ℝ^{2^d}: the FSM's achievable subspace (image of the
    parameter-to-correction linear map).
-3. dim(S) = p (the parameter count).
+3. dim(S) = p = rank of the parameter-to-correction map, detected
+   by SVD with relative cutoff 1e-10 against σ\_max.
 
 ### Rotation
 
@@ -63,9 +71,13 @@ For each S\_rand, compute the L∞ best approximation:
     wall_rand = min_{s ∈ S_rand} ‖δ* − s‖_∞
 
 via the LP: min t subject to −t ≤ δ\* − Bα ≤ t, where B is the
-basis matrix of S\_rand. The minimizer need not be unique in L∞.
-If cellwise residuals are needed, use a canonical tie-breaker:
-among L∞ minimizers, take the one minimizing L2.
+basis matrix of S\_rand. The LP returns a vertex solution.
+
+If the L∞ minimizer is non-unique, the ideal tie-breaker is the one
+minimizing ‖δ\* − Bα‖₂ (the residual L2 norm, not ‖α‖₂). In
+practice, the LP minimizer is generically unique for random subspaces,
+so the tie-break is moot. The current implementation uses the LP
+solution directly; a separate `used_fallback` flag records this.
 
 ### Primary statistics
 
@@ -92,6 +104,10 @@ ensemble:
    χ\_S(x) = (−1)^{Σ\_{i∈S} x\_i} on {0,1}^d
    (O'Donnell, Definition 1.19). Compare the FSM's spectral profile
    (W^0, …, W^d) against the ensemble distribution at each level.
+
+   The normalized profile P^k = W^k / Σ\_j W^j is the primary shape
+   diagnostic; raw W^k is confounded with wall magnitude and is
+   secondary.
 
    Does the FSM's residual concentrate its energy at different
    interaction orders than a random subspace's residual?
@@ -131,7 +147,12 @@ the residual magnitude?" in the directional sense relevant to Doubt
 boundary. The entire residual profile is used.
 
 Available as `scipy.stats.chatterjeexi` in the project's sagew
-environment.
+environment. Since ε(m\_mid) can produce tied values,
+add seeded uniform jitter of magnitude ~1e-12 × max(ε) to ε before
+computing ξ\_n. Generate the jittered ε vector once per configuration
+and reuse it for the FSM and every random draw; resampling jitter per
+draw would inflate ensemble variance artificially. Record the jitter
+seed in every output row.
 
 ### Why Walsh-Hadamard [MENEHUNE]
 
@@ -279,6 +300,10 @@ based threshold makes the magnitude test provably powerless, nor that
 ---
 
 ## 4. What the outcomes mean [MENEHUNE]
+
+The experiment reports quantiles and z-scores, not automatic
+"typical/atypical" labels. The outcome cells below are interpretive
+guidance for a human reader.
 
 With three statistics, the outcome space is richer than a 2×2.
 The most informative cases:

@@ -274,7 +274,7 @@ because each bit carries at most one bit of mode-selection
 information and you have q slots to store it.
 
 This is the connection to branching program lower bounds in
-COVERING-GAME §2. The Fourier characterization would be the
+[COMPLEXITY-REEF](COMPLEXITY-REEF.md) §5. The Fourier characterization would be the
 specific form such a bound takes for the correction function.
 
 ---
@@ -412,7 +412,7 @@ to geometry or stops at analysis.
   originally sighted.
 - [TRAVERSE](TRAVERSE.md) Step 6: the crossing this passage
   prepares.
-- [COVERING-GAME](COVERING-GAME.md) §2: branching program and
+- [COMPLEXITY-REEF](COMPLEXITY-REEF.md) §5: branching program and
   communication complexity routes.
 - [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement
   field.

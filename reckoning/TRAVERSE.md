@@ -5,8 +5,9 @@ pseudo-log and the true logarithm on one binade. The structure of the
 gap ε governs the cost of closing it, in a way that appears to be
 independent of the correction method.
 
-Seven steps from the lattice to the ruler. Terminology: see
+Eleven steps from the lattice to the conjecture. Terminology: see
 [GLOSSARY](GLOSSARY.md). Doubts: see [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md).
+Steps 8–11 are the [ETAK](ETAK.md) horizon rewritten as work items.
 
 ---
 
@@ -108,17 +109,19 @@ band, the stair locations correspond to frequency thresholds rather
 than spatial cell clusters. See [BINADE-WHITECAPS](BINADE-WHITECAPS.md)
 §§7–8.
 
-## Step 5. The covering game [MENEHUNE]
+## Step 5. The interrupted log [MENEHUNE]
 
 Can any adversarial combination of partition strategies beat the
 ε-organised baseline? If a composite partition — cells drawn from
 different families, chosen adversarially — cannot achieve locally
 competitive performance without paying more than the ε-organised
-cost, then geometric structure controls computational cost.
+cost, then the baseline survives partition surgery inside the tested
+zoo.
 
 If the stair locations are set by the forcing regardless of which
 partitions contribute cells, they are problem-intrinsic, not
-architecture-specific. See [COVERING-GAME](COVERING-GAME.md).
+architecture-specific inside the tested zoo. See
+[INTERRUPTED-LOG](INTERRUPTED-LOG.md).
 
 ## Step 6. The coordinate change [MENEHUNE]
 
@@ -134,7 +137,7 @@ the function's structure under any width-bounded sequential reader
 of binary digits. The bound would not care what sits between input
 and output.
 
-See [COVERING-GAME](COVERING-GAME.md) for the proof avenues.
+See [COMPLEXITY-REEF](COMPLEXITY-REEF.md) for the proof avenues.
 
 ## Step 7. The ruler [MENEHUNE]
 
@@ -145,7 +148,61 @@ achieve tolerance τ in departure from L — intrinsic to the gap
 between additive and multiplicative coordinates. A computational
 ruler of the exponential.
 
-See [DISTANT-SHORES](DISTANT-SHORES.md).
+The triangle inequality gives the immediate payoff:
+
+    |APPROX − log₂| ≤ |APPROX − L| + ε
+
+This decomposes the inaccessible comparison (APPROX vs. truth) into
+a computable comparison (APPROX vs. surrogate) plus ε, known in
+closed form. The two terms share no degrees of freedom. The ruler
+tells you what it costs to close any fraction of ε.
+
+See [COMPLEXITY-REEF](COMPLEXITY-REEF.md) for the complexity question.
+
+## Step 8. The singularity [MENEHUNE]
+
+[ETAK](ETAK.md) Link 1 proposes that the wall is necessary: no
+finite-state machine reading binary digits can exactly correct the
+pseudo-log because the underlying additive-to-multiplicative
+translation is singular.
+
+The immediate obligation is to formalise the load-bearing joint:
+does exact finite correction force an absolutely continuous
+coordinate change between binary and geometric addressing? See
+[ETAK](ETAK.md) Link 1.
+
+## Step 9. The spectral fingerprint [MENEHUNE]
+
+[ETAK](ETAK.md) Link 2 proposes that wall decay is governed by the
+spectral content of ε, so that the ruler's tick marks are set by the
+singular map rather than by the correction architecture.
+
+The immediate obligation is to bridge from empirical spectral
+alignment to a theorem: finite sharing must be shown to absorb a
+controlled amount of ε's Fourier/Walsh content, rather than merely
+resembling it numerically. See [ETAK](ETAK.md) Link 2.
+
+## Step 10. The Diophantine gateway [MENEHUNE]
+
+[ETAK](ETAK.md) Link 3 proposes that the spectral tail of ε is
+controlled by the irrationality type of ln 2, so that the ruler would
+measure arithmetic incommensurability rather than machine detail.
+
+The immediate obligation is to prove the arithmetic bridge twice:
+from near-commensurabilities of the lattices to control of ε's
+spectral tail, and then from that decay law to the ruler's staircase.
+See [ETAK](ETAK.md) Link 3.
+
+## Step 11. The conjecture [MENEHUNE]
+
+[ETAK](ETAK.md) Link 4 is the final leap: if the ruler's structure is
+proved arithmetic enough, then an algebraic relation P(2, e) = 0
+would have to regularise that structure in a detectable way.
+
+The immediate obligation is not to argue Schanuel directly, but first
+to show that d_comp detects arithmetic structure at all, rather than
+only the geometry of ε or the limitations of a machine class. See
+[ETAK](ETAK.md) Link 4.
 
 ---
 
@@ -159,8 +216,9 @@ See [DISTANT-SHORES](DISTANT-SHORES.md).
   spectral structure.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): doubts about the wall,
   the forcing-residual gap, the subspace.
-- [COVERING-GAME](COVERING-GAME.md): proof program for Step 5.
+- [INTERRUPTED-LOG](INTERRUPTED-LOG.md): the Step-5 zoo-surgery
+  stress test.
 - [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the complexity question
   for Steps 6–7.
+- [ETAK](ETAK.md): the far horizon (Steps 8–11).
 - [HERE-BE-DRAGONS](HERE-BE-DRAGONS.md): speculative extensions.
-- [DISTANT-SHORES](DISTANT-SHORES.md): the destination.

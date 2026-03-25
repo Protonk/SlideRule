@@ -140,7 +140,7 @@ tilings. Their agreements (depth 1: all three split at 3/2) and
 divergences (depth 2: binary at 5/4, Farey at 4/3) characterize the
 costs of choosing one representation over another.
 
-For DISTANT-SHORES Step 6: the tiling framework suggests a specific
+For TRAVERSE Step 6: the tiling framework suggests a specific
 form of the architecture-invariance question. Is the exchange rate
 determined by the base tiling (vertices and combinatorics, shared
 between horocyclic and geodesic variants) or by edge geometry (which
@@ -164,6 +164,6 @@ controlled skepticism, rather than drifting as ambient enthusiasm.
   field framework these dragons extend.
 - [`ABYSSAL-DOUBT.md`](ABYSSAL-DOUBT.md): the doubt about whether
   the wall measures the problem or the architecture.
-- [`DISTANT-SHORES.md`](DISTANT-SHORES.md): Steps 5–6 that Dragons
+- [`TRAVERSE.md`](TRAVERSE.md): Steps 5–6 that Dragons
   4 and 6 gesture toward.
 - [`AGENTS.md`](AGENTS.md): epistemological rules for the reckoning.

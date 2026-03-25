@@ -2,7 +2,7 @@
 absorption_staircase.sage — G6+G7: Absorption staircase and binding-cell
 migration.
 
-DISTANT-SHORES Step 5 predicts a staircase: as parameter budget q grows,
+TRAVERSE Step 5 predicts a staircase: as parameter budget q grows,
 the wall drops in discrete steps. The binding (worst) cell migrates from
 domain boundaries toward the epsilon peak at m* as q increases.
 
@@ -156,7 +156,7 @@ def plot_staircase(results):
     ax_bot_twin.set_yticks([])
 
     fig.suptitle(
-        'DISTANT-SHORES Step 5: absorption rate at depth=%d, exponent=%d/%d'
+        'TRAVERSE Step 5: absorption rate at depth=%d, exponent=%d/%d'
         % (DEPTH, P_NUM, Q_DEN),
         fontsize=13, fontweight='bold', y=1.01,
     )

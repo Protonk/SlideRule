@@ -4,6 +4,13 @@ The computational complexity question for the ruler. What the
 computational object is, what cost models are admissible, which
 lower-bound tools might apply, and what success would mean.
 
+The load-bearing ambition is a genuine coordinate change, not a
+metaphor: a lower bound proved in computational language should
+become a bound on the cost of correcting the `ε`-organised target,
+independent of the particular FSM implementation. The adversarial
+zoo-surgery test is separate; it lives in
+[INTERRUPTED-LOG](INTERRUPTED-LOG.md).
+
 ---
 
 ## 1. The computational target
@@ -94,6 +101,11 @@ lower-bound tools?
 
 ## 5. Tool routes
 
+These are the candidate routes for making the coordinate change
+literal. Each would turn a statement about a computational model into
+an architecture-free lower bound tied to the structure of `ε` or
+`δ*`.
+
 ### Branching programs
 
 The FSM is an ordered branching program of width q and depth d.
@@ -176,13 +188,13 @@ The weakest nontrivial results that would advance the project:
 ## Reading outward
 
 - [TRAVERSE](TRAVERSE.md): where the complexity question enters
-  (Steps 5–6).
-- [COVERING-GAME](COVERING-GAME.md): the combinatorial test of
-  architecture-invariance.
+  (Steps 6–7).
+- [INTERRUPTED-LOG](INTERRUPTED-LOG.md): the narrower zoo-surgery
+  stress test for Step 5.
 - [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement field
   and spectral structure.
 - [BINADE-WHITECAPS](BINADE-WHITECAPS.md): the Fourier
   decomposition of the density defect.
-- [DISTANT-SHORES](DISTANT-SHORES.md): the destination (d_comp).
+- [TRAVERSE](TRAVERSE.md): the spine (d_comp is Step 7).
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): doubts about the wall and
   the subspace.

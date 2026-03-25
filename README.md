@@ -14,10 +14,10 @@ See [`GLOSSARY.md`](reckoning/GLOSSARY.md).
 
 ```
 reckoning/            The intellectual reckoning
-  TRAVERSE.md           Seven-step spine: lattice to ruler
+  TRAVERSE.md           Eleven-step spine: lattice to conjecture
   DEPARTURE-POINT.md    Day's framework and the scale-symmetry thesis
-  DISTANT-SHORES.md     The destination: d_comp(τ)
-  COVERING-GAME.md      Proof program for architecture-invariance
+  ETAK.md               The far horizon: wall to algebraic independence
+  INTERRUPTED-LOG.md    Step-5 zoo-surgery stress test
   COMPLEXITY-REEF.md    The complexity question: cost models and lower bounds
   THE-TEST-OF-CHARYBDIS.md  Rotation check: is the wall target-driven or subspace-driven?
   ABYSSAL-DOUBT.md      Four doubts that shadow the program
@@ -37,6 +37,7 @@ experiments/          Runnable sweeps, visualizations, and analysis
   alternation/          Sign-pattern analysis
   stepstone/            Chord error structure
   ripple/               Coastline area convergence
+  rotation/             Charybdis rotation check (subspace typicality)
   elementals/           Explanatory figures
 lib/                  Shared math modules (paths, day, partitions, ...)
 helpers/              Import helper (pathing.py)

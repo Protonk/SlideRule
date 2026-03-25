@@ -8,7 +8,7 @@ Can't get to islands without going over water
 
 The keystone thesis says: the logarithm is the canonical coordinate,
 the geometric grid is the zero-cost baseline, and scale symmetry
-organizes everything. Steps 1–4 of DISTANT-SHORES build on this
+organizes everything. Steps 1–4 of TRAVERSE build on this
 cleanly. But the FSM — the architecture we chose to *correct* the
 surrogate — does not share the symmetry it is correcting for.
 
@@ -233,7 +233,7 @@ The computational ruler requires an exchange rate between structural cost (param
 
 Establishing that local profile at a single depth `d` is a finite computation and is safe. The ruler requires the relevant depth-indexed conversion data to stabilize as `d` varies. The natural argument for stabilization passes through the tiling's refinement self-similarity: tiles at depth `d+1` refine those at depth `d`, and this is represented geometrically by the dyadic scaling `z ↦ 2z`. If stabilization requires that refinement to preserve per-tile costs in a way that is invariant under the geometric scaling, then the argument asks per-tile bookkeeping to be invariant under a hyperbolic isometry. Böröczky says it is not.
 
-There is a candidate escape: work entirely in function space. The Fourier coefficients of `ε` do not depend on `d`. Then stabilization would come from the analytic structure of a fixed function on `[0,1]`, not from self-similar bookkeeping in the tiling. The covering game would operate on `ε` as a function, not on counts or densities in the binary tiling. Whether this escape is available — whether the bound is tight without making the geometric and combinatorial parts jointly in the tiling language — is the doubt.
+There is a candidate escape: work entirely in function space. The Fourier coefficients of `ε` do not depend on `d`. Then stabilization would come from the analytic structure of a fixed function on `[0,1]`, not from self-similar bookkeeping in the tiling. The interrupted-log test would operate on `ε` as a function, not on counts or densities in the binary tiling. Whether this escape is available — whether the bound is tight without making the geometric and combinatorial parts jointly in the tiling language — is the doubt.
 
 If the problem factors, the proof should have three safe steps:
 

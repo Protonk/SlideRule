@@ -8,7 +8,7 @@ currently stands. It is based on:
 - the companion plots in `experiments/tiling/results/displacement_field/`
 
 Assumed context: the reader already knows the framing in `ABYSSAL-DOUBT.md`
-and `DISTANT-SHORES.md`.
+and `TRAVERSE.md`.
 
 ## Bottom line
 

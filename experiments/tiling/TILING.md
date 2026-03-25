@@ -1,7 +1,7 @@
 # Tiling
 
 Purpose: argue that hyperbolic binary tiling provides a framework for
-approaching DISTANT-SHORES steps 5 and 6 via a representation-intrinsic
+approaching TRAVERSE Steps 5 and 6 via a representation-intrinsic
 displacement field, and sketch what's testable now.
 
 Reading inward: depends on [`ABYSSAL-DOUBT.md`](../../reckoning/ABYSSAL-DOUBT.md)
@@ -271,7 +271,7 @@ analysis.
 ## Reading outward
 
 - [`ABYSSAL-DOUBT.md`](../../reckoning/ABYSSAL-DOUBT.md): the doubt this responds to.
-- [`DISTANT-SHORES.md`](../../reckoning/DISTANT-SHORES.md): the roadmap whose steps 5–6
+- [`TRAVERSE.md`](../../reckoning/TRAVERSE.md): the roadmap whose Steps 5–6
   this framework addresses.
 - [`WALL.md`](../wall/WALL.md): the wall decomposition and displacement
   analysis.

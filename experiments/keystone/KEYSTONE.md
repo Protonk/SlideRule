@@ -55,7 +55,7 @@ footing as K1--K3. They are consistency checks, not tests.
 - For the current hypothesis status labels, read
   [`EXPERIMENTS.md`](../EXPERIMENTS.md).
 - For the overall science goal, read
-  [`DISTANT-SHORES.md`](../../reckoning/DISTANT-SHORES.md).
+  [`TRAVERSE.md`](../../reckoning/TRAVERSE.md).
 
 ---
 

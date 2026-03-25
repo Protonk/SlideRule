@@ -132,7 +132,7 @@ the automaton-coupling residual. A curve that differs by kind means
 the exchange rate is geometry-dependent. Panel B shows whether the
 mitigation is broad or concentrated.
 
-This is the most direct empirical path to DISTANT-SHORES step 5.
+This is the most direct empirical path to TRAVERSE Step 5.
 
 ### 5. Register hypotheses
 
@@ -175,7 +175,7 @@ and q. Specifically:
   an allocation problem that more states could solve).
 
 - If the displacement range stabilizes, the exchange rate from
-  DISTANT-SHORES step 5 is the cost of buying enough states to match
+  TRAVERSE Step 5 is the cost of buying enough states to match
   the stable displacement budget. If it grows, the exchange rate
   diverges and the wall is a hard structural limit of the FSM family.
 
@@ -210,6 +210,6 @@ problem, not a chord-borrowing problem.
 The plan has paid off when:
 - W1 is resolved: the wall is not chord displacement (done)
 - We know how the fan-out displacement scales with depth and q
-- That scaling behavior connects to DISTANT-SHORES step 5: either as
+- That scaling behavior connects to TRAVERSE Step 5: either as
   a finite exchange rate (displacement stabilizes) or a hard limit
   (displacement grows with cell count)

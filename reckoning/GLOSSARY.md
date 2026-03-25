@@ -145,7 +145,7 @@ The minimum structural cost to achieve tolerance τ in departure from L,
 where the minimum is over correction machinery M and C is a cost measure.
 This is the project's destination. Whether d_comp is a property of the
 approximation problem or the architecture is [MENEHUNE]. See
-[DISTANT-SHORES](DISTANT-SHORES.md).
+[TRAVERSE](TRAVERSE.md) Step 7.
 
 ## delta* (δ*)
 

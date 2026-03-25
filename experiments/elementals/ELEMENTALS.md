@@ -1,9 +1,9 @@
 # Elementals
 
 Purpose: canonical home for non-data-driven figures that illustrate
-steps in the DISTANT-SHORES argument chain.
+steps in the TRAVERSE argument chain.
 
-Reading inward: depends on [`DISTANT-SHORES.md`](../../reckoning/DISTANT-SHORES.md)
+Reading inward: depends on [`TRAVERSE.md`](../../reckoning/TRAVERSE.md)
 for the roadmap, [`TILING.md`](../tiling/TILING.md) for the hyperbolic
 framing, and [`KEYSTONE.md`](../keystone/KEYSTONE.md) for the
 scale-symmetry thesis.
@@ -29,7 +29,7 @@ examples rather than renegotiating scope each time.
 ## What belongs here
 
 - Optimizer-free mathematical figures whose claim is stable across runs
-- Reusable explanatory figures for the DISTANT-SHORES argument chain
+- Reusable explanatory figures for the TRAVERSE argument chain
 - Illustrations that make geometric or algebraic content visible where
   prose compresses it
 
@@ -82,21 +82,21 @@ Every elemental script satisfies:
 
 Figures from or about the Poincaré half-plane model.
 Source domain: hyperbolic geometry.
-Serves: `TILING.md` background (L14-L25), `DISTANT-SHORES.md` Step 2,
+Serves: `TILING.md` background (L14-L25), `TRAVERSE.md` Step 2,
 and the forcing-function framing of Step 5.
 
 ### (future: subspace/)
 
 Projection geometry in R^n.
 Source domain: linear algebra / convex geometry.
-Serves: `DISTANT-SHORES.md` Steps 3-4 (low-rank subspaces, wall as
+Serves: `TRAVERSE.md` Steps 3-4 (low-rank subspaces, wall as
 projection distance, nested subspace inclusions).
 
 ### (future: staircase/)
 
 Discrete absorption and binding-cell ordering.
 Source domain: combinatorial optimization / minimax geometry.
-Serves: `DISTANT-SHORES.md` Step 5 (staircase prediction, covering game).
+Serves: `TRAVERSE.md` Step 5 (staircase prediction, covering game).
 
 ---
 

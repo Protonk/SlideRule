@@ -85,7 +85,7 @@ why H_balance beats H_value. A complete model of c* needs both the
   but whether different architectures absorb it with similar
   efficiency is still untested.
 
-## Implications for DISTANT-SHORES
+## Implications for TRAVERSE
 
 **Step 5:** There is now a concrete, empirically validated forcing
 function. The exchange rate question becomes: how does the FSM's wall
