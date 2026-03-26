@@ -53,35 +53,74 @@ At this level `ε` has three exact identities:
 These are coordinate facts, prior to any correction architecture. See
 [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§4–7.
 
-## Step 2. The wall [MENEHUNE]
+## Step 2. The wall
 
 Replace Day's single intercept with shared corrections. The FSM with
 q states processing d bits generates correction vectors in a subspace
 S ⊂ ℝ^{2^d} (dim O(q) layer-invariant, dim O(qd) layer-dependent).
-The wall is dist(δ*, S) in the minimax norm.
+The wall is dist(δ*, S) in the minimax norm. See
+[WALL.md](../experiments/wall/WALL.md).
 
-S is architecture-specific. A different correction architecture
-produces a different S. A full lookup table gives S = ℝ^{2^d} and
-there is no wall. The dimension tells you S is thin; it does not tell
-you which directions it spans.
+### 2a. Wall decomposition — Done
 
-The wall decomposition S_LI ⊂ S_LD ⊂ ℝ^{2^d} describes the FSM's
-sharing layers. The dominant source is the leading-bit mismatch:
-the first bit splits the domain at its midpoint (additive), while the
-logarithm's natural split is the geometric mean (multiplicative).
-This mismatch is representation-intrinsic. Whether the *cost* of the
-mismatch is also representation-intrinsic is what Steps 5–6 must
-establish. See [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4 and
-[CHARYBDIS](CHARYBDIS.md).
+The wall decomposes into three nested sources:
 
-The Charybdis rotation check (2026-03-24) established that the FSM's
-wall is not a generic consequence of subspace dimension: random
-subspaces of the same dimension produce much larger walls (quantile
-0.000 in 84 configurations including adversary partitions). The FSM's
-subspace orientation is special. The Walsh spectral experiment further
-showed that the shared minimax projection induces bit-interaction
-structure not present in the target. See
+1. **Parameter budget.** 1+2q (LI) or 1+2qd (LD) parameters for
+   2^d cells. At shallow depth, increasing q nearly removes the wall.
+2. **Layer sharing.** Reusing one delta table across all layers is
+   the dominant source (median wall fraction 43–75% across three
+   exponents, 160 cases). See K3.
+3. **Automaton coupling.** Even LD leaves a residual: the path
+   algebra imposes global distortion that no single-cell intercept
+   reuse model captures.
+
+### 2b. Mechanism identification — Done
+
+The wall is a fan-out problem at the early layers. Layer 0 must
+serve all 2^d cells with one delta pair, creating systematic
+positional displacement. Later layers partially repair this under
+LD, cutting the displacement range ~50%. Final residue state does
+not explain the pattern.
+
+The wall is not pairwise chord displacement: adjacent cells' free
+intercepts are nearly interchangeable, but the FSM's shared
+intercept causes 10–17x larger excess (W1 negative result). See
+[EXCHANGE-RATE-PLAN.md](../experiments/wall/EXCHANGE-RATE-PLAN.md).
+
+### 2c. Non-genericity — Done
+
+The Charybdis rotation check established that the FSM's wall is
+not a generic consequence of subspace dimension: random subspaces
+of the same dimension produce much larger walls (quantile 0.000,
+84 configurations including 6 adversary partitions). The Walsh
+spectral experiment showed the FSM's residual has bit-interaction
+structure induced by the shared minimax projection, not inherited
+from the target. See [CHARYBDIS](CHARYBDIS.md) §5,
 [ROTATION.md](../experiments/aft/rotation/ROTATION.md).
+
+### 2d. Scaling characterization [MENEHUNE]
+
+The forcing Δ^L stabilizes with depth (Stage D, convergence by
+d=6–7). The absorption staircase at d=6 shows binding-cell
+migration toward the ε peak as q grows. But these are point
+measurements. The wall's joint scaling with (q, d) has not been
+mapped.
+
+**Remaining work:**
+
+- **Depth-indexed absorption staircase.** Run
+  `wall/absorption_staircase.sage` at d = 4, 5, 6, 7, 8. Does the
+  staircase shape stabilize with depth? Is the binding-cell ordering
+  depth-invariant?
+- **Fan-out scaling sweep.** `wall/fan_out_scaling.sage` (planned in
+  [EXCHANGE-RATE-PLAN.md](../experiments/wall/EXCHANGE-RATE-PLAN.md)
+  §6, not yet implemented): displacement range, per-layer
+  contribution, and displacement-position correlation across a
+  (kind, q, depth) grid. The key question is whether displacement
+  range grows with 2^d or stabilizes.
+
+Whether the wall is representation-intrinsic or FSM-specific is
+the subject of Steps 5–6 and [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §1.
 
 ## Step 3. The forcing — Done
 
@@ -230,4 +269,6 @@ only the geometry of ε or the limitations of a machine class. See
 - [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the complexity question
   for Steps 6–7.
 - [ETAK](ETAK.md): the far horizon (Steps 8–11).
+- [NARROW-PASSAGE](NARROW-PASSAGE.md): the passage toward
+  Step 6 (three-partition framework + connection-flattening).
 - [HERE-BE-DRAGONS](HERE-BE-DRAGONS.md): speculative extensions.

@@ -320,45 +320,17 @@ global invariant of the binary tiling.
 
 ### 11. What the calculation requires
 
-The bulge region at grid point k, depth d, is bounded by:
-
-- the horocyclic segment from (b_k, h) to (b_{k+1}, h)
-  at some height h (the binade level);
-- the geodesic connecting the same two endpoints (a semicircular
-  arc in the half-plane model).
-
-The hyperbolic area of the region between a horocyclic segment and
-the geodesic connecting its endpoints is a standard computation in
-hyperbolic geometry. It depends on the Euclidean length of the
-segment and the height h, combined through the metric
-ds² = (dx² + dy²)/y².
-
-The computation must be done in a coordinate system where the
-binade structure is explicit. The natural choice: set y = 1
-at the bottom of the binade (x = 1 in mantissa space) and
-y = 2 at the top (x = 2). Then binary grid points are at
-y = b_k = 1 + k/2^d and geometric grid points at
-y = g_k = 2^{k/2^d}.
-
-But this is the wrong picture. The binary and geometric grid
-points are not at different heights — they are at different
-horizontal positions at the same depth level in the tiling.
-The binade level is a single horocycle. The two grids mark
-different points along it. The horocyclic arc connects
-adjacent binary grid points. The geodesic connects the
-corresponding geometric grid points — or, more precisely, the
-geodesic is the edge that the pentagonal tiling uses where the
-standard tiling uses the horocyclic arc.
-
-This means the bulge area is between two curves connecting
-the SAME pair of endpoints (the vertices shared by both tilings),
-not between curves connecting different endpoints. The area
+The binary and geometric grid points are at different horizontal
+positions along the same horocycle (the binade level), not at
+different heights. The horocyclic arc connects adjacent tile
+vertices; the geodesic connects the same vertices. The bulge
+region is bounded by two curves connecting the SAME pair of
+endpoints (the vertices shared by both tilings). Its area
 depends on the tile width, which varies across the row.
 
-The computation is therefore: for a horocyclic segment of
-Euclidean length w at height h, what is the hyperbolic area
-between the segment and the geodesic (semicircle) connecting
-its endpoints?
+The computation is: for a horocyclic segment of Euclidean
+length w at height h, what is the hyperbolic area between the
+segment and the geodesic (semicircle) connecting its endpoints?
 
 For a horocyclic segment from (x₀, h) to (x₀ + w, h), the
 geodesic connecting the same endpoints is a semicircle of

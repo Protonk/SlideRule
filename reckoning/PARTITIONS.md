@@ -1,6 +1,6 @@
 # Partition Classification
 
-The partition zoo contains **25 kinds** defined in `lib/partitions.sage`.
+The partition zoo is defined in `lib/partitions.sage`.
 Each kind produces a partition of a domain `[x_start, x_start + x_width)`
 into `2^depth` cells with distinct geometric character.
 

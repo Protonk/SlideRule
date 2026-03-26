@@ -51,11 +51,17 @@ with Applications in Data Science*. 2nd ed. Cambridge University Press.
 
 ## Binade Whitecaps
 
+Sripad, A. B., & Snyder, D. L. (1978). Quantization errors in floating-point arithmetic. *IEEE Trans. Acoustics, Speech, and Signal Processing*, ASSP-26(5), 456–463.
+
+> Core result: Proposition 2 (§II). The mantissa has the reciprocal density 1/(m ln 2) iff φ(2πn) = 0 for all nonzero integers n, where φ is the characteristic function of log₂|X|. Remark 2 gives the sufficient form: band-limited with |φ(u)| = 0 for |u| ≥ 2π. The Gaussian case (§III, eqs. 24–27) evaluates φ(2πn) through the Gamma function on Re(s) = ½, yielding max relative departure 0.23% independent of σ (eq. 30). Proposition 1 gives the general Fourier series for the mantissa density when the condition fails.
+
 Lacroix, A., & Hartwig, F. (1992). Distribution densities of the mantissa and exponent of floating point numbers. In *Proc. IEEE International Symposium on Circuits and Systems*, 1792–1795.
+
+> Key result: §IV ("Independency and Continuity"). Derives a continuity condition at dyad boundaries: the conditional mantissa CDF must satisfy a boundary-matching relation involving p_β(j)/p_β(j+1). For the reciprocal density this holds exactly (statistical independence of mantissa and exponent); for any other density it fails, producing a discontinuity that couples mantissa to exponent. §III shows a single sum of uniform operands gives a triangular mantissa density misaligned with dyad boundaries; two multiplications suffice for near-reciprocal convergence.
 
 Miller, S. J., & Nigrini, M. J. (2007). The modulo 1 central limit theorem and Benford's law for products. arXiv:math/0607686v2.
 
-Sripad, A. B., & Snyder, D. L. (1978). Quantization errors in floating-point arithmetic. *IEEE Trans. Acoustics, Speech, and Signal Processing*, ASSP-26(5), 456–463.
+> Core result: Theorem 1.1 (§2). The sum of M independent continuous RVs mod 1 converges to uniform in L¹ iff for each n ≠ 0, the product ĝ₁(n)···ĝ_M(n) → 0 as M → ∞. Theorem 1.2 translates to Benford's law for products. Convergence rate is controlled by max_m |ĝ_m(n)|: strictly < 1 for each n gives geometric decay in M. Example 2.4 constructs a sequence where individual convergence holds but the non-identical product does not.
 
 ## Binary tiling
 

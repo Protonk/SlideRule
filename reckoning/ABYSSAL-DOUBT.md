@@ -251,7 +251,7 @@ One can see this with an ideal lookup-table. At fixed depth (d), a full table yi
 On that reading, the wall inherits (\varepsilon)-structure because a structured target is being measured against a particular finite model. The forcing organises the demand. The model determines what can be supplied. These are not the same claim.
 
 **Status (2026-03-24).** The Test of Charybdis
-([CHARYBDIS](CHARYBDIS.md) §5b) tested this
+([CHARYBDIS](CHARYBDIS.md) §5) tested this
 doubt directly. The FSM's wall is much smaller than any random
 subspace of the same dimension (quantile 0.000 in all 84
 configurations, including 6 adversary partitions). This rules out the

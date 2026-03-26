@@ -22,6 +22,21 @@ import numpy as np
 import random
 
 
+# ── Solver constants ────────────────────────────────────────────────────
+#
+# DYADIC_BITS: snapping granularity for LP solutions. All experiments in the
+# project use this value; changing it makes results incommensurable with
+# existing sweeps. Do not change without re-running affected baselines.
+DYADIC_BITS = 26
+
+# HiGHS LP tolerances. Tightened from defaults (~1e-7) to match the
+# bisection precision (1e-10) used by optimize_minimax.
+_HIGHS_OPTIONS = {
+    'primal_feasibility_tolerance': 1e-9,
+    'dual_feasibility_tolerance': 1e-9,
+}
+
+
 # ── Per-cell optimization ───────────────────────────────────────────────
 
 def _cell_worst_scalar(c_val, bits, p_num, q_den):
@@ -542,7 +557,7 @@ def _lp_feasibility(A, lo_bounds, hi_bounds):
     b_ub = np.concatenate([-np.array(lo_bounds), np.array(hi_bounds)])
 
     res = scipy_linprog(c_obj, A_ub=A_ub, b_ub=b_ub, bounds=[(None, None)] * n_cols,
-                        method='highs')
+                        method='highs', options=_HIGHS_OPTIONS)
     if res.success and res.status == 0:
         return True, res.x
     return False, None
@@ -582,7 +597,8 @@ def _lp_minimize_max_delta(A, lo_bounds, hi_bounds):
     b_ub = np.concatenate([interval_b, delta_b])
     bounds = [(None, None)] * n_cols + [(0.0, None)]
 
-    res = scipy_linprog(c_obj, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method='highs')
+    res = scipy_linprog(c_obj, A_ub=A_ub, b_ub=b_ub, bounds=bounds, method='highs',
+                        options=_HIGHS_OPTIONS)
     if res.success and res.status == 0:
         return True, res.x[:-1], float(res.x[-1])
     return False, None, None
@@ -699,7 +715,7 @@ def _worst_cell_metadata(metrics, row_map):
     return {}
 
 
-def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=20,
+def optimize_minimax(q, depth, p_num, q_den, tol=1e-10, dyadic_bits=DYADIC_BITS,
                      layer_dependent=False, partition_kind=None,
                      x_start=1, x_width=1, interval_warm_start=True):
     """
@@ -977,7 +993,7 @@ def _shared_objective(params, paths, p_num, q_den, q, dyadic_bits):
 
 def optimize_shared_delta(q, depth, p_num, q_den, c0_init=None,
                           maxiter=5000, n_restarts=3, seed=42,
-                          dyadic_bits=12, method='minimax', layer_dependent=False,
+                          dyadic_bits=DYADIC_BITS, method='minimax', layer_dependent=False,
                           partition_kind=None, x_start=1, x_width=1,
                           interval_warm_start=True):
     """
