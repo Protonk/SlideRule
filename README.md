@@ -4,7 +4,13 @@
 
 In normal radix-2 scientific notation, each value carries a coarse logarithmic coordinate for free: the exponent gives the binade, and the significand interpolates linearly within it. This gives the pseudo-log `L(x)`, which agrees with `log₂` at powers of two and is affine on each binade. The residual `ε(m) = log₂(1+m) − m` is the exact gap between the logarithmic and affine intra-binade coordinates; the same function reappears as approximation error, grid displacement, and density defect.
 
-We study finite-state correctors that read binary digits and share parameters across cells in order to reduce that gap. In the FSM families we have built, finite sharing leaves a residual wall, and much of its observed structure tracks `ε`. Whether that structure is specific to these machines or intrinsic to a broader class of binary-representation correctors is still open.
+We study one-pass binary-digit-reading sequential correctors that
+share parameters across cells in order to reduce that gap. Finite-state
+machines are the current leading subclass and experimental control.
+In the FSM families we have built, finite sharing leaves a residual
+wall, and much of its observed structure tracks `ε`. Whether that
+structure is specific to these machines or intrinsic to the broader
+class of binary-representation correctors is still open.
 
 The project asks whether there is a genuine computational ruler `d_comp(τ)`: a machine-independent exchange rate between structural cost and approximation quality set by the mismatch between additive/binary and multiplicative/logarithmic coordinates. This is [the way](reckoning/ETAK.md); we are [building the instruments](reckoning/TRAVERSE.md) to fix it.
 
@@ -19,6 +25,7 @@ reckoning/            The intellectual reckoning
   TRAVERSE.md           Eleven-step spine: lattice to conjecture
   DEPARTURE-POINT.md    Day's framework and the scale-symmetry thesis
   ETAK.md               The far horizon: wall to algebraic independence
+  AUTOMATON-SARGASSUM.md Step-5 rejection loop for candidate sequential corrector families
   INTERRUPTED-LOG.md    Step-5 zoo-surgery stress test
   COMPLEXITY-REEF.md    The complexity question: cost models and lower bounds
   CHARYBDIS.md          Rotation check: is the wall target-driven or subspace-driven?

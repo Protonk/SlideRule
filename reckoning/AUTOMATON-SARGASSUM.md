@@ -1,8 +1,9 @@
 # Automaton Sargassum
 
-A Step-5 rejection loop for candidate automaton families. The question
-is not "which machine wins?" but "which binary-digit readers survive
-enough abuse to deserve the Interrupted Log?"
+A Step-5 rejection loop for candidate sequential corrector families.
+The question is not "which machine wins?" but "which one-pass
+binary-digit-reading correctors survive enough abuse to deserve the
+Interrupted Log?"
 
 The name is literal. This is the weed-belt where candidate
 architectures pick up computational cruft. Most should stay here.
@@ -19,14 +20,14 @@ architecture triage.
 Step 4 now studies an FSM exchange rate, not a universal one. That
 means Step 5 cannot begin by assuming the current mod-`q` family is
 the right carrier of the project. Before adversarial partition surgery
-can bear load, the candidate automaton family itself must survive a
-separate rejection loop.
+can bear load, the candidate sequential corrector family itself must
+survive a separate rejection loop.
 
 The sargassum answers the upstream question:
 
-> Which one-pass binary-digit-reading architecture families are stable,
-> comparable, and interpretable enough to be worth carrying into the
-> Interrupted Log?
+> Which one-pass binary-digit-reading sequential corrector families are
+> stable, comparable, and interpretable enough to be worth carrying
+> into the Interrupted Log?
 
 The output is not a champion. The output is a short list of families
 that have earned the right to be tested against adversarial
@@ -45,6 +46,9 @@ An entrant must specify:
 
 Single-point gadgets do not qualify. A one-off machine can always look
 good by accident.
+
+The umbrella class here is **sequential corrector families**. FSMs are
+the current leading subclass, not the whole class.
 
 ## 3. Admission rules
 
@@ -68,7 +72,8 @@ tricks from entering the program under the name of "new architecture."
 
 The initial field should be small and interpretable:
 
-- **The current mod-`q` residue family.** The baseline and control.
+- **The current mod-`q` residue family.** The baseline FSM subclass
+  and control.
 - **Structured perturbations of the FSM.** The families sketched in
   [CHARYBDIS](CHARYBDIS.md) §6: binary-tree-preserving randomizations,
   layer-structure-preserving variants, and dyadic-block permutations.
@@ -84,9 +89,9 @@ entrants justify themselves.
 
 ## 5. The battery
 
-Every entrant is sent back through Step 4. The question is whether it
-produces a stable architecture-managed story, not merely whether it
-posts a low gap somewhere.
+Every entrant is sent back through Step 4. The question is whether the
+family produces a stable architecture-managed story, not merely
+whether it posts a low gap somewhere.
 
 The minimum battery is:
 
@@ -133,9 +138,9 @@ A family passes the sargassum only if it yields a stable Step-4 story:
 - interpretable in terms of fan-out, topology, and ordering;
 - worth exposing to an adversarial partition attack.
 
-What gets promoted is not "the best machine." It is "a family whose
-behaviour is coherent enough that failure in the Interrupted Log would
-be informative."
+What gets promoted is not "the best machine." It is "a sequential
+corrector family whose behaviour is coherent enough that failure in
+the Interrupted Log would be informative."
 
 ## 8. What this is not
 

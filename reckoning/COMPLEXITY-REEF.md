@@ -7,6 +7,11 @@ bearing ambition is a lower bound in computational
 language on the cost of correcting the `ε`-organised target,
 independent of a particular architecture.
 
+The upstream search space is broader than the current FSM platform: it
+consists of one-pass binary-digit-reading sequential corrector
+families. FSMs are the present leading subclass and the current
+experimental control.
+
 ---
 
 ## 1. The computational target

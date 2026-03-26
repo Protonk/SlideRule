@@ -173,11 +173,13 @@ yet a cross-architecture theorem. See
 
 The first test is passage through the
 [AUTOMATON-SARGASSUM](AUTOMATON-SARGASSUM.md). This is a rejection
-loop for candidate automaton families: generate, perturb, and discard
-binary-digit readers until one yields a stable Step-4 story worth
-carrying forward. A family passes only if its exchange-rate behavior
-is coherent under depth, topology, and nearby perturbation; then it is
-sent back through Step 4 explicitly on that family.
+loop for candidate sequential corrector families: generate, perturb,
+and discard one-pass binary-digit-reading corrector families until one
+yields a stable Step-4 story worth carrying forward. FSMs are the
+current leading subclass, not the whole field. A family passes only if
+its exchange-rate behavior is coherent under depth, topology, and
+nearby perturbation; then it is sent back through Step 4 explicitly on
+that family.
 
 The second test is partition surgery inside the zoo. Whatever survives
 the sargassum must also survive an adversarial partitioning. If a
