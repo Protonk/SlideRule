@@ -469,10 +469,9 @@ The Walsh-Hadamard analysis (§2) diagonalises the additive/Boolean
 structure induced by binary addressing. The Fourier analysis on the
 binade circle ([BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–8)
 diagonalises the multiplicative/logarithmic structure native to the
-underlying function. The point of comparing them is not just
-"machine side" versus "function side": it is to ask how
-multiplicative regularity or singularity is transported, under
-binary addressing, into additive bit interactions.
+underlying function. The point of comparing them is to ask how multiplicative
+regularity or singularity is transported, under binary
+addressing, into additive bit interactions.
 
 A residual that is spectrally simple in the circle-Fourier basis but
 diffuse or high-order in Walsh would indicate representation-induced

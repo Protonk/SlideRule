@@ -137,9 +137,8 @@ into frequency components on the binade circle.
 
 If a correction architecture absorbs low-frequency displacement
 before high-frequency, the stair locations in §4 correspond to
-frequency thresholds rather than spatial cell clusters. The spectral
-and spatial views of the staircase are dual descriptions of the same
-absorption ordering.
+frequency thresholds: the spectral and spatial views of the
+staircase are dual descriptions of the same absorption ordering.
 
 ---
 

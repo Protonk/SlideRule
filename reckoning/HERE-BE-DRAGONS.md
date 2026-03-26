@@ -150,6 +150,105 @@ provides the geometric reason architecture-invariance might hold.
 
 ---
 
+Let me read the existing document and the uploaded NARROW-PASSAGE to make sure Dragon 7 doesn't repeat something already crystallized there.Good. NARROW-PASSAGE §4 already says the correction task difficulty is a property of ε and the input representation, not the corrector. But it argues this from the coordinate theory — from the fact that all correctors approximate the same function. Dragon 7 would argue it from the tiling's combinatorial structure, which is a different and potentially stronger route.
+
+Here's a draft.
+
+---
+
+## Dragon 7. The wall as a non-crystallographic theorem
+
+The binary subdivision of [0,1] to depth d embeds in the Poincaré
+half-plane as a tiling. Depth d lives at height y = 2^{−d}. Each of
+the 2^d cells has Euclidean width 1/2^d and horocyclic arc length 1,
+independent of d. Consecutive depths are separated by hyperbolic
+distance ln 2. Every tile is congruent: horocyclic width 1, height
+ln 2.
+
+Each tile's bottom edge has horocyclic arc length 2, split into two
+halves by the vertical geodesic separating the two child cells at
+depth d+1. This gives five edges: one short horocyclic edge (a),
+two half-length horocyclic edges (b₁, b₂), and two geodesic edges
+(c). The edge-matching rules of the Böröczky prototile are
+satisfied: c meets c between same-depth neighbors; each of b₁, b₂
+meets the a-edge of the corresponding child; the a-edge meets the
+b₁ or b₂ of the parent. The binary address of a cell — its d-bit
+string — is the tail sequence in the sense of Dolbilin & Frettlöh
+Definition 3.4: bit j records whether the cell descended into the
+b₁ or b₂ half at depth j. All 2^d binary strings are realized at
+depth d.
+
+By Proposition 4.3 of Dolbilin & Frettlöh, the number of distinct
+k-coronae is 2^{k−1}. By Theorem 4.4, the tiling is
+non-crystallographic: no finite local template captures its global
+structure.
+
+The mantissa subdivision occupies a horoball sector (the region
+above y = 0 between x = 0 and x = 1), not all of H². Kisfaludi-Bak
+et al. work explicitly with finite patches of the binary tiling in
+Section 7 of their separator paper. They take a subgraph B₁ of the
+full binary tiling graph B₀ induced by vertices in
+[0,1] × [2^{−⌈9n/δ⌉}, 1], show it is a geodesic subgraph of B₀,
+and conclude it retains constant hyperbolicity. The corona-counting
+argument is local: it requires only that the tile and its depth-k
+neighborhood exist, which they do for any tile sufficiently far from
+the boundary of the patch.
+
+The same paper establishes (Proposition 1.3) that any n-vertex
+planar δ-hyperbolic graph has treewidth O(δ log n). For the binary
+tiling at constant δ, a patch of n = 2^d cells at depth d has
+treewidth Θ(d). A finite-state machine with q states reading d bits
+is a width-q read-once branching program. Width-q branching programs
+cannot represent arbitrary functions on a graph of treewidth t when
+q < 2^{Ω(t)}. Since t = Θ(d) and q is fixed, the machine must
+assign identical corrections to cells whose neighborhoods — and
+therefore whose displacement field values — differ. The residual is
+the projection of Δ^L onto the part of the displacement field that
+the machine's finite width cannot separate.
+
+This makes the wall a property of the tiling's combinatorial
+complexity rather than of any specific correction architecture.
+The tiling has treewidth growing as Θ(d). Any finite machine has
+fixed width. The gap between them is nonzero for every finite
+machine at every sufficient depth. Different machines close
+different parts of the gap, but the gap's existence is forced by
+the tiling, not by the machine's design.
+
+The stair-location invariance claimed in POINCARE-CURRENTS §5
+becomes a corollary: stair locations are set by the corona structure
+of the tiling, stair heights vary by architecture, and the ordering
+does not change because it is set by the tail sequence, which is a
+property of the prototile. The covering game in Step 6 does not
+need to argue about specific architectures if the obstruction is a
+property of the tile complex itself.
+
+The connection to the Fourier picture in NARROW-PASSAGE §8 is
+suggestive but unproved. If the treewidth bound controls the number
+of absorbable Fourier modes of Δ^L, the spectral characterization
+of the residual (modes beyond the machine's width) would follow
+from the tiling's treewidth growth. This would unify the
+combinatorial (corona-counting) and analytical (Fourier tail)
+descriptions of the wall. Whether this unification is real depends
+on whether the FSM's sharing constraints are approximately aligned
+with the Walsh-Hadamard basis of Δ^L — a question the existing
+experimental infrastructure could test.
+
+**Open question.** The identification above requires that the binary
+significand grid, realized as a tiling of H² with horocyclic strips
+at ln 2 spacing, is within the Böröczky class — sharing not just the
+metric parameters but the edge-matching combinatorics. The ln 2
+spacing, the doubling, the horocyclic/geodesic duality, and the
+inter-strip stacking rule (hyperbolic translation by ln 2 along the
+perpendicular geodesic = the shift λ in Dolbilin & Frettlöh §2) all
+match. Is the cell adjacency within each strip sufficient to place
+the mantissa subdivision within the Böröczky class, or is it a
+different tiling built from the same ingredients — and if the
+latter, does the non-crystallographic conclusion (unbounded
+k-coronae, treewidth Θ(d)) still hold for it?
+
+
+---
+
 ## What this document is not
 
 This is not a research plan. There are no experiments proposed, no

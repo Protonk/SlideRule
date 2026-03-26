@@ -163,7 +163,7 @@ variance in the tiling analysis is an early signal: it's exactly the
 part of the wall that ε doesn't explain.
 
 The forcing organises the landscape. The wall measures the distance
-across it. These are not the same thing.
+across it.
 
 ---
 
@@ -180,13 +180,12 @@ This seems like bedrock.
 But the project does not measure errors pointwise. The wall is an
 L∞ norm. The LP solves a minimax problem. The staircase is read off
 norm-level quantities. The moment you pass from the pointwise bound
-to a norm, the operative inequality is not the triangle inequality
-but Minkowski's:
+to a norm, the operative inequality is still the triangle inequality, but in
+Lp it is Minkowski's inequality:
 
     ‖APPROX − log₂‖_p ≤ ‖APPROX − L‖_p + ‖ε‖_p
 
-Minkowski's inequality *is* the triangle inequality in Lp, but its
-equality conditions are not the pointwise conditions. 
+The inequality is the same. The equality conditions are not. 
 
 For p ∈ [1, ∞), For 1 < p < ∞: equality holds in 
 ‖f + g‖\_p = ‖f‖\_p + ‖g‖\_p iff g = λf a.e. for some λ ≥ 0.
@@ -205,8 +204,7 @@ Hölder's inequality is the companion fact. It governs the
 relationship between different Lp norms of the same function, and
 it is what controls the L¹/L∞ conversion that Dragon 4 requires.
 The two inequalities — Minkowski for the decomposition, Hölder for
-the norm comparison — are not incidental tools. They are the
-functional-analytic substrate that Step 1's pointwise split must
+the norm comparison — are the functional-analytic substrate that Step 1's pointwise split must
 pass through to reach the normed quantities the project actually
 measures.
 
@@ -251,7 +249,7 @@ One can see this with an ideal lookup-table. At fixed depth (d), a full table yi
 
 (\Delta^L=-\varepsilon) organises the target (\delta^*). The wall is (\mathrm{dist}(\delta^*,S)). A correlation between the wall and (\varepsilon) therefore does not by itself show that (\varepsilon) governs the wall. It may show only that (\varepsilon) governs the target, while the chosen achievable set (S) governs what part of that target can be reached.
 
-On that reading, the wall inherits (\varepsilon)-structure because a structured target is being measured against a particular finite model. The forcing organises the demand. The model determines what can be supplied. These are not the same claim.
+On that reading, the wall inherits (\varepsilon)-structure because a structured target is being measured against a particular finite model. The forcing organises the demand. The model determines what can be supplied.
 
 **Status (2026-03-24).** The Test of Charybdis
 ([CHARYBDIS](CHARYBDIS.md) §5) tested this
@@ -288,3 +286,48 @@ If the problem factors, the proof should have three safe steps:
 3. combine them without any global bookkeeping argument on the binary tiling.
 
 If it does not factor — if the tight bound requires knowing simultaneously which cells the machine visits and what the local cost is at each one, coupling path-combinatorics to position-weight along a row of tiles — then the proof needs exactly the kind of global bookkeeping on the binary tiling that Böröczky forbids.
+
+---
+
+## 6. The basis-dependence of the contradiction
+
+The contradiction chain in ROARING-40s §9 runs: finite machine
+closes gap → corrections eventually periodic → generating
+function rational → grids commensurable → ?(x) non-singular →
+ln 2 rational → contradiction.
+
+The first arrow is the weak joint. A finite-state machine with
+q states cycles in its own state space. The chain projects that
+cycling onto the Stern-Brocot tree and asserts the projection
+must be eventually periodic. But a finite object cycling in its
+own coordinates can cast non-periodic shadows onto a different
+coordinate system. A rational-slope line on a torus projects to
+a periodic sequence on each axis; an irrational-slope line does
+not, yet the line itself is perfectly finite as a geometric
+object.
+
+The FSM reads binary digits. Its state transitions partition
+the domain along binary boundaries. The Stern-Brocot tree
+partitions the domain along Farey boundaries. These are
+different coordinate systems. The claim that periodicity in one
+forces periodicity in the other is the claim that the two
+systems are interleaved tightly enough that finite structure in
+one cannot hide infinite structure in the other.
+
+This is exactly what must be proved and has not been.
+
+A finite correction scheme that is not eventually periodic in
+the Stern-Brocot basis could still close the gap, if its
+periodicity lives in a basis we did not decompose into. The
+contradiction would then be an artifact of our choice of
+projection, not a property of the problem. Concretely: the
+chain proves that no finite machine can close the gap *in a way
+that factors through finite Stern-Brocot levels*. It does not
+yet prove that every finite machine must factor through finite
+Stern-Brocot levels.
+
+The doubt is whether the Stern-Brocot tree is the unique
+coordinate system for the binary-to-Farey correction problem,
+or merely a convenient one. If unique, the contradiction is in
+the problem. If convenient, the contradiction is in our
+description of the problem.

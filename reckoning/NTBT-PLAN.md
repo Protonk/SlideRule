@@ -157,11 +157,13 @@ outward.
 10. **ETAK.md** — the horizon. Speculative; may have aspirational
     negations.
 11. **NARROW-PASSAGE.md** — the passage toward Step 6.
-12. **HERE-BE-DRAGONS.md** — speculative extensions.
-13. **GLOSSARY.md** — definitions. Unlikely to have rhetorical
+12. **ROARING-40s.md** — the measure-support-to-contradiction
+    chain. Argumentative; likely has oppositions.
+13. **HERE-BE-DRAGONS.md** — speculative extensions.
+14. **GLOSSARY.md** — definitions. Unlikely to have rhetorical
     oppositions but worth a check.
-14. **PARTITIONS.md** — partition classification. Unlikely.
-15. **REFERENCES.md** — bibliography. Skip.
+15. **PARTITIONS.md** — partition classification. Unlikely.
+16. **REFERENCES.md** — bibliography. Skip.
 
 ---
 
