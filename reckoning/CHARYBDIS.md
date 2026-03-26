@@ -2,10 +2,17 @@
 
 Is the FSM's wall special, or would any subspace of the same
 dimension produce a wall with similar ε-structure? This note
-describes a rotation check that can answer that narrower question
-with existing infrastructure.
+describes a rotation check that answered that narrower question.
 
 The test responds to [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4b.
+
+**Verdict.** The FSM is atypical on all three statistics — wall
+magnitude, ξ\_n, and Walsh spectral profile — across all tested
+configurations. The outcome is "multiple atypical" (§4). Results
+and artifacts are in
+[`experiments/aft/rotation/`](../experiments/aft/rotation/ROTATION.md).
+Open questions now concern what determines the FSM's spectral
+fingerprint (§6, §7), not whether one exists.
 
 ---
 
@@ -26,16 +33,21 @@ all. The null is dimension-matched but not cost-matched or
 access-matched: it controls for the thinness of S but not for
 the binary-digit-reading structure that generated it.
 
-The test is therefore a one-sided falsifier. If the FSM is
-atypical, that is informative: orientation matters, and the
-next question is what determines it (§6). If the FSM is
-typical, the result is weak — high-dimensional random
-projections concentrate, so typicality may be generic rather
-than meaningful.
+The test is therefore a one-sided falsifier. The FSM turned out
+to be strongly atypical (§5), so orientation matters and the
+next question is what determines it (§6). Had the FSM been
+typical, the result would have been weak — high-dimensional
+random projections concentrate, so typicality may be generic
+rather than meaningful.
 
 ---
 
 ## 2. The rotation check
+
+This section records the methodology. The implementation is in
+[`charybdis_check.sage`](../experiments/aft/rotation/charybdis_check.sage);
+results are in
+[`experiments/aft/rotation/ROTATION.md`](../experiments/aft/rotation/ROTATION.md).
 
 ### Setup
 
@@ -185,11 +197,11 @@ The Fourier, Walsh, and prefix-tree views address different
 questions about the same residual. The relationship between them is
 open.
 
-The Walsh spectrum of δ\* has not been computed. The level-k
-weight W^k[δ\*] = Σ\_{|S|=k} δ̂\*(S)² is a concrete computation
-to perform. The decay of |δ̂\*(S)| with |S| (interaction order)
-is a natural quantity to compare against what a shallow bounded-
-width reader can capture.
+The Walsh spectrum of δ\* was computed in the spectral experiment
+(§5). Its level-k weight W^k[δ\*] is concentrated at level 0,
+mirroring P(ε). The residual spectrum P(r\_FSM) is spread across
+higher interaction orders — this high-order mass is induced by
+the shared minimax projection, not inherited from the target.
 
 Convention: {0,1}^d addressing to match the codebase. The
 Walsh-Hadamard transform is computed via the fast Hadamard
@@ -210,7 +222,9 @@ Candidate routes for analyzing the Grassmannian ensemble for
 
 None of these are specialized into a theorem about the wall
 functional. They are heuristic guidance, not a proved account
-of when the test has power.
+of when the test has power. The empirical results (§5) establish
+that the FSM is atypical but do not resolve these theoretical
+questions about why the ensemble concentrates where it does.
 
 ### Candidate route: concentration of wall\_rand
 
@@ -308,7 +322,7 @@ guidance for a human reader.
 With three statistics, the outcome space is richer than a 2×2.
 The most informative cases:
 
-### All typical
+### All typical — *not observed*
 
 Wall magnitude, ξ\_n, and Walsh profile are all within the bulk
 of the Grassmannian ensemble. Against this null, the FSM is not
@@ -316,7 +330,7 @@ obviously special. Weak evidence. §3 sketches possible reasons
 why typicality may be generic but does not establish a theorem
 quantifying how weak this case is.
 
-### Wall or ξ atypical, Walsh typical
+### Wall or ξ atypical, Walsh typical — *not observed*
 
 The FSM differs from the null in aggregate (wall size or
 ε-structured residual dependence) but not in the coarse
@@ -324,7 +338,7 @@ distribution of Walsh energy across interaction orders. Under
 this null, the specialness appears in magnitude or aggregate
 ε-structure more than in the level-by-level Walsh profile.
 
-### Walsh atypical, wall and ξ typical
+### Walsh atypical, wall and ξ typical — *not observed*
 
 The FSM's residual occupies different Walsh levels than a random
 subspace's residual, even though the aggregate statistics look
@@ -333,57 +347,25 @@ specific spectral structure in the residual. This outcome is
 invisible to wall magnitude and ξ\_n alone, and it suggests that
 the FSM's binary-tree structure may matter for the wall.
 
-### Multiple atypical
+### Multiple atypical — *observed*
 
-The FSM is atypical on two or three statistics. The next
-question is what determines that specialness (§6). The Walsh
-profile may indicate which interaction orders to investigate.
+The FSM is atypical on all three statistics. Wall magnitude is
+atypical in every configuration (§5). ξ\_n is atypical at
+depth ≥ 7 with configuration-dependent sign. Walsh profile is
+qualitatively different from random subspaces at d=9.
 
----
-
-## 5. Implementation notes
-
-The L∞ best-approximation problem for an arbitrary basis matrix B
-is a standard LP with p + 1 variables (p coefficients α plus the
-slack t) and 2^{d+1} constraints. The existing LP infrastructure
-handles this if the constraint matrix is replaced with B.
-
-Note: the current code may assume the FSM's sparse/tree-structured
-matrix. If so, it needs generalisation to accept an arbitrary
-dense basis.
-
-For each subspace (FSM and each random draw): solve the LP, compute
-the cellwise residual r, compute ξ\_n(ε(m\_mid), |r|) via
-`scipy.stats.chatterjeexi`, and compute the Walsh-Hadamard transform
-of r via the fast Hadamard transform (O(n log n)). If the L∞
-minimizer is non-unique, use the L2 tie-breaker from §2 before
-computing ξ\_n and the Walsh transform.
-
-Normalization matters. With the convention from §2,
-
-    r̂(S) = 2^{−d} Σ_x r(x) χ_S(x),
-
-Parseval gives
-
-    Σ_S r̂(S)^2 = 2^{−d} Σ_x r(x)^2.
-
-So the level weights W^k sum to the mean squared residual, not the
-total squared residual. An implementation using an unnormalized
-Hadamard transform must divide by 2^d before forming W^k.
-
-The ensemble should be large enough to estimate quantiles of both
-wall\_rand and ξ\_rand, as well as reference bands for the Walsh
-level weights W^k. A few hundred draws should suffice at d = 5–7.
-
-The check should be run across multiple partition kinds. If the
-FSM is special for geometric but not for uniform, the answer
-depends on partition geometry, which would itself be informative.
+The next question is what determines that specialness (§6). The
+Walsh profile indicates which interaction orders to investigate;
+the spectral experiment (§5, `spectral/`) established that the
+high-order Walsh mass is *induced* by the shared minimax
+projection, not inherited from the target.
 
 ---
 
-## 5b. Current results (2026-03-24)
+## 5. Results
 
-The rotation check has been run. Results are in
+The rotation check has been run across 84 configurations. Results
+and artifacts are in
 [`experiments/aft/rotation/ROTATION.md`](../experiments/aft/rotation/ROTATION.md)
 (main sweep + adversary sweep) and
 [`experiments/aft/rotation/spectral/`](../experiments/aft/rotation/spectral/)
@@ -415,14 +397,30 @@ what determines the FSM's spectral fingerprint — is addressed by
 the structured null families (§6) and the spectral experiment's
 geometry-vs-placement analysis.
 
+### Implementation record
+
+The L∞ best-approximation for each subspace is a standard LP with
+p + 1 variables and 2^{d+1} constraints, accepting an arbitrary
+dense basis matrix. The LP vertex solution was used in all 72 FSM
+and 21,600 ensemble projections (the unconstrained LS solution
+never satisfied the L∞ constraint). 300 Grassmannian draws per
+configuration at depths 5–8; 500–1000 at d=9 (spectral experiment).
+
+Walsh normalization: r̂(S) = 2^{−d} Σ\_x r(x) χ\_S(x), so
+Parseval gives Σ\_S r̂(S)² = 2^{−d} Σ\_x r(x)². Level weights
+W^k sum to the mean squared residual.
+
 ---
 
-## 6. Structured null families
+## 6. Structured null families [open]
 
-The Grassmannian ensemble tests the FSM against subspaces with
-no structure. To address Doubt 4a — whether the wall's structure
-is shared by other binary-digit-reading architectures — the null
-must preserve binary-address features while varying others.
+The Grassmannian null is now resolved: the FSM is strongly
+atypical against unstructured subspaces (§5). The next question
+is which structural features of the FSM subspace account for
+that atypicality. To address Doubt 4a — whether the wall's
+structure is shared by other binary-digit-reading architectures —
+the null must preserve binary-address features while varying
+others.
 
 Candidate structured families:
 
@@ -455,7 +453,7 @@ architecture.
 
 ---
 
-## 7. Extensions
+## 7. Extensions [open]
 
 ### Principal angle decomposition
 
