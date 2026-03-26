@@ -183,14 +183,16 @@ but Minkowski's:
     ‖APPROX − log₂‖_p ≤ ‖APPROX − L‖_p + ‖ε‖_p
 
 Minkowski's inequality *is* the triangle inequality in Lp, but its
-equality conditions are not the pointwise conditions. For
-p ∈ [1, ∞), For 1 < p < ∞: equality holds in 
+equality conditions are not the pointwise conditions. 
+
+For p ∈ [1, ∞), For 1 < p < ∞: equality holds in 
 ‖f + g‖\_p = ‖f‖\_p + ‖g‖\_p iff g = λf a.e. for some λ ≥ 0.
 
-For p = ∞, the condition
-is different and more permissive: the sup of the sum must be
+For p = ∞, the condition is different and more permissive: the sup of the sum must be
 achieved where both components attain their individual sups with the
-same sign. Neither condition is generically satisfied by a
+same sign.
+
+Neither condition is generically satisfied by a
 correction that is doing useful work. Any correction that reduces
 error in some cells while leaving others unchanged breaks positive
 linear dependence; any correction whose worst-case cell differs from
