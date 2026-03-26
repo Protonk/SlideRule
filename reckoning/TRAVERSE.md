@@ -138,54 +138,72 @@ it depends on the representation, not the corrector. Properties:
 The shape of the gap governs the cost of closing it. See
 [POINCARE-CURRENTS](POINCARE-CURRENTS.md).
 
-## Step 4. The exchange rate [MENEHUNE]
+## Step 4. The FSM exchange rate [MENEHUNE]
 
-The forcing's shape predicts a staircase in the (C, gap) curve.
-ε is zero at domain boundaries, maximal near m* ≈ 0.44, and
-concave. A correction architecture absorbs cells where ε is
-small (near boundaries) before where it is large (near the peak).
-The binding cell advances in discrete jumps.
+How does this particular binary-digit reader spend structure, 
+and which features of that spending survive changes in depth, 
+layer mode, and automaton topology?
 
-Near the ε peak, many cells cluster at similar displacement. These
-must be absorbed roughly simultaneously, predicting a wide plateau
-followed by a cliff. Stair locations are set by ε; stair heights
-by the architecture's absorptive efficiency per parameter.
+ε still organises the demand. It is zero at domain boundaries,
+maximal near m* ≈ 0.44, and concave, so low-capacity correctors
+should absorb boundary cells before cells near the peak. But the wall
+depends on `dist(δ*, S)`, and [DEPENDENCE](../experiments/wall/DEPENDENCE.md)
+shows that inside the mod-q family the achievable subspace S changes
+orientation with q. More states can therefore buy a worse wall.
+
+The exchange rate at this step is therefore an FSM exchange rate.
+Its staircase is real, but it is managed by the architecture: stair
+heights are architectural, and even apparent ordering claims must be
+earned against topology variation rather than assumed from ε alone.
+
+The work here is to map that managed rate across `(q, d)`, layer
+mode, and topology, and to separate stable features from mod-q
+idiosyncrasies. The fan-out scaling sweep is load-bearing: if the
+layer-0 displacement range stabilizes, the architecture faces a
+finite allocation problem; if it grows, the wall is a structural
+limit of the FSM family.
 
 The Fourier decomposition of the density defect (Ê(n) = δ̂(n)/(j2πn))
-gives a spectral interpretation: if absorption proceeds by frequency
-band, the stair locations correspond to frequency thresholds rather
-than spatial cell clusters. See [BINADE-WHITECAPS](BINADE-WHITECAPS.md)
-§§7–8.
+remains a candidate description of what the FSM absorbs first. But at
+this stage it is only an architectural reading of the staircase, not
+yet a cross-architecture theorem. See
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–8.
 
-## Step 5. The interrupted log [MENEHUNE]
+## Step 5. The interrupted log and the sargassum [MENEHUNE]
 
-Can any adversarial combination of partition strategies beat the
-ε-organised baseline? If a composite partition — cells drawn from
-different families, chosen adversarially — cannot achieve locally
-competitive performance without paying more than the ε-organised
-cost, then the baseline survives partition surgery inside the tested
-zoo.
+The first test is passage through the
+[AUTOMATON-SARGASSUM](AUTOMATON-SARGASSUM.md). This is a rejection
+loop for candidate automaton families: generate, perturb, and discard
+binary-digit readers until one yields a stable Step-4 story worth
+carrying forward. A family passes only if its exchange-rate behavior
+is coherent under depth, topology, and nearby perturbation; then it is
+sent back through Step 4 explicitly on that family.
 
-If the stair locations are set by the forcing regardless of which
-partitions contribute cells, they are problem-intrinsic, not
-architecture-specific inside the tested zoo. See
-[INTERRUPTED-LOG](INTERRUPTED-LOG.md).
+The second test is partition surgery inside the zoo. Whatever survives
+the sargassum must also survive an adversarial partitioning. If a
+composite partition — cells drawn from different families, chosen
+adversarially — cannot achieve locally competitive performance
+without paying more than the ε-organised cost, then the baseline
+survives.
+See [INTERRUPTED-LOG](INTERRUPTED-LOG.md).
 
 ## Step 6. The coordinate change [MENEHUNE]
 
-The formal bridge from geometric to computational language. The FSM
-is a branching program of width q and depth d. The correction task —
-mapping a d-bit prefix to a near-optimal δ — is a function whose
-complexity is controlled by the information content of δ*, which is
-controlled by the shape of ε.
+Step 6 opens only after Step 5 isolates a candidate invariant.
+Until that readiness condition is met, [COMPLEXITY-REEF](COMPLEXITY-REEF.md)
+is hazard mapping.
 
-A lower bound on branching program size or communication complexity
-for this function would make the staircase a forced consequence of
-the function's structure under any width-bounded sequential reader
-of binary digits. The bound would not care what sits between input
-and output.
+Now the formal bridge from geometric to computational language becomes
+meaningful. The correction task — mapping a d-bit prefix to a
+near-optimal δ — can be posed as a computational object whose
+complexity may be controlled by the surviving structure in `δ*` and
+in ε.
 
-See [COMPLEXITY-REEF](COMPLEXITY-REEF.md) for the proof avenues.
+A lower bound on branching program size, communication complexity,
+widths, or mode counts would then make the staircase a forced
+consequence of the function's structure under any width-bounded
+sequential reader of binary digits. The bound would not care what
+sits between input and output.
 
 ## Step 7. The ruler [MENEHUNE]
 

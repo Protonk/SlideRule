@@ -1,15 +1,11 @@
 # Complexity Reef
 
-The computational complexity question for the ruler. What the
-computational object is, what cost models are admissible, which
-lower-bound tools might apply, and what success would mean.
-
-The load-bearing ambition is a genuine coordinate change, not a
-metaphor: a lower bound proved in computational language should
-become a bound on the cost of correcting the `ε`-organised target,
-independent of the particular FSM implementation. The adversarial
-zoo-surgery test is separate; it lives in
-[INTERRUPTED-LOG](INTERRUPTED-LOG.md).
+Once a candidate invariant and a comparable cost
+currency have survived the [AUTOMATON-SARGASSUM](AUTOMATON-SARGASSUM.md)
+and the [INTERRUPTED-LOG](INTERRUPTED-LOG.md), the load-
+bearing ambition is a lower bound in computational
+language on the cost of correcting the `ε`-organised target,
+independent of a particular architecture.
 
 ---
 
