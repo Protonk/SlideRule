@@ -1,5 +1,15 @@
 # LORENTZ-ROUTE
 
+> "On two occasions I have been asked, – 'Pray, Mr. Babbage, if
+> you put into the machine wrong figures, will the right answers
+> come out?' ... I am not able rightly to apprehend the kind of
+> confusion of ideas that could provoke such a question."
+> — Charles Babbage
+
+> "You best start believing in ghost stories, Miss Turner...
+> you're in one."
+> — Hector Barbossa
+
 Each level of integration machinery adds more infrastructure to
 the same obstruction. From calculus to Riemann to Stieltjes to
 Lebesgue to Padé to exhaustive TMD enumeration, the residual
@@ -102,13 +112,13 @@ Take n → ∞. The limit is a metric whose induced measure is μ_?
 itself.
 
 Stay at finite n. The level-n floor is a legitimate measure.
-Integration against it works. The error between this floor and
-μ_? is the next level of the fractal — the part of the
-singularity not yet resolved.
+Integration against it works. But it computes against the
+level-n approximation, not against μ_? itself. What remains is
+the gap between that finite approximation and the limit.
 
-This does not converge to a solution. It converges to a
-sequence of increasingly precise descriptions of how the
-singularity is structured, level by level.
+The construction yields increasingly precise descriptions of
+the singular structure, level by level; the full object appears
+only in the limit.
 
 ## §5. The Padé ghost
 
@@ -139,33 +149,42 @@ be commensurable; ln 2 would need to be rational. It isn't. So
 no finite machine that captures a repeating pattern in the
 corrections can succeed.
 
-But §5 doesn't say anything about a finite machine that refuses
-to look for a pattern and simply enumerates.
+So try a stronger but narrower tool. Fix a source format, an
+output format, a rounding mode, and the function log₂. The
+output line is partitioned into rounding cells, with walls at
+the rounding breakpoints: representable numbers in directed
+modes, midpoints between consecutive representable numbers in
+round-to-nearest. Pull that partition back through log₂. On the
+input side, this gives intervals on which the rounding decision
+is constant.
 
-This machine exists. Lefèvre and Muller built it [LM00]. Over
-four years, using approximately a hundred workstations, they
-checked every double-precision floating-point input to log, exp,
-log₂, 2^x, and the trigonometric functions. For each input, they
-determined how close the function value comes to a rounding
-breakpoint — a floating-point number or the midpoint of two
-consecutive floating-point numbers. They published the worst
-cases: the inputs where the function value is closest to a
-breakpoint.
+Now restrict to the binary64 source lattice. For each input x,
+ask how far log₂(x) lies from the nearest rounding wall in the
+chosen output partition. The hard-to-round inputs are those for
+which this boundary clearance is smallest. The TMD tables are
+catalogs of those minima: the sampled inputs where log₂ comes
+closest to the pulled-back rounding walls.
 
-The core of their algorithm is a multi-scale filter. On each
-small subdomain, the function is approximated by a linear
-function, and the problem reduces to finding integer lattice
-points near a line. This is solved by a variant of the Euclidean
-algorithm — that is, by continued fractions [L99]. The
-candidates surviving the filter are verified with
-arbitrary-precision arithmetic. The method is exhaustive: every
-input is checked, either by the filter or directly.
+Lefèvre and Muller built this machinery [LM00]. Over four
+years, using approximately a hundred workstations, they checked
+every double-precision floating-point input to log, exp, log₂,
+2^x, and the trigonometric functions. The core of their
+algorithm is a multi-scale filter. On each small subdomain, the
+function is approximated by a linear function, and the problem
+reduces to finding integer lattice points near a line. This is
+solved by a variant of the Euclidean algorithm — that is, by
+continued fractions [L99]. The candidates surviving the filter
+are verified with arbitrary-precision arithmetic. The method is
+exhaustive: every input is checked, either by the filter or
+directly.
 
 For log₂(x) on the full double-precision range, the result is
 Property 4 of [LM00]: 55 extra bits beyond the 53-bit
 significand suffice to resolve correct rounding, in all four
-IEEE-754 rounding modes. The worst case for log₂ in the binade
-[1/2, 1) has the form
+IEEE-754 rounding modes. The table therefore identifies the
+narrowest sampled passages in this pulled-back partition for
+binary64 log₂. The worst case for log₂ in the binade [1/2, 1)
+has the form
 
     log₂(1.0110000101...) = −10000000000.1000100001...10100101...
                              followed by 55 zeros,
@@ -176,52 +195,39 @@ replaced by 55 ones, by bit complementation — a symmetry of
 
 Muller consolidates the theory in [M16, Ch. 12]. The
 probabilistic model treats the post-significand bits of f(x) as
-independent fair coin flips. Under this model, the longest chain
-of identical bits after the significand, among N inputs, is
-approximately p + log₂(N), where p is the significand width.
-For double precision with log₂ this gives roughly 53 + 55 = 108,
-matching the exhaustive result. Muller's Table 12.1 shows
-agreement between predicted and observed chain-length counts for
-sin(x) at p = 24, down to the last row.
+independent fair coin flips. In this language, a hard-to-round
+point is one where many bits are needed before the value is
+known to lie on one side of the rounding wall rather than the
+other. Under the model, the longest chain of identical bits
+after the significand, among N inputs, is approximately
+p + log₂(N), where p is the significand width. For double
+precision with log₂ this gives roughly 53 + 55 = 108, matching
+the exhaustive result. Muller's Table 12.1 shows agreement
+between predicted and observed chain-length counts for sin(x)
+at p = 24, down to the last row.
 
-Gustafson's "minefield method" [G20] inverts the problem. Instead
-of minimizing approximation error uniformly and hoping this
-resolves all rounding decisions, he treats the hard-to-round
-points as obstacles — "mines" — and builds a polynomial that
-threads between them. His rule of thumb: the polynomial needs
-roughly as many free coefficients as there are mines in its
-domain. The construction is manual, not theoretical. He adjusts
-roots interactively until the approximation clears every mine.
-Perfect rounding is the direct goal, not the consequence of high
-accuracy.
+Gustafson's "minefield method" [G20] attacks the same geometry
+from the other side. Instead of certifying the narrow passages,
+he treats them as obstacles — "mines" — and builds a polynomial
+that threads between them. His rule of thumb: the polynomial
+needs roughly as many free coefficients as there are mines in
+its domain. The construction is manual, not theoretical. He
+adjusts roots interactively until the approximation clears
+every mine. Perfect rounding is the direct goal, not the
+consequence of high accuracy.
 
-At precision p = 53, the question "how does log₂(1+m) interact
-with the binary grid?" is completely answered. The table of worst
-cases is an exhaustive census of the near-commensurabilities
-between the function ε(m) and the breakpoint structure at this
-resolution. The corrections from ε to the grid are known
-individually, for every input. The Padé ghost (§5) said a
-*pattern* in the corrections cannot be captured finitely. The
-TMD project says: we don't need a pattern. We have the list.
+At precision p = 53, this stronger tool succeeds at a fixed
+resolution. It identifies where the binary64 source lattice
+comes closest to the rounding walls pulled back through log₂,
+and it certifies the minimum clearance there. But it still does
+not produce a reusable floor, density, or recurrence. It
+traverses one sampled partition completely.
 
-The list is exact. It is a theorem, not an estimate. Every
-double-precision input to log₂ is correctly accounted for. In
-the language of §§1–4, this is successful Riemann-Stieltjes
-integration of ε against the breakpoint measure at resolution
-p = 53.
-
-But the list does not refine.
-
-Riemann integration refines: the sum at mesh h/2 includes and
-improves the sum at mesh h. Partial sums accumulate. You can
-stop at any resolution and you have captured everything coarser.
-
-The TMD table at precision p gives almost nothing about precision
-p+1. The breakpoints move when the grid changes. The
-near-coincidences are controlled by different convergents of
-continued fractions at different precisions. The table for
-binary64 does not extend, inform, or constrain a table for
-binary128. Muller states this directly:
+And it does not refine across precisions. When the precision
+changes, both the source lattice and the breakpoint set change,
+so the pulled-back partition changes with them. The table for
+binary64 gives almost nothing about binary128. Muller states
+this directly:
 
   "For larger precisions (e.g., binary128), an exhaustive search
   is far beyond the abilities of the most powerful current
@@ -233,66 +239,65 @@ new subintervals, new Coppersmith lattice reductions, new
 feasibility instances. Nothing transfers from the binary64
 computation.
 
-This is §5's consequence, visible as engineering. The Padé ghost
-says the corrections cannot be eventually periodic. Therefore
-the table at precision p cannot predict precision p+1. Each
-precision is a separate, complete, non-transferable act of
-computation. The work grows (exponentially for exhaustive search,
-subexponentially for SLZ) and the results are
-precision-specific.
-
-§5 says: a finite recurrence fails because the generating
-function is irrational. §6 says: enumerate without a
-recurrence and you succeed, but the success is trapped at its
-resolution. The computational cost
-of resolving the ε-grid interaction at precision p is paid in
-full, buys nothing toward precision p+1, and must be repaid from
-scratch at the new precision. Each level of the Stern-Brocot
-correction sequence (§4) requires a full recomputation.
-
-Gustafson's mines are the near-commensurabilities. His
-polynomial threads between those near-alignments. Lefèvre and
-Muller's filter finds them by invoking
-continued fractions — the same machinery that governs rational
-approximation to ln 2. The four years and hundred machines are a
-measurement of the computational cost of one level of the
-fractal floor (§4), at one specific resolution.
-
-The floor supports this weight. At p = 53, the exhaustive
-computation is complete; at p = 113, the corresponding
-exhaustive computation is unavailable.
-
 ## §7. The Culture
 
-Suppose the machine has no resource bound. Not a larger
-computer. A machine that has already completed every finite
-computation. It has the TMD table for every precision p: for
-p = 53, for p = 113, for every natural number. It has every
-convergent of the continued fraction of ln 2.
+The force of §§1–6 cuts both ways. Each failure is evidence
+that the obstruction is structural. But each failure is also
+first-order: one floor, one deformation, one recurrence, one
+sampled rounding partition at a time. The missing object, if
+there is one, may live one level up.
 
-§6 showed that each table is exact and non-transferable. The
-machine overcomes non-transfer by holding all tables
-simultaneously. For each mantissa value m = j/2^p at every
-precision p, it knows the complete interaction between
-log₂(1+m) and the breakpoint grid. By density and continuity,
-this determines ε(m) everywhere on [0,1]. The machine knows ε.
+So strengthen the tool in the only way §6 has not already
+tested. Do not ask for more tables. Ask for a theory of the
+family of tables.
 
-The fractal floor of §4, which converged to μ_? through a
-sequence of finite piecewise-smooth approximations, is now a
-completed object. The machine holds the limit. It has μ_?.
+For each precision p, §6 gives a sampled boundary-clearance
+field: the distance from log₂(x) to the nearest pulled-back
+rounding wall, evaluated on the source lattice of that
+precision. The TMD table records the minima of that field. A
+Culture-scale computation would not stop at certifying those
+minima one precision at a time. It would study the whole family
+{κ_p} at once, looking for transport laws from p to p+1,
+renormalization rules, stable invariants of the minima,
+compressed descriptions of their migration, or coordinates in
+which the family aligns.
 
-With μ_? in hand, integration works. For any continuous f, the
-machine evaluates ∫f dμ_? by Riemann-Stieltjes sums at every
-mesh width and takes the limit. It has the entire integral
-operator f ↦ ∫f dμ_?.
+That is qualitatively different from §6. Section 6 traverses
+one sampled partition completely. This move asks whether the
+sequence of sampled partitions is itself a structured object.
+Perhaps the tables do not refine pointwise but do cohere
+second-order: perhaps the narrow passages migrate by a law, the
+extremal set has a stable statistic, or the family admits a
+compressed generator that no single table reveals.
 
-It cannot write dμ_? = g(x)dx. Not because something remains
-to be calculated. Because g does not exist. The machine has
-complete knowledge of both measures. Their mutual singularity
-is a property of the relationship between two completed
-infinite objects held simultaneously. No further computation is
-available. The obstruction is not a deficit of information. It
-is a theorem about structure.
+If such a theory exists, it changes the question. The task is
+no longer to integrate against one finite survey. It is to
+extract a limit law from the procession of finite surveys. The
+object of integration is not one TMD table but the family of
+TMD tables.
+
+What would success look like? Not another certified table. A
+successful Culture move would produce a reusable description of
+the whole family: enough structure to predict new precisions
+without recomputing them from scratch, or enough compression to
+replace exhaustive traversal by a law.
+
+But that success, if it comes, still has to land somewhere.
+Either the family-level theory remains descriptive —
+statistics, migration rules, compressed summaries — in which
+case it has not yet produced a floor for integration. Or it is
+strong enough to determine the limiting object itself. Then the
+gain is real, but the object reached is the same one already
+waiting at the end of §4: the singular measure μ_?, not an
+absolutely continuous density.
+
+So the Culture objection is not "what if we had more search?"
+Section 6 already answered that form. The serious objection is:
+what if the family of failed finite surveys has a second-order
+structure of its own? This is the strongest version of the
+computational hope. It does not repeat §6 with larger numbers.
+It asks whether the sequence of first-order failures can itself
+be integrated.
 
 ---
 
@@ -308,17 +313,20 @@ is an empirical fact of the Lefèvre-Muller and SLZ programs,
 grounded in §5's cause. The interpretation of Gustafson's mines
 as near-commensurabilities is ours.
 
-§7: the transfinite completion is a thought experiment. Its
-logical content is that removing the resource constraint does
-not remove the singularity. The loop 7 → 4 is forced: the
-completed object is μ_? itself, and μ_? is mutually singular
-with Lebesgue. This is classical once you hold the completed
-object.
+§7: the Culture objection is a thought experiment about
+second-order structure. The family {κ_p} of per-precision
+boundary-clearance fields may, in principle, admit transport
+laws, renormalization, or compression that no single table
+reveals. None of that is established here. The section's
+logical content is narrower: it isolates the strongest
+computational hope that is not merely "more search."
 
-The loop 1 → 2 → 3 → 4 → 5 → 6 → 7 → 4 is a fixed point.
-Every path through the levels returns to §4. The singularity
-between additive and multiplicative structure is not a
-computational problem. It is the geometry.
+The route 1 → 2 → 3 → 4 → 5 → 6 records repeated first-order
+failures against the singularity. Section 7 asks whether those
+failures themselves form a higher-order object. If they do,
+that object still has to land either in a descriptive theory of
+the table family or in the same singular limit already present
+in §4.
 
 ---
 
