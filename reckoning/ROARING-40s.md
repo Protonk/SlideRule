@@ -120,32 +120,43 @@ is a moment where the two grids almost lock into phase. The
 irrationality of ln 2 ensures they never do. The irrationality
 measure of ln 2 controls how close the near-misses get.
 
-## §6. The FSM is a finite recurrence
+## §6. Any finite machine is a finite recurrence
 
-A finite-state machine with q states is a finite recurrence.
-Whatever it computes is eventually periodic in structure. If the
-Stern-Brocot corrections were eventually periodic, an FSM with
-enough states to capture one period could close the gap exactly.
+A finite machine reading binary digits and producing corrections
+has bounded resources. Whatever it computes is eventually periodic
+in structure: a width-q branching program cycles in a state space
+of size at most q, and an unbounded accumulator with a fixed
+weight alphabet produces outputs in a finitely generated group.
 
-The wall — the nonzero residual of any finite-state corrector —
-and the Padé failure — the non-rationality of the correction
-generating function — are therefore two descriptions of the
-same property:
+SCYLLA ([SCYLLA](SCYLLA.md)) shows that neither class escapes ε.
+The finite-width machine faces a treewidth wall: the binary
+tiling's combinatorial complexity forces aliasing across coronas
+whose displacement field values differ (SCYLLA §§5–7). The
+unbounded accumulator faces a polynomial wall: exact knowledge of
+L and z does not make z^{−1/b} a polynomial (SCYLLA §§3–4). Both
+walls are controlled by ε.
 
-- The wall says: no finite machine can close the gap.
-- The Padé failure says: the corrections never repeat.
-- The irrationality of ln 2 says: the grids never re-align.
+If the corrections could be made eventually periodic in the
+Stern-Brocot basis, a finite machine capturing one period could
+close the gap exactly. The Padé failure (§5) says the corrections
+cannot repeat. The wall says the gap cannot close. The
+irrationality of ln 2 says the grids cannot re-align.
 
-The wall is a direct measurement of how far the correction
-sequence is from being eventually periodic. How far from
-rational. How far from commensurable.
+These are three descriptions of the same property:
+
+- The wall measures how far the correction sequence is from
+  eventually periodic.
+- The Padé failure measures how far the generating function is
+  from rational.
+- The irrationality of ln 2 measures how far the two grids are
+  from commensurable.
 
 ## §7. Three residuals, one object
 
 Three processes attempt to bridge additive and multiplicative
 structure with finite resources:
 
-1. **FSM correction of L.** The machine reads binary digits and
+1. **Finite correction of L.** A machine reads binary digits and
    corrects the pseudo-log toward log. It does partition surgery
    with finite state. The residual it cannot absorb has a
    spectral shape.
@@ -241,7 +252,7 @@ What is established:
 - §§1–4: classical, no novel claims.
 - §5: the Padé condition (rationality of corrections) is
   equivalent to commensurability of the grids. Classical.
-- §6: the FSM as finite recurrence is definitional.
+- §6: Conjectured in [SCYLLA](SCYLLA.md), with one question open. 
 - §§7–9: conjectural.
 
 ---

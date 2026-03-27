@@ -1,6 +1,6 @@
 # SCYLLA
 
-Dragon 7's corona-aliasing argument applies to machines with
+Lucky Dragon 7's corona-aliasing argument applies to machines with
 finite total configuration space: at a given depth, a machine
 with only finitely many configurations cannot distinguish all
 local types once the corona count outruns that bound. An
@@ -12,7 +12,8 @@ This document follows that objection to its conclusion and then
 closes the other jaw. The unbounded accumulator faces a
 polynomial correction wall (§§1–4). The finite-width machine
 faces a treewidth wall forced by the combinatorial structure of
-the binary tiling (§4a). No single architecture evades both.
+the binary tiling (§§5–7). No single architecture evades both
+(§8).
 
 ---
 
@@ -157,67 +158,115 @@ resolution. It does not defeat the claim that a wall remains. It
 moves the wall downstream, from front-end access to bounded
 correction.
 
-## §4a. The treewidth wall
+---
 
-The binary subdivision of the mantissa interval to depth d
-embeds in the Poincaré half-plane as a tiling: each of the 2^d
-cells is a tile of horocyclic width 1 and height ln 2, and
-consecutive depths are separated by hyperbolic distance ln 2.
-The tiling is a planar graph of constant hyperbolicity δ.
+## §5. The tiling
 
-By Proposition 1.3 of Kisfaludi-Bak et al. (2023), the
-treewidth of any n-vertex planar δ-hyperbolic graph is
-O(δ log n). For the binary tiling at constant δ, a patch of
-n = 2^d cells at depth d has treewidth Θ(d).
+The binary subdivision of [0,1] to depth d embeds in the Poincaré
+half-plane as a tiling. Depth d lives at height y = 2^{−d}. Each
+of the 2^d cells has Euclidean width 1/2^d and horocyclic arc
+length 1, independent of d. Consecutive depths are separated by
+hyperbolic distance ln 2. Every tile is congruent: horocyclic
+width 1, height ln 2.
 
-A finite-state machine with q states reading d bits is a
-width-q read-once branching program. Width-q branching programs
-cannot represent arbitrary functions on a graph of treewidth t
-when q < 2^{Ω(t)}. Since t = Θ(d) and q is fixed, the machine
-must assign identical corrections to cells whose neighborhoods
-— and therefore whose displacement field values — differ.
+Each tile's bottom edge has horocyclic arc length 2, split into
+two halves by the vertical geodesic separating the two child cells
+at depth d+1. This gives five edges: one short horocyclic edge
+(a), two half-length horocyclic edges (b₁, b₂), and two geodesic
+edges (c). The edge-matching rules of the Böröczky prototile are
+satisfied: c meets c between same-depth neighbors; each of b₁, b₂
+meets the a-edge of the corresponding child; the a-edge meets the
+b₁ or b₂ of the parent. The binary address of a cell — its d-bit
+string — is the tail sequence in the sense of Dolbilin & Frettlöh
+Definition 3.4: bit j records whether the cell descended into the
+b₁ or b₂ half at depth j. All 2^d binary strings are realized at
+depth d.
+
+By Proposition 4.3 of Dolbilin & Frettlöh, the number of distinct
+k-coronae is 2^{k−1}. By Theorem 4.4, the tiling is
+non-crystallographic: no finite local template captures its global
+structure.
+
+The mantissa subdivision occupies a horoball sector (the region
+above y = 0 between x = 0 and x = 1), not all of H².
+Kisfaludi-Bak et al. work explicitly with finite patches of the
+binary tiling in Section 7 of their separator paper. They take a
+subgraph B₁ of the full binary tiling graph B₀ induced by vertices
+in [0,1] × [2^{−⌈9n/δ⌉}, 1], show it is a geodesic subgraph of
+B₀, and conclude it retains constant hyperbolicity. The
+corona-counting argument is local: it requires only that the tile
+and its depth-k neighborhood exist, which they do for any tile
+sufficiently far from the boundary of the patch.
+
+### Open question
+
+The identification above requires that the binary significand
+grid, realized as a tiling of H² with horocyclic strips at ln 2
+spacing, is within the Böröczky class — sharing the edge-matching
+combinatorics, not just the metric parameters. The ln 2 spacing,
+the doubling, the horocyclic/geodesic duality, and the inter-strip
+stacking rule (hyperbolic translation by ln 2 along the
+perpendicular geodesic = the shift λ in Dolbilin & Frettlöh §2)
+all match. Is the cell adjacency within each strip sufficient to
+place the mantissa subdivision within the Böröczky class, or is it
+a different tiling built from the same ingredients — and if the
+latter, does the non-crystallographic conclusion (unbounded
+k-coronae, treewidth Θ(d)) still hold for it?
+
+This question gates §§6-7. If the mantissa grid is Böröczky, the
+results below apply directly. If it is a different tiling with the
+same metric parameters, the treewidth bound must be established
+independently for that tiling.
+
+## §6. The treewidth bound
+
+Kisfaludi-Bak et al. (2023), Proposition 1.3: the treewidth of
+any n-vertex planar δ-hyperbolic graph is O(δ log n).
+
+For the binary tiling at constant δ, a patch of n = 2^d cells at
+depth d has treewidth Θ(d).
+
+A finite-state machine with q states reading d bits is a width-q
+read-once branching program. Width-q branching programs cannot
+represent arbitrary functions on a graph of treewidth t when
+q < 2^{Ω(t)}. Since t = Θ(d) and q is fixed, the machine cannot
+distinguish all local types once d is large enough.
+
+This section depends on §5: the tiling must be planar and
+constant-hyperbolic for Proposition 1.3 to apply. Both properties
+hold for the Böröczky tiling. If the mantissa grid is confirmed
+within that class (§5, open question), the bound follows.
+
+## §7. The aliasing consequence
+
+The treewidth bound (§6) forces the machine to assign identical
+corrections to cells whose neighborhoods differ. The displacement
+field Δ^L = −ε varies across those neighborhoods: it is zero at
+the binade boundaries, maximal near m* ≈ 0.4427, and concave
+between. Cells with different coronas sit at different positions
+in this field.
 
 The residual is the projection of Δ^L onto the part of the
 displacement field that the machine's finite width cannot
-separate. This is forced by the tiling's combinatorial
-structure: the corona count grows as 2^{k−1} (Dolbilin &
-Frettlöh, Proposition 4.3), outruns any fixed machine width,
-and the tiling is non-crystallographic (Theorem 4.4), so no
-finite local template captures its global structure.
+separate. The wall is nonzero because the field varies across the
+aliased coronas.
 
-The treewidth wall differs from the polynomial wall of §3 in
-what it restricts. The polynomial wall applies to unbounded
-accumulators doing polynomial correction: it says exact
-addressing does not remove the approximation problem. The
-treewidth wall applies to finite-width sequential readers doing
-any correction: it says finite width forces aliasing on a graph
-whose treewidth grows with depth. The unbounded accumulator
-evades the treewidth wall (it has unbounded width). The
-finite-width machine evades the polynomial wall (it need not do
-polynomial correction). But both walls are controlled by ε: the
-polynomial wall through ρ, the treewidth wall through the
-displacement field Δ^L = −ε.
+This makes the wall a property of the tiling's combinatorial
+complexity. The tiling has treewidth growing as Θ(d). Any finite
+machine has fixed width. The gap between them is nonzero for every
+finite machine at every sufficient depth. Different machines close
+different parts of the gap, but the gap's existence is forced by
+the tiling.
 
-**Open question.** The identification above requires that the
-binary significand grid, realized as a tiling of H² with
-horocyclic strips at ln 2 spacing, is within the Böröczky class
-— sharing the edge-matching combinatorics, not just the metric
-parameters. The ln 2 spacing, the doubling, the
-horocyclic/geodesic duality, and the inter-strip stacking rule
-all match. Whether the cell adjacency within each strip is
-sufficient to place the mantissa subdivision within the Böröczky
-class, or whether it is a different tiling built from the same
-ingredients — and if the latter, whether the treewidth bound
-still holds — is open. See
-[LUCKY-SEVEN-DRAGON](LUCKY-SEVEN-DRAGON.md).
+---
 
-## §5. The pincer
+## §8. The pincer
 
 Any machine that reads binary digits and produces corrections
 faces at least one of these walls.
 
 If it has finite width, the treewidth of the binary tiling
-forces aliasing (§4a). The machine cannot distinguish all local
+forces aliasing (§§5–7). The machine cannot distinguish all local
 types, so it must assign identical corrections to cells whose
 displacement field values differ. The residual is nonzero
 because Δ^L varies across the aliased coronas.
@@ -246,6 +295,13 @@ obstruction: any bounded correction architecture, whether
 maximally serial or supernaturally parallel, faces a wall that
 is controlled by ε.
 
+The stair-location invariance claimed in
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §12 becomes a corollary
+of the treewidth structure if §§5-7 hold: stair locations are set
+by the corona structure of the tiling, and the ordering does not
+change because it is set by the tail sequence, which is a property
+of the prototile.
+
 ---
 
 ## Status
@@ -254,33 +310,40 @@ is controlled by ε.
 address-resolution objection, computes L exactly, and still
 faces a nonzero polynomial correction wall in Day's framework.
 
-§4a: established conditionally. The treewidth bound (Proposition
-1.3 of Kisfaludi-Bak et al.) is a proved theorem. Its
-application to the project depends on confirming that the binary
-significand grid is within the Böröczky class or that the
-treewidth bound holds for the actual tiling (open question,
-flagged in §4a).
+§§5–7: established conditionally. The treewidth bound
+(Proposition 1.3 of Kisfaludi-Bak et al.) is a proved theorem.
+The tiling embedding and corona counting (Dolbilin & Frettlöh)
+are proved for the Böröczky tiling. Application to the project
+depends on confirming that the binary significand grid is within
+the Böröczky class (open question, flagged in §5).
 
-§5: interpretive. The pincer framing — that the two walls
+§8: interpretive. The pincer framing — that the two walls
 bracket the problem from opposite poles and both are controlled
 by ε — is stated, not proved. The connection to the project's
 sharing wall is motivated and disciplined here, not established.
 
 ## Reading outward
 
-- [LUCKY-SEVEN-DRAGON](LUCKY-SEVEN-DRAGON.md): the corona-aliasing
-  and treewidth argument for finite-width machines.
+- [HERE-BE-DRAGONS](HERE-BE-DRAGONS.md): the other six dragons.
+  Dragon 7 originated there and is now developed here.
 - [TRAVERSE](TRAVERSE.md): the broader traversal of the wall and
   its reformulations.
+- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§9–13: the
+  displacement field framework.
+- [NARROW-PASSAGE](NARROW-PASSAGE.md) §8: the Fourier
+  characterization route (suggestive connection to §§5-7).
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): the project-wide pressure
   on what has and has not been established.
 - [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the complexity framing
   for bounded corrective structure.
+
+## Sources
+
 - Day [2023], arXiv:2307.15600: the correction pipeline used
   in §§1–4.
 - Kisfaludi-Bak et al. [2023], arXiv:2310.11283: separator
   theorem and treewidth bound for planar δ-hyperbolic graphs.
-  Used in §4a.
-- Dolbilin & Frettlöh [2010]: corona counting and
-  non-crystallographic property of the Böröczky tiling.
-  Used in §4a.
+  Used in §§5–6.
+- Dolbilin & Frettlöh [2010], *European Journal of
+  Combinatorics* 31(4): corona counting and non-crystallographic
+  property of the Böröczky tiling. Used in §5.

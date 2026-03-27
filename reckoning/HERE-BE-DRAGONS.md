@@ -153,7 +153,7 @@ provides the geometric reason architecture-invariance might hold.
 
 ## Dragon 7. The wall as a non-crystallographic theorem
 
-Promoted to [LUCKY-SEVEN-DRAGON](LUCKY-SEVEN-DRAGON.md).
+Promoted to [SCYLLA](SCYLLA.md) §§5–7.
 
 ---
 
