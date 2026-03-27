@@ -1,292 +1,286 @@
 # SCYLLA
 
-The corona-aliasing argument of Dragon 7 applies to machines
-with finite total configuration space M. A machine with M
-configurations can distinguish at most M local types at a
-given depth. The Böröczky corona count grows as 2^{k−1},
-which outruns M for every finite M.
+Dragon 7's corona-aliasing argument applies to machines with
+finite total configuration space: at a given depth, a machine
+with only finitely many configurations cannot distinguish all
+local types once the corona count outruns that bound. An
+unbounded real-valued accumulator evades that objection. It can
+read the bit string with positional weights and compute the
+affine pseudo-logarithm exactly.
 
-A natural objection: allow the machine unbounded real-valued
-accumulation. A single-state machine reading bits b₁, …, b_d
-and computing
-
-    S = Σ_{j=1}^{d}  δ_j · b_j
-
-with δ_j drawn from any fixed alphabet produces up to 2^d
-distinct outputs. This outruns the corona count. The aliasing
-argument does not apply.
-
-This document follows the objection to its conclusion.
+This document follows that objection to its conclusion and then
+closes the other jaw. The unbounded accumulator faces a
+polynomial correction wall (§§1–4). The finite-width machine
+faces a treewidth wall forced by the combinatorial structure of
+the binary tiling (§4a). No single architecture evades both.
 
 ---
 
-## §1. The machine
+## §1. The objection
 
-Fix a positive integer d. The machine reads a binary string
-(b₁, b₂, …, b_d) ∈ {0,1}^d. It has one control state and
-one real-valued register, initialized to zero. At step j it
-adds δ_j · b_j to the register, where δ_j is a fixed real
-number depending only on j. After d steps the register holds
+Fix a positive integer d. Read a binary string
+(b₁, b₂, …, b_d) ∈ {0,1}^d with one control state and one
+real-valued register, initialized to zero. At step j, add
+δ_j · b_j to the register, where δ_j depends only on j. After
+d steps the register holds
 
-    S(b₁, …, b_d) = Σ_{j=1}^{d}  δ_j · b_j .
+    S(b₁, …, b_d) = Σ_{j=1}^{d} δ_j · b_j .
 
-The machine has one state. It has no finite-configuration
-bound. For generic choices of (δ₁, …, δ_d) the map
-(b₁, …, b_d) ↦ S is injective, producing 2^d distinct
-output values.
+For generic choices of (δ₁, …, δ_d), this map is injective,
+so the machine can produce 2^d distinct outputs despite having
+only one state. The finite-configuration aliasing argument does
+not apply.
 
-## §2. The natural weights
+Now specialize to the binary significand of a floating-point
+number x in the binade [1, 2):
 
-The input string (b₁, …, b_d) is the binary significand of
-a floating-point number x in the binade [1, 2). The
-relationship is
+    x = 1 + Σ_{j=1}^{d} 2^{−j} · b_j .
 
-    x = 1 + Σ_{j=1}^{d}  2^{−j} · b_j .
+With the natural positional weights δ_j = 2^{−j}, the register
+value is
 
-Set δ_j = 2^{−j}. Then
+    S = Σ_{j=1}^{d} 2^{−j} · b_j = x − 1 = m_x ,
 
-    S = Σ_{j=1}^{d}  2^{−j} · b_j  =  x − 1  =  m_x ,
+the mantissa of x. On [1, 2), the pseudo-logarithm is
 
-the mantissa of x. This is the most natural choice: each
-bit contributes at its positional weight.
+    L(x) = ⌊log₂ x⌋ + m_x = m_x .
 
-## §3. What the machine has computed
+So on this binade the machine computes L(x) exactly. On a
+general binade [2^E, 2^{E+1}), the exponent E is obtained
+separately, and the same mantissa computation gives
 
-The pseudo-logarithm of x ∈ [1, 2) is defined by
+    L(x) = E + m_x .
 
-    L(x) = ⌊log₂ x⌋ + m_x .
+The objection succeeds on its own terms: the machine resolves
+the binary address exactly and gets L for free.
 
-On [1, 2), the exponent ⌊log₂ x⌋ = 0, so L(x) = m_x.
+## §2. The gap
 
-The machine with δ_j = 2^{−j} computes L(x) exactly on
-the binade [1, 2). It reads d bits and produces the
-pseudo-logarithm without error, for every d.
+The true logarithm on [1, 2) is
 
-For x in a general binade [2^E, 2^{E+1}), the exponent E
-is determined by the binade and can be obtained separately.
-The machine's output m_x, together with E, gives L(x) = E + m_x.
+    log₂(x) = log₂(1 + m_x) .
 
-## §4. The gap
+Having computed m_x, the machine has instead computed the affine
+surrogate L(x) = m_x. Define
 
-The true logarithm of x ∈ [1, 2) is log₂(x) = log₂(1 + m_x).
-The machine has produced m_x. Define
-
-    ε(m) = log₂(1 + m) − m,    m ∈ [0, 1).
+    ε(m) = log₂(1 + m) − m,    m ∈ [0, 1) .
 
 Then
 
     log₂(x) = L(x) + ε(m_x) .
 
-The machine has L(x). It does not have log₂(x). The
-difference is ε(m_x).
+So the residual after free pseudo-log extraction is ε(m_x).
+This object is architecture-free: it is determined by the
+relation between log₂ and the bit-level affine surrogate, not
+by any particular correction scheme.
 
-## §5. Properties of ε
+Its basic properties are immediate:
 
-ε(0) = 0.
+- ε(0) = 0.
+- ε(m) → 0 as m → 1.
+- ε(m) > 0 for m ∈ (0, 1).
+- ε is concave on [0, 1).
+- ε has a unique maximum at m* = 1/ln 2 − 1 ≈ 0.4427, where
+  ε(m*) ≈ 0.0861.
 
-ε(m) → 0 as m → 1.
+The unbounded accumulator has removed the addressing problem. It
+has not removed ε.
 
-ε is strictly positive on (0, 1): for m ∈ (0, 1),
-log₂(1 + m) > m because log₂(1 + m) is concave and
-agrees with m at m = 0 with a steeper initial slope
-(d/dm log₂(1+m)|_{m=0} = 1/ln 2 > 1).
+## §3. Day's correction pipeline
 
-ε has a unique maximum at m* = 1/ln 2 − 1 ≈ 0.4427,
-where ε(m*) = log₂(e) − 1/ln 2 ≈ 0.0861.
+Suppose the task is to approximate x^{−a/b} for fixed positive
+integers a and b, in the setting analyzed by Day [2023]. Once
+L(x) is known, form
 
-ε is concave on [0, 1).
+    X = L(x),
+    Y = c/b − (a/b)X,
+    y = L^{−1}(Y) .
 
-These are properties of ε as a function. They do not depend
-on d, on the machine, or on any choice of correction method.
+This is the coarse stage. It uses one affine map in pseudo-log
+space and one inverse pseudo-log evaluation. In the bit model,
+these are exact operations on the representation.
 
-## §6. Using the output
-
-Suppose the machine's purpose is to approximate x^{−a/b}
-for fixed positive integers a, b (the setting of Day [2023]).
-The machine has computed m_x, which gives L(x). The
-algorithm proceeds:
-
-    X = L(x) = E_x + m_x
-
-    Y = c/b − (a/b)X
-
-    y = L^{−1}(Y) = 2^{⌊Y⌋}(1 + (Y − ⌊Y⌋}))
-
-The value y is a coarse approximation to x^{−a/b}. It is
-obtained from L(x) by one linear map and one inverse
-pseudo-log evaluation. These are exact operations on the
-bit representation: an integer multiply-and-shift, an
-integer subtraction, and a bit reinterpretation.
-
-The constant c parameterizes the linear map. Its value
-affects the quality of the coarse approximation but not its
-cost.
-
-## §7. Measuring the coarse error
-
-Define the auxiliary
+Measure the coarse error by
 
     z(x) = x^a · y(x)^b .
 
-If y were exactly x^{−a/b}, then z would equal 1 everywhere.
-The deviation of z from 1 measures how far the coarse
-approximation y is from the target.
+Day shows that z is a bounded continuous periodic function of
+L(x), with period b, and that its range is a closed interval
+[z_min, z_max] determined by c and the pair (a, b). Write
 
-Day shows that z is a bounded, continuous, periodic function
-of L(x) with period b. Its range is a closed interval
-[z_min, z_max] determined entirely by c and the pair (a, b).
+    ρ = z_max / z_min .
 
-Define ρ = z_max / z_min. The ratio ρ depends on c. The
-optimal c is the one that minimizes ρ.
+The correction stage seeks to approximate the exact factor
+z^{−1/b} on that interval. If one restricts to a polynomial
+corrector p(z) of degree at most n, the relevant quantity is the
+minimax relative error
 
-## §8. Correcting the coarse approximation
+    ε_n^*(ρ) =
+      min_{deg p ≤ n} max_{z ∈ [z_min, z_max]}
+      |z^{−1/b} − p(z)| / z^{−1/b} .
 
-The exact correction factor is g(x) = z(x)^{−1/b}. If the
-machine could evaluate g exactly, it would produce x^{−a/b}
-without error. It cannot, because g involves a fractional
-power, which is exactly the function the algorithm exists to
-approximate.
+For every finite degree n and every nondegenerate interval
+[z_min, z_max], this error is strictly positive. The function
+z^{−1/b} is not a polynomial on any interval of positive
+length, so no finite-degree polynomial reproduces it exactly.
 
-Instead, the machine evaluates a polynomial p(z) of fixed
-degree n and returns y · p(z) as the refined approximation.
-The relative error is
+Therefore, even after exact computation of L and exact
+resolution of z, the polynomial correction wall remains:
 
-    e(x) = (z^{−1/b} − p(z)) / z^{−1/b} .
+    ε_n^*(ρ) > 0    for every finite n .
 
-This is the relative error of approximating the function
-z^{−1/b} by a degree-n polynomial on the interval
-[z_min, z_max].
+The parameter ρ is the place where ε re-enters. In Day's
+analysis, the extrema of z are set by where the pseudo-log line
+crosses integer grid boundaries, and those crossings are
+controlled by the deviation of L from log₂, namely ε. So the
+location of the polynomial wall is controlled by ε, though the
+wall itself is still the polynomial approximation problem
+against z^{−1/b}.
 
-## §9. The minimax error
+## §4. What the objection bought
 
-By standard approximation theory (Chebyshev, Remez), for
-every finite degree n and every interval [z_min, z_max] with
-z_min < z_max, the minimax relative error
-
-    ε_n^* = min_{deg p ≤ n}  max_{z ∈ [z_min, z_max]}
-            |z^{−1/b} − p(z)| / z^{−1/b}
-
-is strictly positive. The function z^{−1/b} is not a
-polynomial (it is algebraic of infinite polynomial degree
-for b ≥ 2, and transcendental in related formulations).
-No finite-degree polynomial reproduces it exactly on any
-interval of positive length.
-
-ε_n^* depends on ρ and n. It does not depend on d. It
-does not depend on how many distinct values of z the machine
-can produce. A machine that distinguishes all 2^d values of
-z and evaluates p(z) at each one incurs worst-case error
-ε_n^* at some z in the interval.
-
-## §10. What the unbounded accumulator bought
-
-The machine with δ_j = 2^{−j} computes m_x exactly. This
-gives L(x) exactly. This gives z(x) exactly (given c, a, b).
-The machine resolves all 2^d values of z without aliasing.
-
-None of this reduces ε_n^*. The error is set by the degree
-of p, not by the resolution of z.
-
-To reduce ε_n^*, the machine must increase n (more
-multiply/add operations with more fixed constants), or
-change the correction architecture (piecewise polynomial,
-lookup table, different iteration family). Each of these
-costs additional fixed resources.
-
-## §11. The structure of the cost
-
-The cost of reducing ε_n^* below a target τ is:
-
-At degree n = 0: p(z) = c₀, a single constant. The error
-is determined by ρ alone.
-
-At degree n = 1: p(z) = c₀ + c₁z. Two constants, one
-multiply, one add. This is the standard FRSR with one
-Newton-Raphson step. The error is ε_1^*(ρ).
-
-At degree n = 2: three constants, two multiplies, two adds.
-Householder's method or a quadratic minimax polynomial. The
-error is ε_2^*(ρ).
-
-At each degree, the optimal c changes: the magic constant
-and the polynomial are co-optimized through ρ(c). The
-cost of the constant and the cost of the polynomial are not
-separable.
-
-The sequence ε_0^*(ρ) > ε_1^*(ρ) > ε_2^*(ρ) > ⋯ is
-strictly decreasing and converges to 0 as n → ∞. The
-convergence rate depends on the smoothness of z^{−1/b} on
-[z_min, z_max], which depends on ρ, which depends on c.
-
-## §12. Where the wall is
-
-The machine with unbounded accumulation and a degree-n
-correction polynomial has:
+The unbounded accumulator buys something real and important.
 
 - Zero error in computing L(x).
-- Zero error in computing z(x).
-- Nonzero error ε_n^*(ρ(c*)) in approximating z^{−1/b}
-  by p(z).
+- Zero error in forming the coarse-stage variable z(x).
+- Exact resolution of the binary address and of all realized
+  z-values.
 
-The wall is not in the accumulation. It is not in the
-computation of L. It is not in the resolution of z. It is
-in the approximation of a non-polynomial function by a
-polynomial of finite degree on a bounded interval.
+What it does not buy is exact bounded correction. With a fixed
+degree-n polynomial corrector, the remaining worst-case error is
+still ε_n^*(ρ), and reducing that error requires either higher
+degree or a different correction architecture with additional
+fixed resources.
 
-The bounded interval is [z_min, z_max]. Its width ratio ρ
-is controlled by c, which is controlled by ε: the extrema of
-z occur where the pseudo-log line crosses integer grid
-boundaries (Day, Section 4.3), and those crossings are
-determined by the deviation of L from log₂.
+So the objection defeats the claim that the wall sits in address
+resolution. It does not defeat the claim that a wall remains. It
+moves the wall downstream, from front-end access to bounded
+correction.
 
-The function being approximated is z^{−1/b}. The difficulty
-of approximating it on [z_min, z_max] is set by ρ, which
-is set by the grid crossings, which are set by ε.
+## §4a. The treewidth wall
 
-The correction cost is a functional of ε, mediated by ρ.
+The binary subdivision of the mantissa interval to depth d
+embeds in the Poincaré half-plane as a tiling: each of the 2^d
+cells is a tile of horocyclic width 1 and height ln 2, and
+consecutive depths are separated by hyperbolic distance ln 2.
+The tiling is a planar graph of constant hyperbolicity δ.
 
-## §13. The pseudo-logarithm
+By Proposition 1.3 of Kisfaludi-Bak et al. (2023), the
+treewidth of any n-vertex planar δ-hyperbolic graph is
+O(δ log n). For the binary tiling at constant δ, a patch of
+n = 2^d cells at depth d has treewidth Θ(d).
 
-The machine computes L(x) for free: the bit representation
-gives it without arithmetic. The gap ε(m) = log₂(1+m) − m
-is what remains. Every correction architecture — polynomial,
-piecewise, lookup, iterative — spends its resources reducing
-ε's contribution to the final error.
+A finite-state machine with q states reading d bits is a
+width-q read-once branching program. Width-q branching programs
+cannot represent arbitrary functions on a graph of treewidth t
+when q < 2^{Ω(t)}. Since t = Θ(d) and q is fixed, the machine
+must assign identical corrections to cells whose neighborhoods
+— and therefore whose displacement field values — differ.
 
-L is the unique piecewise-linear function that agrees with
-log₂ at every power of 2 and is determined entirely by the
-binary significand. Any other piecewise-linear approximation
-to log₂ that uses the same bit-level addressing reproduces L
-or is more expensive to compute.
+The residual is the projection of Δ^L onto the part of the
+displacement field that the machine's finite width cannot
+separate. This is forced by the tiling's combinatorial
+structure: the corona count grows as 2^{k−1} (Dolbilin &
+Frettlöh, Proposition 4.3), outruns any fixed machine width,
+and the tiling is non-crystallographic (Theorem 4.4), so no
+finite local template captures its global structure.
 
-The machine that escapes the corona-aliasing bound does so
-by computing L exactly. Having computed L, it faces ε. The
-resources it spends on ε are the wall.
+The treewidth wall differs from the polynomial wall of §3 in
+what it restricts. The polynomial wall applies to unbounded
+accumulators doing polynomial correction: it says exact
+addressing does not remove the approximation problem. The
+treewidth wall applies to finite-width sequential readers doing
+any correction: it says finite width forces aliasing on a graph
+whose treewidth grows with depth. The unbounded accumulator
+evades the treewidth wall (it has unbounded width). The
+finite-width machine evades the polynomial wall (it need not do
+polynomial correction). But both walls are controlled by ε: the
+polynomial wall through ρ, the treewidth wall through the
+displacement field Δ^L = −ε.
+
+**Open question.** The identification above requires that the
+binary significand grid, realized as a tiling of H² with
+horocyclic strips at ln 2 spacing, is within the Böröczky class
+— sharing the edge-matching combinatorics, not just the metric
+parameters. The ln 2 spacing, the doubling, the
+horocyclic/geodesic duality, and the inter-strip stacking rule
+all match. Whether the cell adjacency within each strip is
+sufficient to place the mantissa subdivision within the Böröczky
+class, or whether it is a different tiling built from the same
+ingredients — and if the latter, whether the treewidth bound
+still holds — is open. See Dragon 7 in
+[HERE-BE-DRAGONS](HERE-BE-DRAGONS.md).
+
+## §5. The pincer
+
+Any machine that reads binary digits and produces corrections
+faces at least one of these walls.
+
+If it has finite width, the treewidth of the binary tiling
+forces aliasing (§4a). The machine cannot distinguish all local
+types, so it must assign identical corrections to cells whose
+displacement field values differ. The residual is nonzero
+because Δ^L varies across the aliased coronas.
+
+If it has unbounded width and therefore resolves addressing
+perfectly, the polynomial approximation problem against
+z^{−1/b} forces a nonzero residual (§§3–4). Exact knowledge of
+L and z does not make z^{−1/b} a polynomial.
+
+The common element is ε. The treewidth wall exists because the
+displacement field Δ^L = −ε varies across coronas that the
+machine cannot distinguish. The polynomial wall exists because
+ρ = z_max/z_min is controlled by ε through the grid crossings
+where L deviates from log₂. Both walls measure the cost of
+correcting the additive-to-multiplicative displacement with
+finite resources. They do so through different mechanisms,
+against different machine classes, at opposite ends of the
+space/time tradeoff.
+
+The project's sharing wall — dist(δ*, S) in the L∞ norm — is a
+third object, distinct from both. It concerns shared-parameter
+correctors in the minimax-intercept framework. SCYLLA does not
+prove the sharing wall equals either the polynomial wall or the
+treewidth wall. What it establishes is that ε is the common
+obstruction: any bounded correction architecture, whether
+maximally serial or supernaturally parallel, faces a wall that
+is controlled by ε.
 
 ---
 
 ## Status
 
-§§1–5: definitions and elementary properties.
+§§1–4: established. The unbounded accumulator defeats the
+address-resolution objection, computes L exactly, and still
+faces a nonzero polynomial correction wall in Day's framework.
 
-§§6–9: follows Day [2023], Sections 3–4.4, specialized to
-the FRSR case where needed and stated in general where
-possible.
+§4a: established conditionally. The treewidth bound (Proposition
+1.3 of Kisfaludi-Bak et al.) is a proved theorem. Its
+application to the project depends on confirming that the binary
+significand grid is within the Böröczky class or that the
+treewidth bound holds for the actual tiling (open question,
+flagged in §4a).
 
-§§10–12: consequences of §§6–9 for the unbounded
-accumulator objection. No novel claims; the argument is
-that the objection and the wall address different stages
-of the computation.
-
-§13: interpretive. States what L is and what ε is. Does not
-prove any claim about optimality or uniqueness beyond the
-piecewise-linear observation.
+§5: interpretive. The pincer framing — that the two walls
+bracket the problem from opposite poles and both are controlled
+by ε — is stated, not proved. The connection to the project's
+sharing wall is motivated and disciplined here, not established.
 
 ## Reading outward
 
 - Dragon 7 in [HERE-BE-DRAGONS](HERE-BE-DRAGONS.md): the
   corona-aliasing argument for finite-configuration machines.
-- [NARROW-PASSAGE](NARROW-PASSAGE.md): the correction task
-  as connection-flattening.
-- [ROARING-40s](ROARING-40s.md): three residuals, one object.
-- Day [2023], arXiv:2307.15600: the FRGR framework.
+- [TRAVERSE](TRAVERSE.md): the broader traversal of the wall and
+  its reformulations.
+- [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): the project-wide pressure
+  on what has and has not been established.
+- [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the complexity framing
+  for bounded corrective structure.
+- Day [2023], arXiv:2307.15600: the correction pipeline used
+  in §§1–4.
+- Kisfaludi-Bak et al. [2023], arXiv:2310.11283: separator
+  theorem and treewidth bound for planar δ-hyperbolic graphs.
+  Used in §4a.
+- Dolbilin & Frettlöh [2010]: corona counting and
+  non-crystallographic property of the Böröczky tiling.
+  Used in §4a.
