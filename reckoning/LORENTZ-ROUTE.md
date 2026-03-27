@@ -1,15 +1,16 @@
 # LORENTZ-ROUTE
 
-Each level of integration machinery is a faster reference frame.
-As the frame accelerates — from calculus to Riemann to Stieltjes
-to Lebesgue to Padé to the civilizational enumeration of the TMD
-— the residual transforms but does not vanish. The singularity
-between additive and multiplicative structure is a geometric
-invariant, visible from every frame, removable from none.
+Each level of integration machinery adds more infrastructure to
+the same obstruction. From calculus to Riemann to Stieltjes to
+Lebesgue to Padé to exhaustive TMD enumeration, the residual
+changes form but does not vanish. The singularity between
+additive and multiplicative structure persists throughout.
 
-The sequence §§1–7 is a freefall through successive floors, each
-built from heavier infrastructure than the last. §7 removes the
-resource constraint entirely. The loop 7 → 4 is a fixed point.
+Sections §§1–7 move through successive attempts to integrate
+against μ_?: calculus, Riemann, Stieltjes, Lebesgue, fractal
+approximation, exhaustive enumeration, and finally removal of
+the resource bound. Section 7 returns to §4: even with all
+finite computations completed, the limit object is still μ_?.
 
 ---
 
@@ -24,10 +25,6 @@ Statistics also requires measure. The quincunx produces a
 finite discrete distribution at every stage; the limit that
 gives the continuous distribution requires topology (to say
 what convergence means) and measure (to say what density means).
-
-In both cases, geometry does all the visible work. Measure is
-the invisible infrastructure that lets the limiting process
-land somewhere.
 
 ## §2. Progressive failure of integration against ?(x)
 
@@ -73,10 +70,8 @@ continuous density w.r.t. Lebesgue. Therefore ν_α is absolutely
 continuous w.r.t. Lebesgue for every α ∈ [0,1].
 
 Absolute continuity is transitive. μ_? is singular w.r.t.
-Lebesgue, hence singular w.r.t. every ν_α. The entire
-interpolation family lives on the continent of
-Lebesgue-absolute-continuity. No smooth metric deformation
-reaches μ_?.
+Lebesgue, hence singular w.r.t. every ν_α. No smooth metric
+deformation reaches μ_?.
 
 Letting α vary with position (ds = dx/x^{α(x)}) changes
 nothing as long as α(x) is finite a.e. The Gauss measure
@@ -85,20 +80,26 @@ dynamical system, also has a continuous density. Every
 classically natural candidate floor is absolutely continuous
 w.r.t. Lebesgue and therefore singular w.r.t. μ_?.
 
-The Poincaré half-plane, the hyperbolic metric, the Gauss
-measure — these are all on the Lebesgue side. μ_? is on the
-other side. No smooth boost crosses that gap.
+The Poincaré half-plane, the hyperbolic metric, and the Gauss
+measure all stay in the absolutely continuous class. Classically,
+that class is meager in the weak-* topology on Borel probability
+measures on [0,1] [O80, Ch. 18]. Section 3 fails because every
+smooth candidate stays inside that meager class. Section 4 must
+therefore proceed by finite approximants that remain absolutely
+continuous at each level, with the singular target appearing
+only in the limit.
 
 ## §4. The fractal floor
 
 Construct the floor fractally. At level n of the Stern-Brocot
 tree, deform the metric on each Farey interval to match the
 corresponding dyadic interval. This is a piecewise-smooth
-metric. μ_? at resolution n is absolutely continuous w.r.t.
-this level-n metric.
+metric, so its induced measure remains absolutely continuous
+with respect to Lebesgue. μ_? at resolution n is absolutely
+continuous w.r.t. this level-n metric.
 
 Take n → ∞. The limit is a metric whose induced measure is μ_?
-itself. The floor supports only itself. Circular.
+itself.
 
 Stay at finite n. The level-n floor is a legitimate measure.
 Integration against it works. The error between this floor and
@@ -139,7 +140,7 @@ no finite machine that captures a repeating pattern in the
 corrections can succeed.
 
 But §5 doesn't say anything about a finite machine that refuses
-to look for a pattern. A machine that simply enumerates.
+to look for a pattern and simply enumerates.
 
 This machine exists. Lefèvre and Muller built it [LM00]. Over
 four years, using approximately a hundred workstations, they
@@ -194,8 +195,6 @@ roots interactively until the approximation clears every mine.
 Perfect rounding is the direct goal, not the consequence of high
 accuracy.
 
-What does this accomplish, read as an integration tactic?
-
 At precision p = 53, the question "how does log₂(1+m) interact
 with the binary grid?" is completely answered. The table of worst
 cases is an exhaustive census of the near-commensurabilities
@@ -242,25 +241,26 @@ computation. The work grows (exponentially for exhaustive search,
 subexponentially for SLZ) and the results are
 precision-specific.
 
-The thermocline here is sharper than §5's. §5 says: a finite
-recurrence fails because the generating function is irrational.
-§6 says: enumerate without a recurrence, and you succeed — but
-the success is trapped at its resolution. The computational cost
+§5 says: a finite recurrence fails because the generating
+function is irrational. §6 says: enumerate without a
+recurrence and you succeed, but the success is trapped at its
+resolution. The computational cost
 of resolving the ε-grid interaction at precision p is paid in
 full, buys nothing toward precision p+1, and must be repaid from
 scratch at the new precision. Each level of the Stern-Brocot
-correction sequence (§4) costs a fresh civilizational effort.
+correction sequence (§4) requires a full recomputation.
 
 Gustafson's mines are the near-commensurabilities. His
-polynomial threads between the ghosts of grid alignment.
-Lefèvre and Muller's filter finds the ghosts by invoking
+polynomial threads between those near-alignments. Lefèvre and
+Muller's filter finds them by invoking
 continued fractions — the same machinery that governs rational
 approximation to ln 2. The four years and hundred machines are a
 measurement of the computational cost of one level of the
 fractal floor (§4), at one specific resolution.
 
-The floor supports this weight. At p = 53, the floor is solid.
-Step to p = 113 and you are standing on air.
+The floor supports this weight. At p = 53, the exhaustive
+computation is complete; at p = 113, the corresponding
+exhaustive computation is unavailable.
 
 ## §7. The Culture
 
@@ -294,8 +294,6 @@ infinite objects held simultaneously. No further computation is
 available. The obstruction is not a deficit of information. It
 is a theorem about structure.
 
-The floor supports only itself. This is §4.  ∎
-
 ---
 
 ## Status
@@ -328,21 +326,19 @@ computational problem. It is the geometry.
 
 - [ROARING-40s](ROARING-40s.md): the earlier version of this
   argument, with §§8–9 pursuing the forced-contradiction route
-  (the Brouwer route) rather than the invariance route.
+  rather than the invariance route.
 - [SCYLLA](SCYLLA.md): the pincer argument. The finite-width
-  machine and the unbounded accumulator are two reference frames
-  viewing the same invariant ε. §8 of SCYLLA is the
-  frame-independence claim.
+  machine and the unbounded accumulator face different walls
+  controlled by the same ε. §8 of SCYLLA states that pincer.
 - [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§9–10: the
   displacement field Δ^L = −ε as hyperbolic distance between
   the binary and geometric grids.
 - [DEPARTURE-POINT](DEPARTURE-POINT.md) §5: Day's decoupling
   theorem. The coarse-stage solution is inherited by every
-  correction architecture. Frame-independence of the coarse
-  structure.
+  correction architecture.
 - [ETAK](ETAK.md): Links 1–4 from the wall to algebraic
-  independence. The Brouwer route and the Lorentz route enter
-  Link 1 through different doors.
+  independence. The forced-contradiction route and the
+  invariance route enter Link 1 through different doors.
 - [TRAVERSE](TRAVERSE.md): the route.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): structural doubts.
 
@@ -365,3 +361,6 @@ computational problem. It is the geometry.
 
 - [G20] Gustafson, J. L. "The Minefield Method: A Uniformly Fast
   Solution to the Table-Maker's Dilemma." Proc. IEEE, ~2020.
+
+- [O80] Oxtoby, J. C. *Measure and Category*, 2nd ed.
+  Springer-Verlag, 1980. Chapter 18.
