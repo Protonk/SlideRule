@@ -1,17 +1,24 @@
 # Departure Point
 
-This note records the mathematical starting point of the project: Day's FRGR framework and why the pseudo-log, the geometric grid, and the binary representation are jointly adapted.
+This note records the mathematical starting point of the project:
+Day's FRGR framework and the structural reasons the pseudo-log,
+the geometric grid, and the binary representation are jointly
+adapted.
 
-1. the pseudo-log and its inverse;
+1. the pseudo-log, its inverse, and ε;
 2. the coarse approximation via a line in pseudo-log space;
 3. the quality metric z(x) and its periodicity;
 4. the finite candidate set for the extrema of z;
-5. the optimal intercept via switchover functions;
-6. the logarithm as the unique scaling coordinate;
-7. the pseudo-log as the boundary-aligned surrogate;
-8. the base-2 significance space as the free representation;
+5. the decoupling of coarse and correction stages;
+6. the optimal intercept via switchover functions;
+7. the logarithm as the unique scaling coordinate;
+8. the pseudo-log as the boundary-aligned surrogate;
+9. the base-2 significance space as the free representation;
 
-Sections 1–5 follow Day (2023). Sections 6 & 7 are ours. Section 8 uses the significance space formalization of Matula (1970).  See [`experiments/aft/keystone/KEYSTONE.md`](../experiments/aft/keystone/KEYSTONE.md) for exhibits and partial experimental support.
+Sections 1–6 follow Day (2023), Sections 7 & 8 are ours, and
+Section 9 uses Matula (1970). See
+[`experiments/aft/keystone/KEYSTONE.md`](../experiments/aft/keystone/KEYSTONE.md)
+for exhibits and partial experimental support.
 
 ---
 
@@ -35,7 +42,17 @@ Then
 
     L⁻¹(X) = 2^{E_X} (1 + m_X).
 
-The gap between L and log₂ on one binade is `ε(m) = log₂(1+m) − m`.
+The gap between L and log₂ on one binade is
+
+    ε(m) = log₂(1 + m) − m.
+
+Equivalently, `(1 + m) = 2^{m + ε(m)}`, so that
+
+    η(m) := 2^{−m}(1 + m) = 2^{ε(m)}.
+
+Day (2023) uses η as the central analytic object (his §4.3,
+Figure 3). It is maximised at `m = 1/ln 2 − 1 ≈ 0.4427`,
+which is also the unique maximum of ε on `[0, 1)`.
 
 ---
 
@@ -53,7 +70,7 @@ in pseudo-log coordinates `X = L(x)`, `Y = L(y)`. Solving for y:
 
 This is the coarse stage of the FRGR algorithm (Day, Algorithm 2).
 The classic FRSR bit-hack is the case `a = 1`, `b = 2`, where the
-magic constant encodes c.
+magic constant encodes c via a scale and bias (Day, eq. 62).
 
 ---
 
@@ -75,48 +92,113 @@ The periodicity of the floor function gives `z|_{X+b} = z|_X`, so
 z is periodic with period b in X and period a in Y. The behaviour
 of z is determined by one representative interval `X ∈ [0, b)`.
 
-The optimisation target is `ρ = z_max / z_min`, because after the
-best constant correction the degree-0 minimax relative error is
-
-    (ρ^{1/b} − 1) / (ρ^{1/b} + 1).
+The optimisation target is `ρ = z_max / z_min`. After the best
+degree-n minimax correction polynomial, the peak relative error
+depends on ρ and n but is monotonically increasing in ρ for every
+fixed n (see Section 5).
 
 ---
 
 ## 4. The candidate set
 
-z is continuous and piecewise-smooth. Its interior stationary points
-occur only where `m_x = m_y`, i.e., where the line `aX + bY = c`
-crosses the diagonal of an integer grid square. The remaining
-extrema occur at boundary crossings, where X or Y is an integer.
-This gives three finite candidate families: H and V for the boundary
-crossings, and D for the diagonal crossings where `X − Y` is an
-integer.
+z is continuous and piecewise-smooth. Its derivative within a grid
+square is (Day, §4.3)
 
-Define
+    dz/dX = 2^{aE_x + bE_y} · a(1+m_x)^{a−1}(1+m_y)^{b−1}(m_y − m_x),
+
+which vanishes only where `m_x = m_y`, i.e., where the line
+`aX + bY = c` crosses the diagonal of an integer grid square.
+The remaining extrema occur at boundary crossings, where X or Y
+is an integer. This gives three finite candidate families:
+
+- **H** (horizontal boundaries, integer X),
+- **V** (vertical boundaries, integer Y),
+- **D** (diagonal crossings, integer X − Y).
+
+All three families are instances of a single function. Define
 
     ζ(r, k, c) = 2^{s−r} (1 + (r + t) / k)^k
 
-where `s = floor(c)`, `t = frac(c)`, `k ∈ ℤ⁺`, `r ∈ {0, …, k−1}`.
-Then:
+where `s = floor(c)`, `t = frac(c)`, `k ∈ ℤ⁺`,
+`r ∈ {0, …, k−1}`. Then:
 
-- **H** (integer X): `z|_{X∈ℤ} = ζ(r_b, b, c)`, `r_b ∈ {0, …, b−1}`.
-- **V** (integer Y): `z|_{Y∈ℤ} = ζ(r_a, a, c)`, `r_a ∈ {0, …, a−1}`.
-- **D** (integer X−Y): `z|_{X−Y∈ℤ} = ζ(r_γ, γ, c)`, `r_γ ∈ {0, …, γ−1}`,
+- **H**: `z|_{X∈ℤ} = ζ(r_b, b, c)`, `r_b ∈ {0, …, b−1}`.
+- **V**: `z|_{Y∈ℤ} = ζ(r_a, a, c)`, `r_a ∈ {0, …, a−1}`.
+- **D**: `z|_{X−Y∈ℤ} = ζ(r_γ, γ, c)`, `r_γ ∈ {0, …, γ−1}`,
   where `γ = a + b`.
 
-Setting `α = min(a,b)` and `β = max(a,b)`:
+Day proves that ζ is increasing with respect to k (Appendix A).
+Setting `α = min(a,b)` and `β = max(a,b)`, this ordering gives
 
     z_min(c) = ζ(r_α, α, c),
     z_max(c) = ζ(r_γ, γ, c).
 
-The minimum comes from the smaller of {a, b}; the maximum from D.
+The minimum comes from the family with the smallest k; the maximum
+from D, which has the largest.
+
+**Connection to ε.** Define `η̂(r, k, t) = 2^{−r/k}(1 + (r+t)/k)`,
+so that `ζ(r, k, c) = 2^s · η̂(r, k, t)^k`. At the boundary
+crossings (`t = 0`),
+
+    η̂(r, k, 0) = 2^{−r/k}(1 + r/k) = η(r/k) = 2^{ε(r/k)}.
+
+This is 2^ε evaluated at the sample point `r/k`. The entire
+classification of which residue r gives the extremum of ζ therefore
+reduces to: which discrete sample `r/k` maximises or minimises ε
+on `[0, 1)`. Since ε is unimodal with its peak at
+`m* = 1/ln 2 − 1`, the maximising r is the one nearest
+`k · m*`, and the minimum is always at `r = 0` (the binade
+boundary, where ε vanishes).
+
+Day's extremal analysis is optimisation in ε-coordinates.
 
 ---
 
-## 5. The optimal intercept
+## 5. The decoupling
 
-ρ = z_max/z_min depends only on `t = frac(c)`, not on `s = floor(c)`.
-Two switchover functions determine which candidates are active:
+The coarse-stage constant c and the correction polynomial p(z) are
+independent optimisation problems. This is Day's §4.4, and it is
+the structural fact that makes the entire framework tractable.
+
+**The argument.** After choosing c, the correction polynomial p(z)
+of degree n approximates `z^{−1/b}` on `[z_min(c), z_max(c)]`.
+Rescale to `ẑ = z / z_min`, so `ẑ ∈ [1, ρ]` with
+`ρ = z_max / z_min`. The relative error becomes
+
+    e = (ẑ^{−1/b} − q(ẑ)) / ẑ^{−1/b}
+
+for a degree-n polynomial q. The integer part s of c cancels from
+ρ (since 2^s scales both z_min and z_max), so ρ depends only on
+`t = frac(c)`.
+
+By the Chebyshev Alternation Theorem, the optimal q on `[1, ρ]`
+produces exactly n + 2 equioscillation points: n interior stationary
+points plus the two endpoints. Since both endpoints carry
+equioscillation peaks, shrinking ρ to any `ρ₁ < ρ` strictly reduces
+the minimax error. (If it did not, the optimal polynomial on the
+smaller interval would equal the one on the larger, but the larger
+interval's endpoint equioscillation point has been removed,
+violating alternation. Contradiction.)
+
+Therefore: for every polynomial degree n, the minimax error is
+strictly decreasing in ρ. Minimising ρ — which depends only on
+c — is the right objective regardless of what correction method
+follows.
+
+**Consequence.** The coarse stage (choosing c to minimise ρ) and
+the correction stage (choosing p to minimise peak error on the
+resulting interval) separate cleanly. The coarse-stage problem is
+solved once, and its solution is inherited by every correction
+architecture: polynomial of any degree, monic polynomial, iterated
+refinement, or any future method.
+
+---
+
+## 6. The optimal intercept
+
+ρ = z_max/z_min depends only on `t = frac(c)`, not on
+`s = floor(c)`. Two switchover functions determine which candidates
+are active:
 
     t₀(k) = (k − 1) / (2^{1−1/k} − 1) − k
 
@@ -136,9 +218,14 @@ The optimal `t*` minimising ρ:
 For FRSR (`a = 1, b = 2`): `α = 1, β = 2, γ = 3`, giving
 `t* = 0.5`, so `c* = s + 0.5` for any integer s.
 
+Day's §4.5 establishes existence and uniqueness of t* by showing
+that `dρ/dt` is the product of a positive factor K(t) and a
+piecewise-linear function σ(t) that transitions from negative to
+positive exactly once on `[0, 1)`.
+
 ---
 
-## 6. The coordinate
+## 7. The coordinate
 
 On `ℝ_{>0}`, scaling `x → λx` is the native symmetry. The
 logarithm is the unique coordinate (up to affine transformation)
@@ -157,7 +244,7 @@ therefore equally hard for that metric.
 
 ---
 
-## 7. The surrogate
+## 8. The surrogate
 
 The affine pseudo-log `L(x) = x − 1` on `[1, 2)` is not the best
 affine pointwise fit to `log₂`. A Chebyshev minimax affine fit
@@ -175,7 +262,7 @@ binade, not the minimax affine surrogate.
 
 ---
 
-## 8. The representation
+## 9. The representation
 
 Matula (1970) defines the significance space of base β with n
 significant digits as
