@@ -10,8 +10,7 @@ architectures pick up computational cruft. Most should stay here.
 Only a family that still tells a coherent Step-4 story after fouling,
 perturbation, and comparison should be allowed through.
 
-This is not a theorem note. It is a charter for disciplined
-architecture triage.
+This is a charter for disciplined architecture triage.
 
 ---
 
@@ -142,18 +141,7 @@ What gets promoted is not "the best machine." It is "a sequential
 corrector family whose behaviour is coherent enough that failure in
 the Interrupted Log would be informative."
 
-## 8. What this is not
-
-This is not:
-
-- a winner-take-all tournament;
-- an unconstrained automaton synthesizer;
-- a beauty contest for exotic constructions;
-- a substitute for the Interrupted Log.
-
-A tournament produces a champion. The project needs a filter.
-
-## 9. Operational rule
+## 8. Operational rule
 
 Keep the field small. Reject aggressively. Record why families fail.
 The sargassum is useful only if most things drown there.

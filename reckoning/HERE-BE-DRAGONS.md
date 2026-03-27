@@ -212,7 +212,7 @@ The tiling has treewidth growing as Θ(d). Any finite machine has
 fixed width. The gap between them is nonzero for every finite
 machine at every sufficient depth. Different machines close
 different parts of the gap, but the gap's existence is forced by
-the tiling, not by the machine's design.
+the tiling.
 
 The stair-location invariance claimed in POINCARE-CURRENTS §5
 becomes a corollary: stair locations are set by the corona structure
@@ -249,13 +249,10 @@ k-coronae, treewidth Θ(d)) still hold for it?
 
 ---
 
-## What this document is not
-
-This is not a research plan. There are no experiments proposed, no
-hypotheses stated, no predictions made. Each dragon may turn out to
-be a cloud, a coastline, or a sea monster. The purpose is to have
-them written down so they can be examined one at a time under
-controlled skepticism, rather than drifting as ambient enthusiasm.
+Each dragon may turn out to be a cloud, a coastline, or a sea
+monster. The purpose is to have them written down so they can be
+examined one at a time under controlled skepticism, rather than
+drifting as ambient enthusiasm.
 
 ## Reading outward
 

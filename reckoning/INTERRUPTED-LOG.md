@@ -25,9 +25,9 @@ is:
 > zoo families, achieve locally competitive performance everywhere
 > without paying more than the `ε`-organised baseline?
 
-The point is not to find a prettier partition. It is to ask whether
-the local advantages of different families can be pasted together
-cheaply enough to beat the common `ε` profile they all appear to see.
+The point is to ask whether the local advantages of different
+families can be pasted together cheaply enough to beat the common
+`ε` profile they all appear to see.
 
 ## 2. What a positive answer would give
 

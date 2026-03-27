@@ -187,10 +187,7 @@ The limit requires measure. The measure requires a floor.
 On one binade, a cooperative geometry exists: the binary grid
 and logarithmic density align well enough that ε is visible as
 a shape. Outside that binade, the same coordinates produce
-singularities. The cooperative patch is not a property of the
-description. It is a fine-structure accident that reveals the
-incommensurability everywhere else by being the one place it
-hides.
+singularities.
 
 Arriving at the problem almost geometrically is the point. The
 residual — the part geometry cannot reach — is where the

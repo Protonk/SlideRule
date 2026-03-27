@@ -369,14 +369,14 @@ and Parts I–II still stand on their own).
 
 ---
 
-## What this document is not
+## Scope
 
-This is not the coordinate change (TRAVERSE Step 6). It is
-preparation for attempting that change. Part I is ready to use.
-Part II identifies what would need to be true for the connection
-language to bear weight. Part III identifies a specific
-calculation whose outcome determines whether the weight traces
-to geometry or stops at analysis.
+This document is preparation for the coordinate change
+(TRAVERSE Step 6). Part I is ready to use. Part II identifies
+what would need to be true for the connection language to bear
+weight. Part III identifies a specific calculation whose outcome
+determines whether the weight traces to geometry or stops at
+analysis.
 
 ## Reading outward
 
