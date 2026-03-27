@@ -208,8 +208,8 @@ all match. Whether the cell adjacency within each strip is
 sufficient to place the mantissa subdivision within the Böröczky
 class, or whether it is a different tiling built from the same
 ingredients — and if the latter, whether the treewidth bound
-still holds — is open. See Dragon 7 in
-[HERE-BE-DRAGONS](HERE-BE-DRAGONS.md).
+still holds — is open. See
+[LUCKY-SEVEN-DRAGON](LUCKY-SEVEN-DRAGON.md).
 
 ## §5. The pincer
 
@@ -268,8 +268,8 @@ sharing wall is motivated and disciplined here, not established.
 
 ## Reading outward
 
-- Dragon 7 in [HERE-BE-DRAGONS](HERE-BE-DRAGONS.md): the
-  corona-aliasing argument for finite-configuration machines.
+- [LUCKY-SEVEN-DRAGON](LUCKY-SEVEN-DRAGON.md): the corona-aliasing
+  and treewidth argument for finite-width machines.
 - [TRAVERSE](TRAVERSE.md): the broader traversal of the wall and
   its reformulations.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): the project-wide pressure
