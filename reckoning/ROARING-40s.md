@@ -254,5 +254,5 @@ What is established:
   through Links 1–3.
 - [TRAVERSE](TRAVERSE.md): the route.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): structural doubts.
-- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): some of the geometric
-  infrastructure.
+- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§9–10: some of the
+  geometric infrastructure.

@@ -31,8 +31,7 @@ reckoning/            The intellectual reckoning
   CHARYBDIS.md          Rotation check: is the wall target-driven or subspace-driven?
   ABYSSAL-DOUBT.md      Doubts that shadow the program
   HERE-BE-DRAGONS.md    Speculative extensions (pentagonal tiling, duality)
-  BINADE-WHITECAPS.md   Coordinate scaffold: ε triple identity
-  POINCARE-CURRENTS.md  Displacement field and staircase prediction
+  BINADE-WHITECAPS.md   Coordinate theory, displacement field, and staircase prediction
   PARTITIONS.md         Partition family classification
   GLOSSARY.md           Project terminology
   REFERENCES.md         Literature

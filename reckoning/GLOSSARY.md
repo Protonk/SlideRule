@@ -187,7 +187,7 @@ that processes binary significand bits must absorb this field.
 
 The tiling framework identifies Δ^L as the forcing function that
 organises the wall's coarse structure. See
-[`POINCARE-CURRENTS.md`](POINCARE-CURRENTS.md).
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §9.
 
 ## dyadic
 
@@ -222,7 +222,8 @@ derivative is `ε''(m) = −1/((1+m)² ln 2)`.
 ε is the central function of the project. It has three identities under
 the log₂/mod-1 coordinate system:
 - The surrogate error (DEPARTURE-POINT §7): the cost of using L instead of log₂.
-- The representation displacement field: Δ^L = −ε (POINCARE-CURRENTS.md).
+- The representation displacement field:
+  `Δ^L = −ε` ([BINADE-WHITECAPS](BINADE-WHITECAPS.md) §9).
 - The accumulated departure from the reciprocal density in log-binade
   coordinates: E(t) = ∫₀ᵗ (2^w ln 2 − 1) dw = −ε(φ(t)), where
   φ(t) = 2^t − 1. See [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §6–§7.

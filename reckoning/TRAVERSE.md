@@ -136,7 +136,7 @@ it depends on the representation, not the corrector. Properties:
   geometry.
 
 The shape of the gap governs the cost of closing it. See
-[POINCARE-CURRENTS](POINCARE-CURRENTS.md).
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§9–14.
 
 ## Step 4. The FSM exchange rate [MENEHUNE]
 
@@ -278,10 +278,8 @@ only the geometry of ε or the limitations of a machine class. See
 
 - [DEPARTURE-POINT](DEPARTURE-POINT.md): Day's framework,
   scale-symmetry thesis, four-layer compatibility.
-- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): displacement field,
-  staircase prediction, spectral structure.
 - [BINADE-WHITECAPS](BINADE-WHITECAPS.md): coordinate theory,
-  spectral structure.
+  displacement field, staircase prediction, spectral structure.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): doubts about the wall,
   the forcing-residual gap, the subspace.
 - [INTERRUPTED-LOG](INTERRUPTED-LOG.md): the Step-5 zoo-surgery

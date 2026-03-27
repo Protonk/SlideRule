@@ -107,7 +107,7 @@ recombination.
 - [TRAVERSE](TRAVERSE.md) Step 5: where this stress test enters.
 - [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the separate complexity
   question that this note does not solve.
-- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement field
+- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §9: the displacement field
   the zoo appears to follow.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §5: the non-factoring doubt this
   test does not resolve.

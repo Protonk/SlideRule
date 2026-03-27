@@ -145,7 +145,7 @@ of S, which is architecture-specific.
 
 ### Spectral / mode-count lower bounds
 
-If absorption proceeds by frequency band (POINCARE-CURRENTS §6),
+If absorption proceeds by frequency band (BINADE-WHITECAPS §13),
 the number of resolved modes is an architecture-free count. A
 lower bound on modes needed to achieve tolerance τ would give a
 spectral version of d_comp.
@@ -192,10 +192,9 @@ The weakest nontrivial results that would advance the project:
   (Steps 6–7).
 - [INTERRUPTED-LOG](INTERRUPTED-LOG.md): the narrower zoo-surgery
   stress test for Step 5.
-- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement field
-  and spectral structure.
-- [BINADE-WHITECAPS](BINADE-WHITECAPS.md): the Fourier
-  decomposition of the density defect.
+- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–13: the displacement
+  field, spectral-spatial duality, and the Fourier decomposition of
+  the density defect.
 - [TRAVERSE](TRAVERSE.md): the spine (d_comp is Step 7).
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md): doubts about the wall and
   the subspace.

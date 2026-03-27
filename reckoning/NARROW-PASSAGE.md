@@ -107,7 +107,7 @@ Since L(2^{k/2^d}) = (k/2^d) only when k/2^d is an integer (the
 pseudo-log is exact at powers of 2), the two displacements are
 related by the pseudo-log residual evaluated at the geometric
 point. But the simpler and more useful statement is the one
-already in POINCARE-CURRENTS: the displacement field at the binary
+already in BINADE-WHITECAPS §9: the displacement field at the binary
 grid points is Δ^L_k = −ε(k/2^d), which is the pseudo-log
 residual evaluated at the binary mantissa.
 
@@ -386,9 +386,7 @@ analysis.
   prepares.
 - [COMPLEXITY-REEF](COMPLEXITY-REEF.md) §5: branching program and
   communication complexity routes.
-- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the displacement
-  field.
-- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–8: Fourier
-  structure of the density defect.
+- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–9: the displacement
+  field and Fourier structure of the density defect.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §§1, 4: the fan-out problem
   and the subspace objection.

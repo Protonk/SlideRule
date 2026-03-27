@@ -489,11 +489,10 @@ spectral theories remains open.
 - [ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §4: the doubt this test
   addresses.
 - [TRAVERSE](TRAVERSE.md) Step 2: the wall's [MENEHUNE] status.
-- [POINCARE-CURRENTS](POINCARE-CURRENTS.md): the forcing on the
-  target side.
-- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–8: Fourier analysis
-  on the binade circle (multiplicative/logarithmic side). Distinct
-  from the Walsh analysis here (additive/binary side).
+- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§7–13: the forcing on the
+  target side and the Fourier analysis on the binade circle
+  (multiplicative/logarithmic side). Distinct from the Walsh analysis
+  here (additive/binary side).
 - [COMPLEXITY-REEF](COMPLEXITY-REEF.md): the complexity question
   this test is upstream of.
 - O'Donnell, *Analysis of Boolean Functions* (Cambridge, 2014),

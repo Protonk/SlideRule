@@ -21,11 +21,12 @@ Mathematical source: Dolbilin & Frettlöh, "Properties of Böröczky
 tilings in high-dimensional hyperbolic spaces," *European Journal of
 Combinatorics* 31(4), 2010.
 
-Connection to project: POINCARE-CURRENTS.md identifies the binary (uniform)
-partition as the horocyclic slicing and the geometric partition as the
-geodesic slicing of the same hyperbolic structure. The pentagonal
-variant makes this duality a fact of tiling theory rather than an
-analogy.
+Connection to project:
+[BINADE-WHITECAPS](BINADE-WHITECAPS.md) §9 identifies the binary
+(uniform) partition as the horocyclic slicing and the geometric
+partition as the geodesic slicing of the same hyperbolic structure.
+The pentagonal variant makes this duality a fact of tiling theory
+rather than an analogy.
 
 ---
 
@@ -214,7 +215,7 @@ machine at every sufficient depth. Different machines close
 different parts of the gap, but the gap's existence is forced by
 the tiling.
 
-The stair-location invariance claimed in POINCARE-CURRENTS §5
+The stair-location invariance claimed in BINADE-WHITECAPS §12
 becomes a corollary: stair locations are set by the corona structure
 of the tiling, stair heights vary by architecture, and the ordering
 does not change because it is set by the tail sequence, which is a
@@ -256,7 +257,7 @@ drifting as ambient enthusiasm.
 
 ## Reading outward
 
-- [`POINCARE-CURRENTS.md`](POINCARE-CURRENTS.md): the displacement
+- [BINADE-WHITECAPS](BINADE-WHITECAPS.md) §§9–13: the displacement
   field framework these dragons extend.
 - [`ABYSSAL-DOUBT.md`](ABYSSAL-DOUBT.md): the doubt about whether
   the wall measures the problem or the architecture.
