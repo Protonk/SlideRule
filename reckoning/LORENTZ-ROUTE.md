@@ -10,6 +10,32 @@
 > you're in one."
 > — Hector Barbossa
 
+This document traces the singularity of Minkowski's question mark
+function ?(x) through seven levels of integration machinery, from
+the fundamental theorem of calculus to exhaustive enumeration of
+the Table Maker's Dilemma. Each level fails to dissolve the mutual
+singularity between the additive and multiplicative measures on
+[0,1]. The failures share a cause in the irrationality of ln 2,
+which prevents the binary and Farey subdivisions from ever
+re-aligning. The final section asks whether the sequence of
+failures is itself a structured object.
+
+Prerequisites:
+
+- Lebesgue integration, absolute continuity, and mutual
+  singularity of measures (at the level of Rudin's *Real and
+  Complex Analysis*, chapters 1-6).
+- The Stern-Brocot tree and its relationship to continued
+  fractions and Farey sequences.
+- Minkowski's question mark function ?(x) and the classical
+  result that its distributional measure μ_? is singular with
+  respect to Lebesgue (Salem 1943, Kinney 1960).
+- Familiarity with the Table Maker's Dilemma and the
+  Lefèvre-Muller exhaustive search framework is helpful for §6
+  but not required for §§1-5.
+
+---
+
 Each level of integration machinery adds more infrastructure to
 the same obstruction. From calculus to Riemann to Stieltjes to
 Lebesgue to Padé to exhaustive TMD enumeration, the residual
@@ -24,7 +50,7 @@ finite computations completed, the limit object is still μ_?.
 
 ---
 
-## §1. The floor
+## §1. Measure and integration
 
 Integration requires measure. The curve gives heights; the
 measure gives widths. Without a measure, "area under the curve"
@@ -35,6 +61,22 @@ Statistics also requires measure. The quincunx produces a
 finite discrete distribution at every stage; the limit that
 gives the continuous distribution requires topology (to say
 what convergence means) and measure (to say what density means).
+
+What's available within one binade is the cooperative geometry:
+the binary grid and the logarithmic density align well enough
+that ε is visible as a shape, the coordinate theory works, and
+the displacement field has a clean closed form. Cross a binade
+boundary and the alignment resets — the pseudo-log is piecewise
+linear with a seam at every power of 2, the mantissa coordinate
+restarts, and the geometric inference that works within [1,2)
+does not compose across the boundary without bookkeeping that
+the binary tiling does not support invariantly (Böröczky; see
+[ABYSSAL-DOUBT](ABYSSAL-DOUBT.md) §5).
+
+This document stays with measure and integration because the
+geometric tools that make ε legible are binade-local, while the
+singularity they are chasing is global. Integration is how you
+get from local to global when the geometry won't compose.
 
 ## §2. Progressive failure of integration against ?(x)
 
@@ -299,6 +341,132 @@ computational hope. It does not repeat §6 with larger numbers.
 It asks whether the sequence of first-order failures can itself
 be integrated.
 
+## §8. Deus deceptor
+
+A demon arrives at the bottom of the tower with every result
+from §§1–7 in hand. It knows the tower falls. It knows why.
+It proposes to win anyway.
+
+**Win condition.** The demon wins if it can establish an
+information asymmetry across the boundary between the
+absolutely continuous class and the singular class, and if
+that boundary can carry the information so established. Two
+conditions, chained: asymmetry, then transmission. Without
+asymmetry there is nothing to exploit. With asymmetry but
+without transmission, the demon knows something it cannot use.
+
+**The game.** Play is dyadic on the binary tree. At each node,
+the tree branches into two children — a bit of the mantissa.
+The demon and the measure alternate moves. The demon seeks to
+extract information about ε at a specific leaf (a specific
+input at a specific precision) at a total cost below the
+information content of what it extracts. The measure seeks to
+prevent this.
+
+The demon is Player I. The singular structure of μ_? is
+Player II. The game descends the binary tree, and the
+question at each level is: does the demon's move learn
+anything about ε that it did not already know?
+
+**The handicap.** We grant the demon a specific three-phase
+strategy — the donkey play — and ask whether it suffices.
+
+*Phase 1. The donkey's move.* The demon generates a smooth
+hallucination ε̃: a function on [0,1] with the right general
+shape, the right symmetry under m ↦ 1−m, the right first
+few Fourier modes. The hallucination is absolutely continuous.
+It lives on the smooth continent. Its generation cost is
+O(1) — independent of the precision, independent of the
+depth of the tree. This is a legal opening move. It is not
+immediately catastrophic. It is in book.
+
+*Phase 2. Forced disgorgement.* The demon feeds ε̃ into a
+process that interacts with ε. Not a comparison — the demon
+does not ask "how far is ε̃ from ε?" That question costs as
+much as computing ε. Instead, the process performs its own
+work: rounding, correction, evaluation — whatever engages
+with log₂ at the points where it must. The process responds.
+Its response depends on ε. The response was not elicited by
+the probe; the probe merely created a context in which the
+response becomes legible.
+
+The cost of the disgorgement is borne by the process, not
+by the demon. Recomputing ε to full precision at the relevant
+points would cost what §§6–7 document: exhaustive traversal
+at the given precision, non-transferable across precisions.
+The demon does not pay this. The demon's thesis is that the
+process, forced to act, reveals a residue that costs less to
+read than to produce.
+
+*Phase 3. Stochastic recovery.* The demon reads the response.
+Not the full computation — a partial, noisy, stochastic
+reading. On which side of a rounding boundary did the
+evaluation fall? Which narrow passage was threaded, and in
+which direction? One bit, a few bits, recovered at cost
+O(n) — polynomial in the depth, not exponential, not
+proportional to the cost of recomputation.
+
+This phase is granted generously. We allow the demon
+recovery at polynomial cost of information produced by a
+process whose own cost may be much higher. The demon is
+eavesdropping, not recomputing. Whether this grant is
+coherent — whether the parameters that make the game
+interesting also determine its outcome — is precisely
+what must be established.
+
+**What the demon needs.** With these three phases, the demon
+needs a channel. The asymmetry is between ε̃ (smooth,
+cheap, on the absolutely continuous side) and ε (singular,
+expensive, on the μ_? side). The response to Phase 2 crosses
+the boundary between them. If that crossing carries
+information — if a smooth query can extract singular
+information at any positive rate — the demon iterates,
+improving ε̃ at each round at a cost below the value of
+the improvement.
+
+The bandwidth of the channel determines whether this
+iteration converges. If the channel from singular to smooth
+has positive capacity, the demon has a strategy: probe,
+read, update, repeat. The cost of the strategy is the
+number of rounds times the per-round cost (O(1) + O(n)),
+and the gain per round is the mutual information between
+the probe's response and ε at the relevant points.
+
+If the channel has zero capacity — if mutual singularity
+of μ_? and Lebesgue implies that no smooth observable
+carries information about the singular structure at any
+positive rate — then the demon's strategy fails regardless
+of the number of rounds. The iteration does not converge.
+The handicap does not help.
+
+**The game-theoretic form.** The tradition that adjudicates
+this question is older than information theory. Borel
+(1921) proved results about the structure of sets by
+showing that no strategy wins against them. Banach and
+Mazur (~1935) formalized this: two players alternately
+choose nested intervals, and the determinacy of the game
+encodes whether the target set is meager. Martin (1975)
+proved that all Borel games are determined.
+
+In this tradition, the result is not computed. It is
+proved by showing that Player II — the structure of the
+set — has a winning strategy against every possible
+strategy of Player I. Not against a specific attack, but
+against all conceivable attacks. The demon's cleverness is
+not a variable. The underhandedness of the strategy is
+irrelevant. If the game is determined and Player II wins,
+Player II wins against arbitrarily sophisticated play.
+
+The game on the binary tree, with the demon as Player I
+and μ_? as Player II, asks: can the demon, by any sequence
+of moves — random probes, forced disgorgements, stochastic
+recoveries, iterated updates — extract enough information
+about ε to cross from the absolutely continuous side to the
+singular side at finite total cost?
+
+Determinacy says: either the demon has a winning strategy
+or the measure does. There is no draw.
+
 ---
 
 ## Status
@@ -327,6 +495,20 @@ failures themselves form a higher-order object. If they do,
 that object still has to land either in a descriptive theory of
 the table family or in the same singular limit already present
 in §4.
+
+§8: The game is formulated. Its determinacy follows
+from Martin's theorem (the target set — the support of
+μ_? intersected with the leaves of the tree at precision
+p — is Borel). What is not established is the
+identification of the game's outcome with the
+information-theoretic claim: that mutual singularity
+implies zero channel capacity across the smooth/singular
+boundary. That identification is the computational face
+of the project's central conjecture. Geometry says the
+grids are incommensurable. Numerics says the spectral
+structure of ε controls the cost. Computation must say:
+the channel the demon needs does not exist.
+
 
 ---
 

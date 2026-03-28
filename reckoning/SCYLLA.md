@@ -9,7 +9,7 @@ read the bit string with positional weights and compute the
 affine pseudo-logarithm exactly.
 
 This document follows that objection to its conclusion and then
-closes the other jaw. The unbounded accumulator faces a
+closes the pincer. The unbounded accumulator faces a
 polynomial correction wall (§§1–4). The finite-width machine
 faces a treewidth wall forced by the combinatorial structure of
 the binary tiling (§§5–7). No single architecture evades both
